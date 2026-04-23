@@ -1,0 +1,21 @@
+export const posProducts = [
+  { id: 'p1', name: 'iPhone 15 Pro 256GB', sku: 'APL-IP15P-256', price: 12500, stock: 4, category: 'Apple', image: 'https://readdy.ai/api/search-image?query=iPhone%2015%20Pro%20titanium%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos1&orientation=squarish' },
+  { id: 'p2', name: 'Samsung S24 Ultra 256GB', sku: 'SAM-S24U-256', price: 12800, stock: 3, category: 'Samsung', image: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20S24%20Ultra%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos2&orientation=squarish' },
+  { id: 'p3', name: 'iPhone 14 128GB', sku: 'APL-IP14-128', price: 8200, stock: 6, category: 'Apple', image: 'https://readdy.ai/api/search-image?query=iPhone%2014%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos3&orientation=squarish' },
+  { id: 'p4', name: 'Redmi Note 13 Pro 256GB', sku: 'XMI-RN13P-256', price: 2800, stock: 12, category: 'Xiaomi', image: 'https://readdy.ai/api/search-image?query=Redmi%20Note%2013%20Pro%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos4&orientation=squarish' },
+  { id: 'p5', name: 'Samsung A55 5G 128GB', sku: 'SAM-A55-128', price: 3400, stock: 8, category: 'Samsung', image: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20A55%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos5&orientation=squarish' },
+  { id: 'p6', name: 'Google Pixel 8 Pro 256GB', sku: 'GOO-PX8P-256', price: 9800, stock: 2, category: 'Google', image: 'https://readdy.ai/api/search-image?query=Google%20Pixel%208%20Pro%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos6&orientation=squarish' },
+  { id: 'p7', name: 'iPhone 15 128GB', sku: 'APL-IP15-128', price: 10200, stock: 5, category: 'Apple', image: 'https://readdy.ai/api/search-image?query=iPhone%2015%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos7&orientation=squarish' },
+  { id: 'p8', name: 'Tecno Camon 30 Pro', sku: 'TEC-C30P-256', price: 1800, stock: 15, category: 'Tecno', image: 'https://readdy.ai/api/search-image?query=Tecno%20Camon%20smartphone%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos8&orientation=squarish' },
+  { id: 'p9', name: 'Apple AirPods Pro 2', sku: 'APL-APP2', price: 1800, stock: 9, category: 'Accessories', image: 'https://readdy.ai/api/search-image?query=Apple%20AirPods%20Pro%202%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos9&orientation=squarish' },
+  { id: 'p10', name: 'Samsung 25W Fast Charger', sku: 'SAM-CHG-25W', price: 120, stock: 30, category: 'Accessories', image: 'https://readdy.ai/api/search-image?query=Samsung%20fast%20charger%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos10&orientation=squarish' },
+  { id: 'p11', name: 'Tempered Glass Screen Protector', sku: 'ACC-TG-UNI', price: 35, stock: 100, category: 'Accessories', image: 'https://readdy.ai/api/search-image?query=tempered%20glass%20screen%20protector%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos11&orientation=squarish' },
+  { id: 'p12', name: 'Phone Case - Universal', sku: 'ACC-CASE-UNI', price: 45, stock: 80, category: 'Accessories', image: 'https://readdy.ai/api/search-image?query=phone%20case%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos12&orientation=squarish' },
+];
+
+export const posRecentSales = [
+  { id: 'R001', customer: 'Kwame Asante', items: 'iPhone 15 Pro + AirPods Pro', total: 14300, method: 'MoMo', time: '10:42 AM' },
+  { id: 'R002', customer: 'Ama Owusu', items: 'Samsung S24 Ultra', total: 12800, method: 'Cash', time: '10:15 AM' },
+  { id: 'R003', customer: 'Kofi Mensah', items: 'Redmi Note 13 Pro x2', total: 5600, method: 'Card', time: '09:50 AM' },
+  { id: 'R004', customer: 'Walk-in Customer', items: 'Screen Protector x3 + Case', total: 150, method: 'Cash', time: '09:30 AM' },
+];

@@ -1,0 +1,176 @@
+import { useState } from 'react';
+import AdminLayout from '@/components/feature/AdminLayout';
+import { customers, customerStats } from '@/mocks/customers';
+
+const segmentConfig: Record<string, { label: string; color: string }> = {
+  VIP: { label: 'VIP', color: 'bg-amber-100 text-amber-700' },
+  Repeat: { label: 'Repeat', color: 'bg-blue-100 text-blue-700' },
+  New: { label: 'New', color: 'bg-emerald-100 text-emerald-700' },
+  'At-Risk': { label: 'At-Risk', color: 'bg-red-100 text-red-600' },
+};
+
+export default function CustomersPage() {
+  const [filter, setFilter] = useState('all');
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const filtered = customers.filter((c) => filter === 'all' || c.segment === filter);
+  const customer = selected ? customers.find((c) => c.id === selected) : null;
+
+  return (
+    <AdminLayout title="Customers" subtitle="Profiles, segments, and lifetime value">
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+        {customerStats.map((s) => (
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-slate-100 relative overflow-hidden">
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.accent} rounded-l-2xl`} />
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{s.label}</p>
+                <p className="text-2xl font-bold text-slate-800 mt-1">{s.value}</p>
+                <p className="text-xs text-emerald-600 font-medium mt-1">{s.change}</p>
+              </div>
+              <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+                <i className={`${s.icon} text-lg`} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5">
+        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 flex-1 max-w-sm">
+          <div className="w-4 h-4 flex items-center justify-center text-slate-400">
+            <i className="ri-search-line text-sm" />
+          </div>
+          <input type="text" placeholder="Search customers..." className="bg-transparent text-sm text-slate-600 outline-none w-full" />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {['all', 'VIP', 'Repeat', 'New', 'At-Risk'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+                filter === f ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              {f === 'all' ? 'All' : f}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Customer Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filtered.map((c) => {
+          const seg = segmentConfig[c.segment];
+          return (
+            <div
+              key={c.id}
+              onClick={() => setSelected(c.id)}
+              className="bg-white rounded-2xl p-5 border border-slate-100 hover:shadow-md hover:border-slate-200 transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${c.segment === 'VIP' ? 'bg-amber-500' : c.segment === 'At-Risk' ? 'bg-red-500' : 'bg-emerald-500'}`}>
+                  {c.avatar || c.name[0]}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-slate-800 truncate">{c.name}</p>
+                  <p className="text-[10px] text-slate-400">{c.phone}</p>
+                </div>
+                <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${seg.color}`}>{seg.label}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div className="bg-slate-50 rounded-xl p-2.5">
+                  <p className="text-[10px] text-slate-400">LTV</p>
+                  <p className="text-sm font-bold text-slate-800">{c.ltv}</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-2.5">
+                  <p className="text-[10px] text-slate-400">Orders</p>
+                  <p className="text-sm font-bold text-slate-800">{c.orders}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-slate-400">
+                <span>Since {c.since}</span>
+                <span>Last: {c.lastOrder}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Detail Panel */}
+      {customer && (
+        <div className="fixed inset-0 bg-black/30 z-50" onClick={() => setSelected(null)}>
+          <div className="absolute right-0 top-0 bottom-0 w-[420px] bg-white shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-sm font-semibold text-slate-800">Customer Profile</h3>
+                <button onClick={() => setSelected(null)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 cursor-pointer">
+                  <i className="ri-close-line text-base" />
+                </button>
+              </div>
+              <div className="flex items-center gap-3 mb-5">
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-bold ${customer.segment === 'VIP' ? 'bg-amber-500' : customer.segment === 'At-Risk' ? 'bg-red-500' : 'bg-emerald-500'}`}>
+                  {customer.name[0]}
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-slate-900">{customer.name}</h4>
+                  <p className="text-xs text-slate-400">{customer.phone}</p>
+                  <p className="text-xs text-slate-400">{customer.email}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 mb-5">
+                <div className="bg-slate-50 rounded-xl p-3 text-center">
+                  <p className="text-lg font-bold text-slate-800">{customer.ltv}</p>
+                  <p className="text-[10px] text-slate-400">Lifetime Value</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-3 text-center">
+                  <p className="text-lg font-bold text-slate-800">{customer.orders}</p>
+                  <p className="text-[10px] text-slate-400">Orders</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-3 text-center">
+                  <p className="text-lg font-bold text-slate-800">{customer.avgOrder}</p>
+                  <p className="text-[10px] text-slate-400">Avg Order</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 mb-5">
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Segment</span>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${segmentConfig[customer.segment].color}`}>{customer.segment}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Customer Since</span>
+                  <span className="text-xs font-medium text-slate-800">{customer.since}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Last Order</span>
+                  <span className="text-xs font-medium text-slate-800">{customer.lastOrder}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Active Warranties</span>
+                  <span className="text-xs font-medium text-slate-800">{customer.warranties}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Repair History</span>
+                  <span className="text-xs font-medium text-slate-800">{customer.repairs} repairs</span>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button className="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap">
+                  Send Offer
+                </button>
+                <button className="flex-1 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
+                  Message
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </AdminLayout>
+  );
+}

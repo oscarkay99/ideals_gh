@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --brand-primary: #1E5FBE;
+  --brand-primary-dark: #154290;
+  --brand-primary-deeper: #0A1F4A;
+  --brand-gold: #F5A623;
+  --brand-gold-dark: #D97706;
+  --brand-bg: #F0F4FA;
+}
+
+/* Brand primary button utility */
+.btn-brand {
+  background: var(--brand-primary);
+  color: white;
+  transition: opacity 0.15s;
+}
+.btn-brand:hover { opacity: 0.9; }
+
+.btn-gold {
+  background: var(--brand-gold);
+  color: white;
+  transition: opacity 0.15s;
+}
+.btn-gold:hover { opacity: 0.9; }
+
+* {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

@@ -1,0 +1,211 @@
+import { useState } from 'react';
+import AdminLayout from '@/components/feature/AdminLayout';
+import { inventoryProducts, inventoryStats } from '@/mocks/inventory';
+
+const conditionConfig: Record<string, { label: string; color: string; dot: string }> = {
+  'New': { label: 'New', color: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' },
+  'Used - Excellent': { label: 'Used — Excellent', color: 'bg-blue-100 text-blue-700', dot: 'bg-blue-500' },
+  'Used - Good': { label: 'Used — Good', color: 'bg-slate-100 text-slate-600', dot: 'bg-slate-400' },
+  'Refurbished': { label: 'Refurbished', color: 'bg-amber-100 text-amber-700', dot: 'bg-amber-500' },
+};
+
+export default function InventoryPage() {
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const filtered = inventoryProducts.filter((p) => {
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === 'all' || p.condition === filter || (filter === 'low' && p.stock <= 2) || (filter === 'out' && p.stock === 0);
+    return matchSearch && matchFilter;
+  });
+
+  const product = selected ? inventoryProducts.find((p) => p.id === selected) : null;
+
+  return (
+    <AdminLayout title="Inventory" subtitle="Manage products, stock, and suppliers">
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+        {inventoryStats.map((s) => (
+          <div key={s.label} className="bg-white rounded-2xl p-5 border border-slate-100 relative overflow-hidden">
+            <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.accent} rounded-l-2xl`} />
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{s.label}</p>
+                <p className="text-2xl font-bold text-slate-800 mt-1">{s.value}</p>
+                <p className="text-xs text-emerald-600 font-medium mt-1">{s.change}</p>
+              </div>
+              <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
+                <i className={`${s.icon} text-lg`} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5">
+        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-2 flex-1 max-w-sm">
+          <div className="w-4 h-4 flex items-center justify-center text-slate-400">
+            <i className="ri-search-line text-sm" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-transparent text-sm text-slate-600 outline-none w-full"
+          />
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {['all', 'New', 'Used - Excellent', 'Refurbished', 'low', 'out'].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap capitalize ${
+                filter === f ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+              }`}
+            >
+              {f === 'all' ? 'All' : f === 'low' ? 'Low Stock' : f === 'out' ? 'Out of Stock' : f}
+            </button>
+          ))}
+        </div>
+        <button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap">
+          <div className="w-4 h-4 flex items-center justify-center">
+            <i className="ri-add-line text-sm" />
+          </div>
+          Add Product
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                {['Product', 'Condition', 'Price', 'Stock', 'Location', 'Supplier', 'Actions'].map((h) => (
+                  <th key={h} className="text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-3 whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p, i) => {
+                const cond = conditionConfig[p.condition] || conditionConfig['New'];
+                return (
+                  <tr key={p.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/20'}`}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0">
+                          <i className="ri-smartphone-line text-lg" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-800">{p.name}</p>
+                          <p className="text-[10px] text-slate-400">{p.id} · {p.category}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <div className={`w-1.5 h-1.5 rounded-full ${cond.dot}`} />
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${cond.color}`}>{cond.label}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-xs font-bold text-slate-800">{p.price}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden w-16">
+                          <div
+                            className={`h-full rounded-full ${p.stock === 0 ? 'bg-red-400' : p.stock <= 2 ? 'bg-amber-400' : 'bg-emerald-500'}`}
+                            style={{ width: `${Math.min((p.stock / 10) * 100, 100)}%` }}
+                          />
+                        </div>
+                        <span className={`text-xs font-medium ${p.stock === 0 ? 'text-red-500' : p.stock <= 2 ? 'text-amber-600' : 'text-slate-600'}`}>{p.stock}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-slate-600">{p.location}</td>
+                    <td className="px-4 py-3 text-xs text-slate-600">{p.supplier}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => setSelected(p.id)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
+                          <i className="ri-eye-line text-sm" />
+                        </button>
+                        <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
+                          <i className="ri-edit-line text-sm" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Detail Panel */}
+      {product && (
+        <div className="fixed inset-0 bg-black/30 z-50" onClick={() => setSelected(null)}>
+          <div className="absolute right-0 top-0 bottom-0 w-[400px] bg-white shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-sm font-semibold text-slate-800">Product Details</h3>
+                <button onClick={() => setSelected(null)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 cursor-pointer">
+                  <i className="ri-close-line text-base" />
+                </button>
+              </div>
+              <div className="w-full h-40 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+                <i className="ri-smartphone-line text-4xl text-slate-300" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900 mb-1">{product.name}</h4>
+              <p className="text-xs text-slate-400 mb-4">{product.id} · {product.category}</p>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-slate-50 rounded-xl p-3">
+                  <p className="text-[10px] text-slate-400 uppercase">Price</p>
+                  <p className="text-sm font-bold text-slate-800">{product.price}</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-3">
+                  <p className="text-[10px] text-slate-400 uppercase">Stock</p>
+                  <p className={`text-sm font-bold ${product.stock === 0 ? 'text-red-500' : product.stock <= 2 ? 'text-amber-600' : 'text-slate-800'}`}>{product.stock} units</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-3">
+                  <p className="text-[10px] text-slate-400 uppercase">IMEI / Serial</p>
+                  <p className="text-xs font-mono text-slate-700">{product.imei}</p>
+                </div>
+                <div className="bg-slate-50 rounded-xl p-3">
+                  <p className="text-[10px] text-slate-400 uppercase">Location</p>
+                  <p className="text-xs text-slate-700">{product.location}</p>
+                </div>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Supplier</span>
+                  <span className="text-xs font-medium text-slate-800">{product.supplier}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Last Restocked</span>
+                  <span className="text-xs font-medium text-slate-800">{product.lastRestocked}</span>
+                </div>
+                <div className="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span className="text-xs text-slate-500">Fast Mover</span>
+                  <span className={`text-xs font-medium ${product.fastMover ? 'text-emerald-600' : 'text-slate-400'}`}>{product.fastMover ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button className="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap">
+                  Edit Product
+                </button>
+                <button className="flex-1 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
+                  Restock
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </AdminLayout>
+  );
+}
