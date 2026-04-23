@@ -72,7 +72,7 @@ export default function CustomersPage() {
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold ${c.segment === 'VIP' ? 'bg-amber-500' : c.segment === 'At-Risk' ? 'bg-red-500' : 'bg-emerald-500'}`}>
-                  {c.avatar || c.name[0]}
+                  {c.name[0]}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-800 truncate">{c.name}</p>

@@ -34,7 +34,7 @@ const modules = [
 
 export default function SignInPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, resetPassword, isSupabaseAuth } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -54,8 +54,7 @@ export default function SignInPage() {
     if (!email || !password) { setError('Please fill in all fields'); return; }
     setLoading(true);
     setError('');
-    await new Promise(r => setTimeout(r, 900));
-    const result = login(email, password);
+    const result = await login(email, password);
     setLoading(false);
     if (result.success) {
       setLoginSuccess(true);
@@ -72,9 +71,13 @@ export default function SignInPage() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail)) { setForgotError('Please enter a valid email address'); return; }
     setForgotLoading(true);
     setForgotError('');
-    await new Promise(r => setTimeout(r, 1200));
+    const result = await resetPassword(forgotEmail);
     setForgotLoading(false);
-    setView('reset_sent');
+    if (result.success) {
+      setView('reset_sent');
+      return;
+    }
+    setForgotError(result.error || 'Unable to send reset link');
   };
 
   const quickLogin = (userEmail: string, userPassword: string) => {
@@ -172,7 +175,7 @@ export default function SignInPage() {
                 <div>
                   <label className="text-xs font-semibold text-white/50 block mb-2">Email Address</label>
                   <div className={`relative rounded-xl transition-all duration-200 ${emailFocused ? 'ring-2' : ''}`}
-                    style={emailFocused ? { ringColor: '#1E5FBE' } : {}}>
+                    style={emailFocused ? { outline: '2px solid #1E5FBE' } : {}}>
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                       <i className={`ri-mail-line text-sm transition-colors ${emailFocused ? '' : 'text-white/30'}`} style={emailFocused ? { color: '#F5A623' } : {}} />
                     </div>
@@ -259,42 +262,45 @@ export default function SignInPage() {
               </form>
 
               {/* Divider */}
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
-                <span className="text-[10px] text-white/25 uppercase tracking-wider">Demo Accounts</span>
-                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
-              </div>
+              {!isSupabaseAuth && (
+                <>
+                  <div className="flex items-center gap-3 my-5">
+                    <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+                    <span className="text-[10px] text-white/25 uppercase tracking-wider">Demo Accounts</span>
+                    <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+                  </div>
 
-              {/* Quick Login */}
-              <div className="space-y-2">
-                {[
-                  { name: 'Kwame Asante', role: 'Admin', email: 'admin@idealstechhub.com', password: 'admin123', avatar: 'KA', color: '#1E5FBE' },
-                  { name: 'Kofi Mensah', role: 'Sales Manager', email: 'kofi@idealstechhub.com', password: 'kofi123', avatar: 'KM', color: '#F5A623' },
-                  { name: 'Ama Owusu', role: 'Technician', email: 'ama@idealstechhub.com', password: 'ama123', avatar: 'AO', color: '#E05A2B' },
-                ].map(u => (
-                  <button
-                    key={u.email}
-                    type="button"
-                    onClick={() => quickLogin(u.email, u.password)}
-                    className="w-full flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left group"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-                  >
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0" style={{ background: u.color }}>
-                      {u.avatar}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-white/80">{u.name}</p>
-                      <p className="text-[10px] text-white/35">{u.role}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] text-white/25 font-mono hidden group-hover:block">{u.password}</span>
-                      <i className="ri-arrow-right-line text-white/20 text-sm group-hover:text-white/50 transition-colors" />
-                    </div>
-                  </button>
-                ))}
-              </div>
+                  <div className="space-y-2">
+                    {[
+                      { name: 'Kwame Asante', role: 'Admin', email: 'admin@idealstechhub.com', password: 'admin123', avatar: 'KA', color: '#1E5FBE' },
+                      { name: 'Kofi Mensah', role: 'Sales Manager', email: 'kofi@idealstechhub.com', password: 'kofi123', avatar: 'KM', color: '#F5A623' },
+                      { name: 'Ama Owusu', role: 'Technician', email: 'ama@idealstechhub.com', password: 'ama123', avatar: 'AO', color: '#E05A2B' },
+                    ].map(u => (
+                      <button
+                        key={u.email}
+                        type="button"
+                        onClick={() => quickLogin(u.email, u.password)}
+                        className="w-full flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left group"
+                        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                      >
+                        <div className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0" style={{ background: u.color }}>
+                          {u.avatar}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-white/80">{u.name}</p>
+                          <p className="text-[10px] text-white/35">{u.role}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] text-white/25 font-mono hidden group-hover:block">{u.password}</span>
+                          <i className="ri-arrow-right-line text-white/20 text-sm group-hover:text-white/50 transition-colors" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
 
               <p className="text-center text-[11px] text-white/20 mt-6">
                 Having trouble? Contact your system administrator.
@@ -375,8 +381,12 @@ export default function SignInPage() {
                 <div className="flex items-start gap-2">
                   <i className="ri-information-line text-sm mt-0.5" style={{ color: '#F5A623' }} />
                   <div>
-                    <p className="text-xs font-semibold mb-0.5" style={{ color: '#F5A623' }}>Demo Mode</p>
-                    <p className="text-xs text-white/40">This is a simulated reset. In production, a real email would be sent. Contact your system administrator to reset your password.</p>
+                    <p className="text-xs font-semibold mb-0.5" style={{ color: '#F5A623' }}>{isSupabaseAuth ? 'Supabase Connected' : 'Demo Mode'}</p>
+                    <p className="text-xs text-white/40">
+                      {isSupabaseAuth
+                        ? 'If your Supabase project is configured to send auth emails, the reset link has been dispatched.'
+                        : 'This is a simulated reset. In production, a real email would be sent. Contact your system administrator to reset your password.'}
+                    </p>
                   </div>
                 </div>
               </div>

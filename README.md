@@ -100,6 +100,17 @@ npm run dev
 
 The application will be available at `http://localhost:5173`
 
+### Supabase
+
+Create a `.env.local` file with:
+
+```bash
+VITE_SUPABASE_URL=your-project-url
+VITE_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+The frontend can connect with those public credentials. To create the database schema, apply [`supabase/migrations/20260423_init_core.sql`](supabase/migrations/20260423_init_core.sql) in the Supabase SQL editor or through the Supabase CLI.
+
 ### Build for Production
 
 ```bash

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { useAuth } from '@/hooks/useAuth';
-import { roleLabels, roleColors, rolePermissions, allPermissions } from '@/mocks/users';
+import { roleLabels, roleColors, rolePermissions } from '@/mocks/users';
 import type { UserRole } from '@/hooks/useAuth';
 
 const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
