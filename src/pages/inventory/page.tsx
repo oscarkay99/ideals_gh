@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { inventoryProducts, inventoryStats } from '@/mocks/inventory';
+import ProductDetail from './components/ProductDetail';
 
 const conditionConfig: Record<string, { label: string; color: string; dot: string }> = {
   'New': { label: 'New', color: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' },
@@ -143,69 +144,7 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Detail Panel */}
-      {product && (
-        <div className="fixed inset-0 bg-black/30 z-50" onClick={() => setSelected(null)}>
-          <div className="absolute right-0 top-0 bottom-0 w-[400px] bg-white shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-sm font-semibold text-slate-800">Product Details</h3>
-                <button onClick={() => setSelected(null)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 cursor-pointer">
-                  <i className="ri-close-line text-base" />
-                </button>
-              </div>
-              <div className="w-full h-40 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-                <i className="ri-smartphone-line text-4xl text-slate-300" />
-              </div>
-              <h4 className="text-base font-bold text-slate-900 mb-1">{product.name}</h4>
-              <p className="text-xs text-slate-400 mb-4">{product.id} · {product.category}</p>
-
-              <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="bg-slate-50 rounded-xl p-3">
-                  <p className="text-[10px] text-slate-400 uppercase">Price</p>
-                  <p className="text-sm font-bold text-slate-800">{product.price}</p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-3">
-                  <p className="text-[10px] text-slate-400 uppercase">Stock</p>
-                  <p className={`text-sm font-bold ${product.stock === 0 ? 'text-red-500' : product.stock <= 2 ? 'text-amber-600' : 'text-slate-800'}`}>{product.stock} units</p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-3">
-                  <p className="text-[10px] text-slate-400 uppercase">IMEI / Serial</p>
-                  <p className="text-xs font-mono text-slate-700">{product.imei}</p>
-                </div>
-                <div className="bg-slate-50 rounded-xl p-3">
-                  <p className="text-[10px] text-slate-400 uppercase">Location</p>
-                  <p className="text-xs text-slate-700">{product.location}</p>
-                </div>
-              </div>
-
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between py-2 border-b border-slate-50">
-                  <span className="text-xs text-slate-500">Supplier</span>
-                  <span className="text-xs font-medium text-slate-800">{product.supplier}</span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-slate-50">
-                  <span className="text-xs text-slate-500">Last Restocked</span>
-                  <span className="text-xs font-medium text-slate-800">{product.lastRestocked}</span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b border-slate-50">
-                  <span className="text-xs text-slate-500">Fast Mover</span>
-                  <span className={`text-xs font-medium ${product.fastMover ? 'text-emerald-600' : 'text-slate-400'}`}>{product.fastMover ? 'Yes' : 'No'}</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <button className="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap">
-                  Edit Product
-                </button>
-                <button className="flex-1 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
-                  Restock
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {product && <ProductDetail product={product} onClose={() => setSelected(null)} />}
     </AdminLayout>
   );
 }

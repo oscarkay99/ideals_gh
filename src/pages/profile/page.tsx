@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { useAuth } from '@/hooks/useAuth';
-import { roleLabels, roleColors, rolePermissions, allPermissions } from '@/mocks/users';
+import { roleLabels, roleColors, rolePermissions } from '@/mocks/users';
 import type { UserRole } from '@/hooks/useAuth';
+import { canAccessModule } from '@/utils/access';
+import { isSupabaseConfigured, supabase } from '@/services/supabase';
 
 const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
@@ -37,10 +39,16 @@ export default function ProfilePage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   const roleColor = user?.role ? roleColors[user.role] : '#1E5FBE';
   const roleLabel = user?.role ? roleLabels[user.role] : 'User';
   const userPermissions = user?.role ? rolePermissions[user.role] : [];
+  const quickActions = [
+    { label: 'Go to Dashboard', icon: 'ri-dashboard-3-line', path: '/', module: 'Dashboard' as const },
+    { label: 'User Management', icon: 'ri-user-settings-line', path: '/users', module: 'Users' as const },
+    { label: 'System Settings', icon: 'ri-settings-4-line', path: '/settings', module: 'Settings' as const },
+  ].filter((item) => canAccessModule(user?.role, item.module));
 
   const handleSaveProfile = () => {
     setSaved(true);
@@ -48,11 +56,37 @@ export default function ProfilePage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     setPasswordError('');
     if (!currentPassword) { setPasswordError('Please enter your current password'); return; }
-    if (newPassword.length < 6) { setPasswordError('New password must be at least 6 characters'); return; }
+    if (newPassword.length < 10) { setPasswordError('New password must be at least 10 characters'); return; }
     if (newPassword !== confirmPassword) { setPasswordError('Passwords do not match'); return; }
+    setPasswordLoading(true);
+
+    if (isSupabaseConfigured && user?.email) {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        setPasswordLoading(false);
+        setPasswordError('Current password is incorrect');
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) {
+        setPasswordLoading(false);
+        setPasswordError(updateError.message);
+        return;
+      }
+    }
+
+    setPasswordLoading(false);
     setPasswordSuccess(true);
     setCurrentPassword('');
     setNewPassword('');
@@ -128,11 +162,7 @@ export default function ProfilePage() {
           <div className="bg-white rounded-2xl border border-slate-100 p-4">
             <p className="text-xs font-bold text-slate-700 mb-3">Quick Actions</p>
             <div className="space-y-1">
-              {[
-                { label: 'Go to Dashboard', icon: 'ri-dashboard-3-line', path: '/' },
-                { label: 'User Management', icon: 'ri-user-settings-line', path: '/users' },
-                { label: 'System Settings', icon: 'ri-settings-4-line', path: '/settings' },
-              ].map(item => (
+              {quickActions.map(item => (
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
@@ -362,7 +392,7 @@ export default function ProfilePage() {
                   <div className="bg-slate-50 rounded-xl p-3">
                     <p className="text-[10px] text-slate-500 font-semibold mb-1">Password Requirements</p>
                     {[
-                      { rule: 'At least 6 characters', met: newPassword.length >= 6 },
+                      { rule: 'At least 10 characters', met: newPassword.length >= 10 },
                       { rule: 'At least one uppercase letter', met: /[A-Z]/.test(newPassword) },
                       { rule: 'At least one number', met: /[0-9]/.test(newPassword) },
                       { rule: 'At least one special character', met: /[^A-Za-z0-9]/.test(newPassword) },
@@ -376,10 +406,11 @@ export default function ProfilePage() {
 
                   <button
                     onClick={handleChangePassword}
-                    className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap"
+                    disabled={passwordLoading}
+                    className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap disabled:opacity-60"
                     style={{ background: 'linear-gradient(135deg, #0A1F4A, #1E5FBE)' }}
                   >
-                    Update Password
+                    {passwordLoading ? 'Updating Password...' : 'Update Password'}
                   </button>
                 </div>
               </div>

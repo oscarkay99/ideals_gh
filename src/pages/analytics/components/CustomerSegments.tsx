@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { customerSegmentData } from '@/mocks/analytics';
 
 const segmentColors: Record<string, { bg: string; text: string; dot: string }> = {
@@ -8,6 +9,7 @@ const segmentColors: Record<string, { bg: string; text: string; dot: string }> =
 };
 
 export default function CustomerSegments() {
+  const navigate = useNavigate();
   const total = customerSegmentData.reduce((s, c) => s + c.count, 0);
 
   return (
@@ -17,7 +19,7 @@ export default function CustomerSegments() {
           <h3 className="text-sm font-bold text-slate-800">Customer Segments</h3>
           <p className="text-xs text-slate-400 mt-0.5">{total} total customers</p>
         </div>
-        <button className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium">View all</button>
+        <button onClick={() => navigate('/customers')} className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium">View all</button>
       </div>
 
       {/* Stacked bar */}

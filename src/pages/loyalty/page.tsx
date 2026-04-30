@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { loyaltyTiers, loyaltyCustomers, loyaltyRewards, loyaltyStats } from '@/mocks/loyalty';
+import RedeemModal from './components/RedeemModal';
 
 const tabs = ['Members', 'Tiers', 'Rewards', 'Analytics'];
 
@@ -206,60 +207,14 @@ export default function LoyaltyPage() {
         </div>
       )}
 
-      {/* Redeem Modal */}
       {showRedeem && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-800">Redeem Points</h3>
-              <button onClick={() => setShowRedeem(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer">
-                <i className="ri-close-line text-slate-400" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Select Member</label>
-                <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
-                  <option>Choose member...</option>
-                  {loyaltyCustomers.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name} — {c.points.toLocaleString()} pts ({c.tier})</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Select Reward</label>
-                <select
-                  className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                  value={selectedReward}
-                  onChange={(e) => setSelectedReward(e.target.value)}
-                >
-                  <option value="">Choose reward...</option>
-                  {loyaltyRewards.map((r) => (
-                    <option key={r.id} value={r.id}>{r.name} — {r.points.toLocaleString()} pts</option>
-                  ))}
-                </select>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-slate-500">Current Points</span>
-                  <span className="font-semibold text-slate-700">8,200</span>
-                </div>
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-slate-500">Cost</span>
-                  <span className="font-semibold text-slate-700">-5,000</span>
-                </div>
-                <div className="h-px bg-slate-200 my-1" />
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-500">Remaining</span>
-                  <span className="font-semibold" style={{ color: '#F5A623' }}>3,200</span>
-                </div>
-              </div>
-              <button onClick={() => setShowRedeem(false)} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#F5A623' }}>
-                Confirm Redemption
-              </button>
-            </div>
-          </div>
-        </div>
+        <RedeemModal
+          customers={loyaltyCustomers}
+          rewards={loyaltyRewards}
+          selectedReward={selectedReward}
+          onRewardChange={setSelectedReward}
+          onClose={() => setShowRedeem(false)}
+        />
       )}
     </AdminLayout>
   );

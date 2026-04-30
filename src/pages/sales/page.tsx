@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { salesStats, recentSales, cartProducts } from '@/mocks/sales';
+import CartPanel from './components/CartPanel';
+import QuoteModal from './components/QuoteModal';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-700' },
@@ -90,10 +92,10 @@ export default function SalesPage() {
           </div>
 
           {/* Recent Sales */}
-          <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+          <div id="recent-sales-table" className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
             <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-slate-800">Recent Sales</h3>
-              <button className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer">View all</button>
+              <button onClick={() => document.getElementById('recent-sales-table')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer">View all</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -133,165 +135,30 @@ export default function SalesPage() {
 
         {/* Cart Panel */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl border border-slate-100 p-5 sticky top-20">
-            <h3 className="text-sm font-semibold text-slate-800 mb-4">Current Sale</h3>
-
-            {cartItems.length === 0 ? (
-              <div className="text-center py-8">
-                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 mx-auto mb-3">
-                  <i className="ri-shopping-cart-line text-xl text-slate-300" />
-                </div>
-                <p className="text-xs text-slate-400">Add products to start a sale</p>
-              </div>
-            ) : (
-              <>
-                <div className="space-y-3 mb-4">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                      <div className="w-10 h-10 rounded-lg bg-white overflow-hidden flex-shrink-0">
-                        <img src={item.image} alt={item.name} className="w-full h-full object-cover object-top" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-slate-800 truncate">{item.name}</p>
-                        <p className="text-[10px] text-slate-400">GHS {item.price.toLocaleString()} each</p>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => updateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-200 text-slate-500 cursor-pointer">
-                          <i className="ri-subtract-line text-xs" />
-                        </button>
-                        <span className="w-5 text-center text-xs font-semibold">{item.qty}</span>
-                        <button onClick={() => updateQty(item.id, item.qty + 1)} className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-200 text-slate-500 cursor-pointer">
-                          <i className="ri-add-line text-xs" />
-                        </button>
-                      </div>
-                      <button onClick={() => removeFromCart(item.id)} className="w-6 h-6 flex items-center justify-center text-slate-300 hover:text-red-400 cursor-pointer">
-                        <i className="ri-close-line text-xs" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Delivery */}
-                <div className="mb-4">
-                  <p className="text-xs text-slate-500 mb-2">Delivery Method</p>
-                  <div className="flex gap-2">
-                    {(['pickup', 'delivery'] as const).map((d) => (
-                      <button
-                        key={d}
-                        onClick={() => setDelivery(d)}
-                        className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer whitespace-nowrap capitalize ${
-                          delivery === d ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-500 hover:bg-slate-100'
-                        }`}
-                      >
-                        {d}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Payment */}
-                <div className="mb-4">
-                  <p className="text-xs text-slate-500 mb-2">Payment Method</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {['MoMo', 'Bank Transfer', 'Cash', 'Card'].map((m) => (
-                      <button
-                        key={m}
-                        onClick={() => setPayment(m)}
-                        className={`flex items-center gap-1.5 py-2 px-2 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap ${
-                          payment === m ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-slate-50 border border-transparent text-slate-500 hover:bg-slate-100'
-                        }`}
-                      >
-                        <div className="w-3 h-3 flex items-center justify-center">
-                          <i className={`${methodIcons[m]} text-xs`} />
-                        </div>
-                        {m}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Totals */}
-                <div className="space-y-2 mb-4 pt-3 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Subtotal</span>
-                    <span className="text-slate-800">GHS {subtotal.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-500">Delivery</span>
-                    <span className="text-slate-800">{deliveryFee > 0 ? `GHS ${deliveryFee}` : 'Free'}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm font-bold pt-2 border-t border-slate-50">
-                    <span className="text-slate-800">Total</span>
-                    <span className="text-slate-900">GHS {total.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <button onClick={() => setShowQuote(true)} className="w-full py-3 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap">
-                    Generate Quote
-                  </button>
-                  <button className="w-full py-3 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
-                    Complete Sale
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <CartPanel
+            cartItems={cartItems}
+            delivery={delivery}
+            payment={payment}
+            subtotal={subtotal}
+            deliveryFee={deliveryFee}
+            total={total}
+            onDeliveryChange={setDelivery}
+            onPaymentChange={setPayment}
+            onUpdateQty={updateQty}
+            onRemove={removeFromCart}
+            onGenerateQuote={() => setShowQuote(true)}
+          />
         </div>
       </div>
 
-      {/* Quote Modal */}
       {showQuote && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={() => setShowQuote(false)}>
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-sm font-semibold text-slate-800">Quote Preview</h3>
-              <button onClick={() => setShowQuote(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 cursor-pointer">
-                <i className="ri-close-line text-base" />
-              </button>
-            </div>
-            <div className="text-center mb-5">
-              <div className="w-10 h-10 rounded-xl overflow-hidden mx-auto mb-2">
-                <img src="https://public.readdy.ai/ai/img_res/7bf43506-9df4-4671-b4ee-9c6d6fc6f9c0.png" alt="GadgetFlow" className="w-full h-full object-cover" />
-              </div>
-              <p className="text-sm font-bold text-slate-800">GadgetFlow</p>
-              <p className="text-[10px] text-slate-400">Quote #Q-2026-0089 · Valid until Apr 30, 2026</p>
-            </div>
-            <div className="space-y-2 mb-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between py-2 border-b border-slate-50">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-600">{item.name}</span>
-                    <span className="text-[10px] text-slate-400">x{item.qty}</span>
-                  </div>
-                  <span className="text-xs font-semibold text-slate-800">GHS {item.lineTotal.toLocaleString()}</span>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-1.5 mb-5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Subtotal</span>
-                <span className="text-slate-800">GHS {subtotal.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500">Delivery</span>
-                <span className="text-slate-800">{deliveryFee > 0 ? `GHS ${deliveryFee}` : 'Free'}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm font-bold pt-2 border-t border-slate-100">
-                <span className="text-slate-800">Total</span>
-                <span className="text-emerald-600">GHS {total.toLocaleString()}</span>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <button className="flex-1 py-2.5 bg-[#25D366] text-white text-xs font-semibold rounded-xl hover:bg-[#20b858] transition-all cursor-pointer whitespace-nowrap flex items-center justify-center gap-2">
-                <i className="ri-whatsapp-line text-sm" /> Share via WhatsApp
-              </button>
-              <button className="flex-1 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
-                Download PDF
-              </button>
-            </div>
-          </div>
-        </div>
+        <QuoteModal
+          cartItems={cartItems}
+          subtotal={subtotal}
+          deliveryFee={deliveryFee}
+          total={total}
+          onClose={() => setShowQuote(false)}
+        />
       )}
     </AdminLayout>
   );

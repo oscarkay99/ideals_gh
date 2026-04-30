@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { suppliers, purchaseOrders, supplierStats } from '@/mocks/suppliers';
+import PurchaseOrderDetail from './components/PurchaseOrderDetail';
+import NewPOModal from './components/NewPOModal';
 
 const tabs = ['Purchase Orders', 'Suppliers'];
 
@@ -98,63 +100,7 @@ export default function SuppliersPage() {
           {/* PO Detail */}
           <div>
             {selectedOrder ? (
-              <div className="bg-white rounded-2xl border border-slate-100 p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-slate-800">{selectedOrder.id}</h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold text-white" style={{ background: statusConfig[selectedOrder.status].color }}>
-                    {statusConfig[selectedOrder.status].label}
-                  </span>
-                </div>
-                <div className="space-y-2 mb-4 text-xs">
-                  <div className="flex justify-between py-1.5 border-b border-slate-50">
-                    <span className="text-slate-500">Supplier</span>
-                    <span className="font-semibold text-slate-800">{selectedOrder.supplier}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-slate-50">
-                    <span className="text-slate-500">Ordered</span>
-                    <span className="text-slate-700">{selectedOrder.orderedDate}</span>
-                  </div>
-                  <div className="flex justify-between py-1.5 border-b border-slate-50">
-                    <span className="text-slate-500">Expected</span>
-                    <span className="text-slate-700">{selectedOrder.expectedDate}</span>
-                  </div>
-                  {selectedOrder.deliveredDate && (
-                    <div className="flex justify-between py-1.5 border-b border-slate-50">
-                      <span className="text-slate-500">Delivered</span>
-                      <span className="text-green-600 font-semibold">{selectedOrder.deliveredDate}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-slate-700 mb-2">Items</p>
-                  <div className="space-y-2">
-                    {selectedOrder.items.map((item, i) => (
-                      <div key={i} className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl text-xs">
-                        <div>
-                          <p className="font-semibold text-slate-800">{item.name}</p>
-                          <p className="text-slate-400">Qty: {item.qty} · GHS {item.unitCost.toLocaleString()} each</p>
-                        </div>
-                        <p className="font-bold text-slate-800">GHS {item.total.toLocaleString()}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex justify-between text-sm font-bold pt-3 border-t border-slate-100 mb-4">
-                  <span>Total</span>
-                  <span style={{ color: '#1E5FBE' }}>GHS {selectedOrder.totalValue.toLocaleString()}</span>
-                </div>
-                {selectedOrder.notes && (
-                  <div className="bg-slate-50 rounded-xl p-3 mb-4">
-                    <p className="text-[10px] text-slate-400 mb-1">Notes</p>
-                    <p className="text-xs text-slate-600">{selectedOrder.notes}</p>
-                  </div>
-                )}
-                {selectedOrder.status === 'in_transit' && (
-                  <button className="w-full py-2.5 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
-                    Mark as Delivered
-                  </button>
-                )}
-              </div>
+              <PurchaseOrderDetail order={selectedOrder} />
             ) : (
               <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center">
                 <i className="ri-file-list-3-line text-3xl text-slate-200 mb-3" />
@@ -214,61 +160,7 @@ export default function SuppliersPage() {
         </div>
       )}
 
-      {/* New PO Modal */}
-      {showNewPO && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-800">New Purchase Order</h3>
-              <button onClick={() => setShowNewPO(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer">
-                <i className="ri-close-line text-slate-400" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Supplier</label>
-                <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
-                  {suppliers.map(s => <option key={s.id}>{s.name}</option>)}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-slate-500 mb-1 block">Expected Delivery</label>
-                  <input type="date" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" />
-                </div>
-                <div>
-                  <label className="text-xs text-slate-500 mb-1 block">Payment Terms</label>
-                  <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
-                    <option>Prepaid</option>
-                    <option>Net 7</option>
-                    <option>Net 14</option>
-                    <option>Net 30</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-2 block">Items</label>
-                <div className="space-y-2">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="grid grid-cols-3 gap-2">
-                      <input type="text" placeholder="Product name" className="col-span-1 px-3 py-2 rounded-xl bg-slate-50 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" />
-                      <input type="number" placeholder="Qty" className="px-3 py-2 rounded-xl bg-slate-50 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" />
-                      <input type="number" placeholder="Unit cost (GHS)" className="px-3 py-2 rounded-xl bg-slate-50 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Notes</label>
-                <textarea className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 resize-none" rows={2} placeholder="Optional notes..." />
-              </div>
-              <button onClick={() => setShowNewPO(false)} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
-                Submit Purchase Order
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showNewPO && <NewPOModal suppliers={suppliers} onClose={() => setShowNewPO(false)} />}
     </AdminLayout>
   );
 }

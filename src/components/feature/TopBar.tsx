@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Notification } from '@/hooks/useNotifications';
+import { useAuth } from '@/hooks/useAuth';
+import { roleLabels, roleColors } from '@/mocks/users';
 
 interface TopBarProps {
   title: string;
@@ -23,6 +25,7 @@ const typeConfig = {
 export default function TopBar({ title, subtitle, notifications = [], unreadCount = 0, onMarkAllRead, isDark, onToggleDark }: TopBarProps) {
   const [notifOpen, setNotifOpen] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const displayNotifs = notifications.length > 0 ? notifications.slice(0, 8) : [
     { id: 'default-1', type: 'alert' as const, title: 'Low Stock', message: 'Samsung Galaxy S24 — only 1 unit left', time: new Date(), read: false },
@@ -125,12 +128,15 @@ export default function TopBar({ title, subtitle, notifications = [], unreadCoun
           onClick={() => navigate('/profile')}
           className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
         >
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold" style={{ background: '#1E5FBE' }}>
-            KA
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+            style={{ background: user?.role ? roleColors[user.role] : '#1E5FBE' }}
+          >
+            {user?.avatar ?? 'U'}
           </div>
           <div className="hidden md:block text-left">
-            <p className="text-xs font-semibold text-slate-700 leading-tight">Kwame Asante</p>
-            <p className="text-[10px] text-slate-400">Admin</p>
+            <p className="text-xs font-semibold text-slate-700 leading-tight">{user?.name ?? 'User'}</p>
+            <p className="text-[10px] text-slate-400">{user?.role ? roleLabels[user.role] : ''}</p>
           </div>
         </button>
       </div>
