@@ -73,9 +73,6 @@ const navGroups = [
   {
     label: 'Intelligence',
     items: [
-      { label: 'WhatsApp', icon: 'ri-whatsapp-line', path: '/whatsapp', module: 'WhatsApp' as AppModule },
-      { label: 'Instagram', icon: 'ri-instagram-line', path: '/instagram', module: 'Instagram' as AppModule },
-      { label: 'TikTok', icon: 'ri-tiktok-line', path: '/tiktok', module: 'TikTok' as AppModule },
       { label: 'SMS', icon: 'ri-message-3-line', path: '/sms', module: 'SMS' as AppModule },
       { label: 'Price Intel', icon: 'ri-line-chart-line', path: '/price-intel', module: 'Price Intel' as AppModule },
       { label: 'Trade-In', icon: 'ri-exchange-line', path: '/trade-in', module: 'Trade-In' as AppModule },

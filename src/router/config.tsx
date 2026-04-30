@@ -17,14 +17,11 @@ import CustomersPage from "../pages/customers/page";
 import TeamPage from "../pages/team/page";
 import RepairsPage from "../pages/repairs/page";
 import AnalyticsPage from "../pages/analytics/page";
-import WhatsAppPage from "../pages/whatsapp/page";
-import InstagramPage from "../pages/instagram/page";
 import AuthenticationPage from "../pages/authentication/page";
 import TradeInPage from "../pages/tradein/page";
 import PriceIntelPage from "../pages/priceintel/page";
 import WalletPage from "../pages/wallet/page";
 import DeliveryPage from "../pages/delivery/page";
-import TikTokPage from "../pages/tiktok/page";
 import SMSPage from "../pages/sms/page";
 import LoyaltyPage from "../pages/loyalty/page";
 import ExpensesPage from "../pages/expenses/page";
@@ -58,8 +55,6 @@ const routes: RouteObject[] = [
   { path: "/ai-studio", element: <AuthGuard requiredModule="AI Studio"><AIStudioPage /></AuthGuard> },
   { path: "/team", element: <AuthGuard requiredModule="Team"><TeamPage /></AuthGuard> },
   { path: "/settings", element: <AuthGuard requiredModule="Settings"><SettingsPage /></AuthGuard> },
-  { path: "/whatsapp", element: <AuthGuard requiredModule="WhatsApp"><WhatsAppPage /></AuthGuard> },
-  { path: "/instagram", element: <AuthGuard requiredModule="Instagram"><InstagramPage /></AuthGuard> },
   { path: "/authentication", element: <AuthGuard requiredModule="Authentication"><AuthenticationPage /></AuthGuard> },
   { path: "/trade-in", element: <AuthGuard requiredModule="Trade-In"><TradeInPage /></AuthGuard> },
   { path: "/price-intel", element: <AuthGuard requiredModule="Price Intel"><PriceIntelPage /></AuthGuard> },
@@ -68,7 +63,6 @@ const routes: RouteObject[] = [
   { path: "/store", element: <StorefrontPage /> },
   { path: "/store/catalog", element: <StorefrontPage /> },
   { path: "/store/product/:id", element: <ProductDetailPage /> },
-  { path: "/tiktok", element: <AuthGuard requiredModule="TikTok"><TikTokPage /></AuthGuard> },
   { path: "/sms", element: <AuthGuard requiredModule="SMS"><SMSPage /></AuthGuard> },
   { path: "/loyalty", element: <AuthGuard requiredModule="Loyalty"><LoyaltyPage /></AuthGuard> },
   { path: "/expenses", element: <AuthGuard requiredModule="Expenses"><ExpensesPage /></AuthGuard> },

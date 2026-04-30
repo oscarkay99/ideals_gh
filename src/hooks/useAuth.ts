@@ -13,6 +13,7 @@ export interface AuthUser {
 }
 
 const STORAGE_KEY = 'ideals_auth_user';
+const MOCK_SESSION_KEY = 'ideals_mock_session';
 const RESET_REDIRECT_PATH = '/signin';
 const DEFAULT_ROLE: UserRole = 'sales_rep';
 
@@ -164,6 +165,12 @@ async function syncSupabaseSession() {
     return;
   }
 
+  // If a mock session is active, keep it — don't overwrite with Supabase state
+  if (localStorage.getItem(MOCK_SESSION_KEY)) {
+    setAuthState({ initializing: false });
+    return;
+  }
+
   const { data, error } = await supabase.auth.getSession();
 
   if (error || !data.session?.user) {
@@ -183,6 +190,9 @@ function ensureSupabaseAuth() {
   authInitialized = true;
 
   supabase.auth.onAuthStateChange((_event, session) => {
+    // Don't let Supabase auth state overwrite an active mock session
+    if (localStorage.getItem(MOCK_SESSION_KEY)) return;
+
     if (!session?.user) {
       writeStoredUser(null);
       setAuthState({ user: null, initializing: false });
@@ -210,27 +220,31 @@ export function useAuth() {
   }, [state.initializing]);
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
+    // Always try mock users first so demo accounts work regardless of Supabase config
+    const mockFound = mockUsers.find((u) => u.email === email && u.password === password);
+    if (mockFound) {
+      const { password: _pw, ...authUser } = mockFound;
+      localStorage.setItem(MOCK_SESSION_KEY, '1');
+      writeStoredUser(authUser);
+      setAuthState({ user: authUser, initializing: false });
+      return { success: true };
+    }
+
     if (isSupabaseConfigured) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return { success: false, error: error.message };
+      if (error) return { success: false, error: 'Invalid email or password' };
       await syncSupabaseSession();
       return { success: true };
     }
 
-    const found = mockUsers.find((user) => user.email === email && user.password === password);
-    if (!found) return { success: false, error: 'Invalid email or password' };
-
-    const { password: _pw, ...authUser } = found;
-    writeStoredUser(authUser);
-    setAuthState({ user: authUser, initializing: false });
-    return { success: true };
+    return { success: false, error: 'Invalid email or password' };
   };
 
   const logout = async () => {
+    localStorage.removeItem(MOCK_SESSION_KEY);
     if (isSupabaseConfigured) {
       await supabase.auth.signOut();
     }
-
     writeStoredUser(null);
     setAuthState({ user: null, initializing: false });
   };
