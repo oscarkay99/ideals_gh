@@ -73,7 +73,7 @@ export default function FeaturedProducts() {
                   </div>
                 </div>
 
-                <button className="mt-3 w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 transition-all cursor-pointer whitespace-nowrap">
+                <button onClick={() => navigate('/store/product-detail')} className="mt-3 w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 transition-all cursor-pointer whitespace-nowrap">
                   View Details
                 </button>
               </div>

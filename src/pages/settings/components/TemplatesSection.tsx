@@ -5,13 +5,25 @@ interface MessageTemplate {
   message: string;
 }
 
+import { useState } from 'react';
+
 interface TemplatesSectionProps {
   templates: MessageTemplate[];
   editingTemplate: string | null;
   onEditToggle: (id: string) => void;
+  onNewTemplate: () => void;
 }
 
-export default function TemplatesSection({ templates, editingTemplate, onEditToggle }: TemplatesSectionProps) {
+export default function TemplatesSection({ templates, editingTemplate, onEditToggle, onNewTemplate }: TemplatesSectionProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyTemplate = (id: string, message: string) => {
+    navigator.clipboard.writeText(message).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
       <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -19,7 +31,7 @@ export default function TemplatesSection({ templates, editingTemplate, onEditTog
           <h3 className="text-sm font-bold text-slate-800">Message Templates</h3>
           <p className="text-xs text-slate-400 mt-0.5">Used for WhatsApp, SMS, and automated messages</p>
         </div>
-        <button className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+        <button onClick={onNewTemplate} className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
           <i className="ri-add-line mr-1" /> New Template
         </button>
       </div>
@@ -52,8 +64,12 @@ export default function TemplatesSection({ templates, editingTemplate, onEditTog
                 >
                   <i className={`${editingTemplate === t.id ? 'ri-check-line text-green-500' : 'ri-edit-line text-slate-400'} text-sm`} />
                 </button>
-                <button className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer">
-                  <i className="ri-file-copy-line text-slate-400 text-sm" />
+                <button
+                  onClick={() => copyTemplate(t.id, t.message)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer"
+                  title="Copy template"
+                >
+                  <i className={`${copiedId === t.id ? 'ri-check-line text-green-500' : 'ri-file-copy-line text-slate-400'} text-sm`} />
                 </button>
               </div>
             </div>

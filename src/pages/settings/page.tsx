@@ -130,11 +130,11 @@ export default function SettingsPage() {
           )}
 
           {activeSection === 'automation' && (
-            <AutomationSection automations={automations} onToggle={toggleAutomation} />
+            <AutomationSection automations={automations} onToggle={toggleAutomation} onNewRule={() => {}} />
           )}
 
           {activeSection === 'integrations' && (
-            <IntegrationsSection integrations={integrations} />
+            <IntegrationsSection />
           )}
 
           {activeSection === 'security' && <SecuritySection />}

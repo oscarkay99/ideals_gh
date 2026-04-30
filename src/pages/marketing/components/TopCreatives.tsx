@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { topCreatives } from '@/mocks/marketing';
 
 const channelMeta: Record<string, { icon: string; color: string; label: string }> = {
@@ -7,6 +8,7 @@ const channelMeta: Record<string, { icon: string; color: string; label: string }
 };
 
 export default function TopCreatives() {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5">
       <div className="flex items-center justify-between mb-4">
@@ -14,7 +16,7 @@ export default function TopCreatives() {
           <h3 className="text-sm font-semibold text-slate-800">Top Performing Creatives</h3>
           <p className="text-xs text-slate-400 mt-0.5">Best click-through rates this month</p>
         </div>
-        <button className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer">View all</button>
+        <button onClick={() => navigate('/marketing')} className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer">View all</button>
       </div>
       <div className="space-y-4">
         {topCreatives.map((c, i) => {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { recentActivity } from '@/mocks/dashboard';
 
 const iconMap: Record<string, { icon: string; bg: string; text: string }> = {
@@ -9,6 +10,7 @@ const iconMap: Record<string, { icon: string; bg: string; text: string }> = {
 };
 
 export default function LiveFeed() {
+  const navigate = useNavigate();
   const [pulse, setPulse] = useState(false);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function LiveFeed() {
             <span className="text-[10px] text-emerald-600 font-semibold">Live</span>
           </div>
         </div>
-        <button className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium">View all</button>
+        <button onClick={() => navigate('/analytics')} className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium">View all</button>
       </div>
       <div className="divide-y divide-slate-50">
         {recentActivity.map((item, i) => {

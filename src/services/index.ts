@@ -5,3 +5,6 @@ export * from './leads';
 export * from './sales';
 export * from './repairs';
 export * from './payments';
+export * from './social';
+export * from './channels';
+export * from './ai';

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { warranties, returns, warrantyStats } from '@/mocks/warranty';
+import WarrantyDetail from './components/WarrantyDetail';
+import NewReturnModal from './components/NewReturnModal';
 
 const tabs = ['Warranties', 'Returns & Refunds'];
 
@@ -144,50 +146,11 @@ export default function WarrantyPage() {
           {/* Detail Panel */}
           <div>
             {selected ? (
-              <div className="bg-white rounded-2xl border border-slate-100 p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-bold text-slate-800">Warranty Details</h3>
-                  <button onClick={() => setSelectedWarranty(null)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer">
-                    <i className="ri-close-line text-slate-400 text-sm" />
-                  </button>
-                </div>
-                <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden mb-4">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${selected.status === 'expired' ? 100 : Math.max(5, 100 - (selected.daysLeft / 365) * 100)}%`,
-                      background: selected.status === 'active' ? '#25D366' : selected.status === 'expiring_soon' ? '#F5A623' : '#94A3B8',
-                    }}
-                  />
-                </div>
-                <div className="space-y-2 text-xs">
-                  {[
-                    { label: 'Customer', value: selected.customer },
-                    { label: 'Phone', value: selected.phone },
-                    { label: 'Device', value: selected.device },
-                    { label: 'IMEI', value: selected.imei },
-                    { label: 'Purchase Date', value: selected.purchaseDate },
-                    { label: 'Expiry Date', value: selected.expiryDate },
-                    { label: 'Type', value: selected.type },
-                    { label: 'Duration', value: selected.duration },
-                    { label: 'Sale ID', value: selected.saleId },
-                    { label: 'Purchase Price', value: `GHS ${selected.cost.toLocaleString()}` },
-                  ].map(item => (
-                    <div key={item.label} className="flex justify-between py-1.5 border-b border-slate-50">
-                      <span className="text-slate-500">{item.label}</span>
-                      <span className="font-semibold text-slate-800 text-right">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex gap-2 mt-4">
-                  <button onClick={() => setShowNewReturn(true)} className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#E05A2B' }}>
-                    Log Return
-                  </button>
-                  <button className="flex-1 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 text-slate-600 cursor-pointer whitespace-nowrap">
-                    Extend Warranty
-                  </button>
-                </div>
-              </div>
+              <WarrantyDetail
+                warranty={selected}
+                onClose={() => setSelectedWarranty(null)}
+                onNewReturn={() => setShowNewReturn(true)}
+              />
             ) : (
               <div className="bg-white rounded-2xl border border-slate-100 p-8 text-center">
                 <i className="ri-shield-check-line text-3xl text-slate-200 mb-3" />
@@ -235,49 +198,7 @@ export default function WarrantyPage() {
         </div>
       )}
 
-      {/* New Return Modal */}
-      {showNewReturn && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-slate-800">New Return Request</h3>
-              <button onClick={() => setShowNewReturn(false)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer">
-                <i className="ri-close-line text-slate-400" />
-              </button>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Customer Name</label>
-                <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="Customer name" />
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Device / Product</label>
-                <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="e.g. iPhone 15 Pro 256GB" />
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">IMEI / Serial Number</label>
-                <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="15-digit IMEI" />
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Reason for Return</label>
-                <textarea className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 resize-none" rows={3} placeholder="Describe the issue..." />
-              </div>
-              <div>
-                <label className="text-xs text-slate-500 mb-1 block">Resolution Type</label>
-                <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
-                  <option>Exchange</option>
-                  <option>Full Refund</option>
-                  <option>Partial Refund</option>
-                  <option>Repair Under Warranty</option>
-                </select>
-              </div>
-              <button onClick={() => setShowNewReturn(false)} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#E05A2B' }}>
-                Submit Return Request
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {showNewReturn && <NewReturnModal onClose={() => setShowNewReturn(false)} />}
     </AdminLayout>
   );
 }

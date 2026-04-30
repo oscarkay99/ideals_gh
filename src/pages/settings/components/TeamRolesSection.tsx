@@ -71,7 +71,7 @@ export default function TeamRolesSection({ roles, onAddRole }: TeamRolesSectionP
             </div>
           ))}
         </div>
-        <button className="w-full mt-4 py-2.5 rounded-xl text-xs font-semibold border border-dashed border-slate-300 text-slate-500 hover:bg-slate-50 cursor-pointer whitespace-nowrap">
+        <button onClick={onAddRole} className="w-full mt-4 py-2.5 rounded-xl text-xs font-semibold border border-dashed border-slate-300 text-slate-500 hover:bg-slate-50 cursor-pointer whitespace-nowrap">
           <i className="ri-user-add-line mr-1" /> Invite Team Member
         </button>
       </div>

@@ -1,6 +1,62 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import idealsTechHubLogo from '@/assets/ideals-tech-hub-logo.png';
+
+function TransparentLogo() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const img = new Image();
+    img.src = idealsTechHubLogo;
+    img.onload = () => {
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+
+        // Remove white / near-white background
+        if (r > 235 && g > 235 && b > 235) {
+          data[i + 3] = 0;
+          continue;
+        }
+
+        // Detect grayscale pixels (text, neutral shadows) vs coloured logo mark
+        const max = Math.max(r, g, b);
+        const saturation = max === 0 ? 0 : (max - Math.min(r, g, b)) / max;
+
+        if (saturation < 0.25) {
+          // Low saturation = text or neutral → paint white, preserve anti-alias alpha
+          const darkness = 1 - r / 255;
+          data[i]     = 255;
+          data[i + 1] = 255;
+          data[i + 2] = 255;
+          data[i + 3] = Math.round(darkness * data[i + 3]);
+        }
+        // Coloured pixels (blue circle, gold arc) → untouched
+      }
+      ctx.putImageData(imageData, 0, 0);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        width: '260px',
+        height: 'auto',
+        filter: 'drop-shadow(0 0 24px rgba(30,95,190,0.5)) drop-shadow(0 0 10px rgba(245,166,35,0.28))',
+      }}
+    />
+  );
+}
 
 function IDealsLogoMark({ size = 40 }: { size?: number }) {
   return (
@@ -87,10 +143,10 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex overflow-hidden" style={{ background: '#060E1F' }}>
+    <div className="min-h-screen lg:grid lg:grid-cols-[1.08fr_0.92fr] overflow-hidden" style={{ background: '#060E1F' }}>
 
       {/* ── LEFT PANEL ── */}
-      <div className="hidden lg:flex lg:w-[55%] relative flex-col overflow-hidden">
+      <div className="hidden lg:flex relative min-h-screen overflow-hidden">
 
         {/* Background image */}
         <div className="absolute inset-0">
@@ -118,62 +174,76 @@ export default function SignInPage() {
         {/* Glow orbs */}
         <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(30,95,190,0.25) 0%, transparent 70%)' }} />
         <div className="absolute bottom-1/3 right-1/4 w-56 h-56 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.18) 0%, transparent 70%)' }} />
-
         {/* Content */}
-        <div className="relative flex flex-col h-full p-12 z-10">
-
-
-
-          {/* Hero text */}
-          <div className="mt-auto mb-8">
-            <h1 className="text-5xl font-black text-white leading-[1.1] mb-5 tracking-tight">
-              Run your entire<br />
-              phone business<br />
-              <span className="relative inline-block">
-                <span style={{ color: '#F5A623' }}>from one place.</span>
-              </span>
-            </h1>
-            <p className="text-white/50 text-sm leading-relaxed max-w-sm">
-              32 modules covering sales, repairs, inventory, social media, loyalty, analytics and more — built for Ghana&apos;s fastest-growing phone shops.
-            </p>
+        <div className="relative z-10 flex min-h-screen flex-col px-12 py-10">
+          <div className="flex items-center">
+            <TransparentLogo />
           </div>
 
-          {/* Module pills */}
-          <div className="flex flex-wrap gap-2">
-            {modules.map(m => (
-              <div key={m.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <i className={`${m.icon} text-xs text-white/50`} />
-                <span className="text-white/50 text-[10px] font-medium">{m.label}</span>
+          <div className="flex flex-1 flex-col justify-center">
+            <div className="max-w-xl">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/80 backdrop-blur-sm">
+                <span className="h-2 w-2 rounded-full" style={{ background: '#F5A623' }} />
+                Ghana&apos;s Phone Retail Command Center
               </div>
-            ))}
+              <h1 className="text-5xl font-black text-white leading-[1.02] tracking-tight">
+                Run your entire
+                <br />
+                phone business
+                <br />
+                <span style={{ color: '#F5A623' }}>from one place.</span>
+              </h1>
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-white/80">
+                iDeals Tech Hub brings sales, repairs, inventory, customer follow-up and analytics into one secure command center built for fast-moving device stores.
+              </p>
+            </div>
           </div>
 
-          <p className="text-white/20 text-[10px] mt-8">&copy; 2026 iDeals Tech Hub · All rights reserved</p>
+          <div>
+            <div className="flex flex-wrap gap-2">
+              {modules.map(m => (
+                <div key={m.label} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)' }}>
+                  <i className={`${m.icon} text-xs text-white/75`} />
+                  <span className="text-white/75 text-[10px] font-medium">{m.label}</span>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-white/50 text-[10px] mt-8">&copy; 2026 iDeals Tech Hub · All rights reserved</p>
+          </div>
         </div>
       </div>
 
       {/* ── RIGHT PANEL ── */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-10 relative">
+      <div className="relative flex min-h-screen items-stretch justify-center px-6 py-8 lg:px-10 lg:py-10">
 
         {/* Subtle bg texture */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(30,95,190,0.08) 0%, transparent 60%)' }} />
 
-        <div className="w-full max-w-[400px] relative z-10">
-
-
+        <div className="relative z-10 flex w-full max-w-[440px] flex-col justify-center">
+          <div className="rounded-[32px] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl lg:p-8">
+            <div className="mb-7 flex items-center gap-3 lg:hidden">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/8 ring-1 ring-white/10">
+                <IDealsLogoMark size={32} />
+              </div>
+              <div>
+                <p className="text-2xl font-black leading-none text-white">iDeals</p>
+                <p className="mt-0.5 text-xs font-semibold uppercase tracking-[0.24em] text-white/70">Tech Hub</p>
+              </div>
+            </div>
 
           {/* ── SIGN IN VIEW ── */}
           {view === 'signin' && (
             <div className={`transition-all duration-500 ${loginSuccess ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
               <div className="mb-7">
                 <h2 className="text-2xl font-black text-white mb-1 tracking-tight">Welcome back</h2>
-                <p className="text-white/40 text-sm">Sign in to your Command Center</p>
+                <p className="text-white/65 text-sm">Sign in to your Command Center</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email */}
                 <div>
-                  <label className="text-xs font-semibold text-white/50 block mb-2">Email Address</label>
+                  <label className="text-xs font-semibold text-white/70 block mb-2">Email Address</label>
                   <div className={`relative rounded-xl transition-all duration-200 ${emailFocused ? 'ring-2' : ''}`}
                     style={emailFocused ? { outline: '2px solid #1E5FBE' } : {}}>
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
@@ -198,7 +268,7 @@ export default function SignInPage() {
                 {/* Password */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-semibold text-white/50">Password</label>
+                    <label className="text-xs font-semibold text-white/70">Password</label>
                     <button
                       type="button"
                       onClick={() => { setView('forgot'); setForgotEmail(email); setForgotError(''); }}
@@ -302,7 +372,7 @@ export default function SignInPage() {
                 </>
               )}
 
-              <p className="text-center text-[11px] text-white/20 mt-6">
+              <p className="text-center text-[11px] text-white/45 mt-6">
                 Having trouble? Contact your system administrator.
               </p>
             </div>
@@ -313,7 +383,7 @@ export default function SignInPage() {
             <div>
               <button
                 onClick={() => setView('signin')}
-                className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 cursor-pointer mb-7 transition-colors"
+                className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white/90 cursor-pointer mb-7 transition-colors"
               >
                 <i className="ri-arrow-left-line" /> Back to Sign In
               </button>
@@ -323,12 +393,12 @@ export default function SignInPage() {
                   <i className="ri-lock-password-line text-xl" style={{ color: '#F5A623' }} />
                 </div>
                 <h2 className="text-2xl font-black text-white mb-1 tracking-tight">Forgot Password?</h2>
-                <p className="text-white/40 text-sm">Enter your email and we&apos;ll send you a reset link.</p>
+                <p className="text-white/65 text-sm">Enter your email and we&apos;ll send you a reset link.</p>
               </div>
 
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-white/50 block mb-2">Email Address</label>
+                  <label className="text-xs font-semibold text-white/70 block mb-2">Email Address</label>
                   <div className="relative">
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                       <i className="ri-mail-line text-white/30 text-sm" />
@@ -374,7 +444,7 @@ export default function SignInPage() {
                 <i className="ri-mail-check-line text-3xl" style={{ color: '#25D366' }} />
               </div>
               <h2 className="text-2xl font-black text-white mb-2 tracking-tight">Check your email</h2>
-              <p className="text-white/40 text-sm mb-2">We&apos;ve sent a password reset link to</p>
+              <p className="text-white/65 text-sm mb-2">We&apos;ve sent a password reset link to</p>
               <p className="text-sm font-bold mb-6" style={{ color: '#F5A623' }}>{forgotEmail}</p>
 
               <div className="p-4 rounded-xl mb-6 text-left" style={{ background: 'rgba(245,166,35,0.08)', border: '1px solid rgba(245,166,35,0.2)' }}>
@@ -382,7 +452,7 @@ export default function SignInPage() {
                   <i className="ri-information-line text-sm mt-0.5" style={{ color: '#F5A623' }} />
                   <div>
                     <p className="text-xs font-semibold mb-0.5" style={{ color: '#F5A623' }}>{isSupabaseAuth ? 'Supabase Connected' : 'Demo Mode'}</p>
-                    <p className="text-xs text-white/40">
+                    <p className="text-xs text-white/65">
                       {isSupabaseAuth
                         ? 'If your Supabase project is configured to send auth emails, the reset link has been dispatched.'
                         : 'This is a simulated reset. In production, a real email would be sent. Contact your system administrator to reset your password.'}
@@ -408,9 +478,10 @@ export default function SignInPage() {
                 <i className="ri-check-double-line text-3xl" style={{ color: '#25D366' }} />
               </div>
               <p className="text-white font-bold text-lg">Welcome back!</p>
-              <p className="text-white/40 text-sm mt-1">Redirecting to Command Center...</p>
+              <p className="text-white/65 text-sm mt-1">Redirecting to Command Center...</p>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

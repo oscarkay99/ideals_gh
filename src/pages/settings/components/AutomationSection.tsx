@@ -10,9 +10,10 @@ interface AutomationRule {
 interface AutomationSectionProps {
   automations: AutomationRule[];
   onToggle: (id: string) => void;
+  onNewRule: () => void;
 }
 
-export default function AutomationSection({ automations, onToggle }: AutomationSectionProps) {
+export default function AutomationSection({ automations, onToggle, onNewRule }: AutomationSectionProps) {
   return (
     <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
       <div className="p-5 border-b border-slate-100 flex items-center justify-between">
@@ -20,7 +21,7 @@ export default function AutomationSection({ automations, onToggle }: AutomationS
           <h3 className="text-sm font-bold text-slate-800">Automation Rules</h3>
           <p className="text-xs text-slate-400 mt-0.5">{automations.filter(a => a.status).length} of {automations.length} rules active</p>
         </div>
-        <button className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+        <button onClick={onNewRule} className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
           <i className="ri-add-line mr-1" /> New Rule
         </button>
       </div>

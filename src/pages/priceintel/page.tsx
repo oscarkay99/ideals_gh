@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { priceIntelProducts, priceAlerts } from '@/mocks/priceintel';
+import PriceDetail from './components/PriceDetail';
 
 export default function PriceIntelPage() {
   const [selectedProduct, setSelectedProduct] = useState(priceIntelProducts[0]);
@@ -91,121 +92,7 @@ export default function PriceIntelPage() {
         </div>
 
         {/* Detail Panel */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-base font-bold text-slate-800">{selectedProduct.device}</h3>
-                <p className="text-xs text-slate-400 mt-0.5">Last updated: 2 hours ago</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs px-3 py-1 rounded-full font-medium ${positionConfig[selectedProduct.position as keyof typeof positionConfig].color}`}>
-                  {positionConfig[selectedProduct.position as keyof typeof positionConfig].label}
-                </span>
-              </div>
-            </div>
-
-            {/* Price Comparison */}
-            <div className="space-y-3 mb-5">
-              <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <i className="ri-store-2-line text-emerald-600 text-sm" />
-                  </div>
-                  <span className="text-sm font-bold text-slate-800">GadgetFlow (You)</span>
-                </div>
-                <span className="text-base font-bold text-emerald-600">GHS {selectedProduct.ourPrice.toLocaleString()}</span>
-              </div>
-
-              {selectedProduct.competitors.map((comp, i) => {
-                const diff = comp.price - selectedProduct.ourPrice;
-                return (
-                  <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center">
-                        <i className="ri-building-2-line text-slate-500 text-sm" />
-                      </div>
-                      <div>
-                        <span className="text-sm text-slate-700">{comp.name}</span>
-                        <p className="text-[10px] text-slate-400">{comp.lastUpdated}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-slate-700">GHS {comp.price.toLocaleString()}</p>
-                      <p className={`text-[10px] font-medium ${diff > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                        {diff > 0 ? '+' : ''}{diff.toLocaleString()} vs you
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Market Average Bar */}
-            <div className="mb-5">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-slate-500">Market Range</span>
-                <span className="text-xs text-slate-500">Avg: GHS {selectedProduct.marketAvg.toLocaleString()}</span>
-              </div>
-              <div className="relative h-3 bg-slate-100 rounded-full">
-                <div className="absolute top-0 h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full" style={{ width: '60%' }} />
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-emerald-500 rounded-full shadow-sm"
-                  style={{ left: `${Math.min(Math.max(((selectedProduct.ourPrice - 7000) / 4000) * 100, 5), 90)}%` }}
-                />
-              </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-[10px] text-slate-400">GHS {Math.min(...selectedProduct.competitors.map(c => c.price)).toLocaleString()}</span>
-                <span className="text-[10px] text-slate-400">GHS {Math.max(...selectedProduct.competitors.map(c => c.price)).toLocaleString()}</span>
-              </div>
-            </div>
-
-            {/* AI Suggestion */}
-            <div className="bg-violet-50 border border-violet-200 rounded-xl p-4">
-              <div className="flex items-start gap-2">
-                <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-                  <i className="ri-sparkling-2-line text-violet-600 text-sm" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-violet-700 mb-0.5">AI Pricing Suggestion</p>
-                  <p className="text-xs text-slate-600">{selectedProduct.suggestion}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Demand Score */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h4 className="text-sm font-bold text-slate-800 mb-3">Market Demand Score</h4>
-            <div className="flex items-center gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0">
-                <svg className="w-20 h-20 -rotate-90" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f1f5f9" strokeWidth="3" />
-                  <circle
-                    cx="18" cy="18" r="15.9" fill="none"
-                    stroke={selectedProduct.demandScore > 80 ? '#10b981' : selectedProduct.demandScore > 60 ? '#f59e0b' : '#ef4444'}
-                    strokeWidth="3"
-                    strokeDasharray={`${selectedProduct.demandScore} ${100 - selectedProduct.demandScore}`}
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-slate-800">{selectedProduct.demandScore}</span>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-700 mb-1">
-                  {selectedProduct.demandScore > 80 ? 'High Demand' : selectedProduct.demandScore > 60 ? 'Moderate Demand' : 'Low Demand'}
-                </p>
-                <p className="text-xs text-slate-500">Based on search trends, competitor stock levels, and your sales velocity over the past 30 days.</p>
-                <div className="flex items-center gap-1 mt-2">
-                  <i className={`text-xs ${selectedProduct.trend === 'rising' ? 'ri-arrow-up-line text-emerald-500' : selectedProduct.trend === 'falling' ? 'ri-arrow-down-line text-rose-500' : 'ri-subtract-line text-slate-400'}`} />
-                  <span className="text-xs text-slate-500 capitalize">{selectedProduct.trend} trend</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PriceDetail product={selectedProduct} />
       </div>
     </AdminLayout>
   );

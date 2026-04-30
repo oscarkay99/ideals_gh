@@ -14,7 +14,7 @@ export interface AuthUser {
 
 const STORAGE_KEY = 'ideals_auth_user';
 const RESET_REDIRECT_PATH = '/signin';
-const DEFAULT_ROLE: UserRole = 'admin';
+const DEFAULT_ROLE: UserRole = 'sales_rep';
 
 const mockUsers: (AuthUser & { password: string })[] = [
   { id: 'U001', name: 'Kwame Asante', email: 'admin@idealstechhub.com', password: 'admin123', role: 'admin', avatar: 'KA', lastLogin: 'Apr 23, 2026' },

@@ -31,7 +31,8 @@ export default function BrandingSection({
             <div className="w-16 h-16 rounded-2xl border border-slate-100 flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0A1F4A, #1E5FBE)' }}>
               <i className="ri-smartphone-line text-2xl text-white" />
             </div>
-            <button className="px-4 py-2 border border-slate-200 rounded-xl text-xs text-slate-600 hover:bg-slate-50 cursor-pointer whitespace-nowrap">Change Logo</button>
+            <input type="file" accept="image/*" id="logo-upload" className="hidden" onChange={() => {}} />
+            <button onClick={() => document.getElementById('logo-upload')?.click()} className="px-4 py-2 border border-slate-200 rounded-xl text-xs text-slate-600 hover:bg-slate-50 cursor-pointer whitespace-nowrap">Change Logo</button>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
