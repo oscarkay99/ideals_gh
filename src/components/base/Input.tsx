@@ -21,8 +21,8 @@ export function Input({ label, error, icon, className = '', id, ...props }: Inpu
         )}
         <input
           id={inputId}
-          className={`w-full bg-[#0A1F4A] border rounded-lg text-sm text-white placeholder-slate-500
-            focus:outline-none focus:ring-2 focus:ring-[#1E5FBE]/50 transition-colors
+          className={`w-full bg-[#07101F] border rounded-lg text-sm text-white placeholder-slate-500
+            focus:outline-none focus:ring-2 focus:ring-[#0D1F4A]/50 transition-colors
             ${error ? 'border-red-500' : 'border-[#1E3A6E]'}
             ${icon ? 'pl-9 pr-3' : 'px-3'} py-2 ${className}`}
           {...props}

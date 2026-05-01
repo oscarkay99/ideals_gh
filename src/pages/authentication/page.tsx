@@ -17,8 +17,8 @@ export default function AuthenticationPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         {[
-          { label: 'Certificates Issued', value: '891', icon: 'ri-shield-check-line', iconColor: '#1E5FBE', bg: '#EEF4FF' },
-          { label: 'IMEI Checks Today', value: '47', icon: 'ri-scan-line', iconColor: '#1A52A8', bg: '#E8F0FB' },
+          { label: 'Certificates Issued', value: '891', icon: 'ri-shield-check-line', iconColor: '#0D1F4A', bg: 'rgba(7,16,31,0.06)' },
+          { label: 'IMEI Checks Today', value: '47', icon: 'ri-scan-line', iconColor: '#0E3D8A', bg: '#E8F0FB' },
           { label: 'Clean Devices', value: '98.7%', icon: 'ri-checkbox-circle-line', iconColor: '#F5A623', bg: '#FEF3C7' },
           { label: 'Flagged Devices', value: '11', icon: 'ri-alert-line', iconColor: '#E05A2B', bg: '#FEE2E2' },
         ].map(s => (
@@ -57,12 +57,12 @@ export default function AuthenticationPage() {
                 key={cert.id}
                 onClick={() => { setSelectedCert(cert); setCertDetailOpen(true); }}
                 className={`w-full bg-white rounded-2xl border p-4 text-left transition-all cursor-pointer`}
-                style={{ borderColor: selectedCert.id === cert.id ? '#1E5FBE' : '#f1f5f9' }}
+                style={{ borderColor: selectedCert.id === cert.id ? '#0D1F4A' : '#f1f5f9' }}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#EEF4FF' }}>
-                      <i className="ri-shield-check-line text-lg" style={{ color: '#1E5FBE' }} />
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(7,16,31,0.06)' }}>
+                      <i className="ri-shield-check-line text-lg" style={{ color: '#0D1F4A' }} />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-slate-800">{cert.device}</p>
@@ -73,7 +73,7 @@ export default function AuthenticationPage() {
                     <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cert.condition === 'New' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-600'}`}>
                       {cert.condition}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: '#EEF4FF', color: '#1E5FBE' }}>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ background: 'rgba(7,16,31,0.06)', color: '#0D1F4A' }}>
                       <i className="ri-checkbox-circle-line mr-0.5" />Verified
                     </span>
                   </div>
@@ -85,7 +85,7 @@ export default function AuthenticationPage() {
                   </div>
                   <div>
                     <p className="text-[10px] text-slate-400">IMEI Status</p>
-                    <p className="text-xs font-semibold" style={{ color: '#1E5FBE' }}><i className="ri-checkbox-circle-fill mr-0.5" />Clean</p>
+                    <p className="text-xs font-semibold" style={{ color: '#0D1F4A' }}><i className="ri-checkbox-circle-fill mr-0.5" />Clean</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-slate-400">Warranty</p>

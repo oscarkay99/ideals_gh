@@ -36,7 +36,7 @@ export default function TikTokVideos({ videos, onNewVideo, formatNumber }: TikTo
         {videos.map((video) => (
           <div key={video.id} className="bg-slate-50 rounded-2xl overflow-hidden">
             <div className="relative">
-              <img src={video.thumbnail} alt={video.caption} className="w-full h-48 object-cover" />
+              <img loading="lazy" decoding="async" src={video.thumbnail} alt={video.caption} className="w-full h-48 object-cover" />
               <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-md">
                 {video.duration}
               </div>

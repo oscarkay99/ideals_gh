@@ -14,11 +14,11 @@ const typeLabels: Record<string, string> = {
 
 const typeColors: Record<string, string> = {
   repair: '#E05A2B',
-  consultation: '#1E5FBE',
+  consultation: '#0D1F4A',
   tradein: '#F5A623',
-  internal: '#0A1F4A',
+  internal: '#07101F',
   marketing: '#F5A623',
-  delivery: '#154290',
+  delivery: '#1552A8',
 };
 
 const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -38,8 +38,8 @@ export default function CalendarPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
         {[
-          { label: "Today's Appts", value: `${calendarStats.todayAppointments}`, icon: 'ri-calendar-check-line', color: '#1E5FBE' },
-          { label: 'This Week', value: `${calendarStats.weekAppointments}`, icon: 'ri-calendar-2-line', color: '#0A1F4A' },
+          { label: "Today's Appts", value: `${calendarStats.todayAppointments}`, icon: 'ri-calendar-check-line', color: '#0D1F4A' },
+          { label: 'This Week', value: `${calendarStats.weekAppointments}`, icon: 'ri-calendar-2-line', color: '#07101F' },
           { label: 'Pending Confirm', value: `${calendarStats.pendingConfirmations}`, icon: 'ri-time-line', color: '#F5A623' },
           { label: 'Repair Queue', value: `${calendarStats.repairQueue}`, icon: 'ri-tools-line', color: '#E05A2B' },
           { label: 'Completed', value: `${calendarStats.completedToday}`, icon: 'ri-check-double-line', color: '#25D366' },
@@ -81,7 +81,7 @@ export default function CalendarPage() {
               <button
                 onClick={() => setShowAddEvent(true)}
                 className="px-4 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer whitespace-nowrap"
-                style={{ background: '#1E5FBE' }}
+                style={{ background: '#0D1F4A' }}
               >
                 <i className="ri-add-line mr-1" /> Add
               </button>
@@ -201,7 +201,7 @@ export default function CalendarPage() {
                         <p className="text-xs text-slate-600">{event.notes}</p>
                       </div>
                       <div className="flex gap-2 pt-2">
-                        <button className="flex-1 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+                        <button className="flex-1 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
                           Confirm
                         </button>
                         <button className="flex-1 py-2 rounded-lg text-xs font-semibold border border-slate-200 text-slate-500 cursor-pointer whitespace-nowrap">
@@ -221,9 +221,9 @@ export default function CalendarPage() {
             <div className="space-y-2">
               {[
                 { label: 'New Repair Booking', icon: 'ri-tools-line', color: '#E05A2B' },
-                { label: 'Schedule Consultation', icon: 'ri-user-voice-line', color: '#1E5FBE' },
+                { label: 'Schedule Consultation', icon: 'ri-user-voice-line', color: '#0D1F4A' },
                 { label: 'Book Trade-In', icon: 'ri-exchange-line', color: '#F5A623' },
-                { label: 'Staff Meeting', icon: 'ri-team-line', color: '#0A1F4A' },
+                { label: 'Staff Meeting', icon: 'ri-team-line', color: '#07101F' },
               ].map((action) => (
                 <button
                   key={action.label}

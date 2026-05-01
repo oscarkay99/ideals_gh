@@ -10,10 +10,10 @@ import { isSupabaseConfigured, supabase } from '@/services/supabase';
 const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
 const activityLog = [
-  { id: 1, action: 'Signed in', detail: 'Chrome on Windows · Accra, Ghana', time: 'Today, 9:42 AM', icon: 'ri-login-box-line', color: '#1E5FBE' },
+  { id: 1, action: 'Signed in', detail: 'Chrome on Windows · Accra, Ghana', time: 'Today, 9:42 AM', icon: 'ri-login-box-line', color: '#0D1F4A' },
   { id: 2, action: 'Created sale', detail: 'iPhone 15 Pro · GHS 12,500 · Kwame Asante', time: 'Today, 10:15 AM', icon: 'ri-shopping-bag-3-line', color: '#25D366' },
   { id: 3, action: 'Updated inventory', detail: 'Samsung S24 Ultra — restocked 8 units', time: 'Today, 11:00 AM', icon: 'ri-archive-line', color: '#F5A623' },
-  { id: 4, action: 'Generated report', detail: 'Monthly Sales Summary · PDF', time: 'Yesterday, 4:30 PM', icon: 'ri-file-chart-line', color: '#0A1F4A' },
+  { id: 4, action: 'Generated report', detail: 'Monthly Sales Summary · PDF', time: 'Yesterday, 4:30 PM', icon: 'ri-file-chart-line', color: '#07101F' },
   { id: 5, action: 'Added customer', detail: 'Efua Boateng · +233 24 000 0006', time: 'Yesterday, 2:00 PM', icon: 'ri-user-add-line', color: '#E05A2B' },
   { id: 6, action: 'Signed out', detail: 'Session ended', time: 'Yesterday, 7:00 PM', icon: 'ri-logout-box-line', color: '#94A3B8' },
 ];
@@ -41,7 +41,7 @@ export default function ProfilePage() {
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
-  const roleColor = user?.role ? roleColors[user.role] : '#1E5FBE';
+  const roleColor = user?.role ? roleColors[user.role] : '#0D1F4A';
   const roleLabel = user?.role ? roleLabels[user.role] : 'User';
   const userPermissions = user?.role ? rolePermissions[user.role] : [];
   const quickActions = [
@@ -114,7 +114,7 @@ export default function ProfilePage() {
     const levels = [
       { score: 1, label: 'Weak', color: '#E05A2B' },
       { score: 2, label: 'Fair', color: '#F5A623' },
-      { score: 3, label: 'Good', color: '#1E5FBE' },
+      { score: 3, label: 'Good', color: '#0D1F4A' },
       { score: 4, label: 'Strong', color: '#25D366' },
     ];
     return levels[score - 1] || { score: 0, label: '', color: '' };
@@ -168,8 +168,8 @@ export default function ProfilePage() {
                   onClick={() => navigate(item.path)}
                   className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
                 >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#1E5FBE15' }}>
-                    <i className={`${item.icon} text-xs`} style={{ color: '#1E5FBE' }} />
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#0D1F4A15' }}>
+                    <i className={`${item.icon} text-xs`} style={{ color: '#0D1F4A' }} />
                   </div>
                   <span className="text-xs font-medium text-slate-700">{item.label}</span>
                   <i className="ri-arrow-right-s-line text-slate-300 ml-auto" />
@@ -197,7 +197,7 @@ export default function ProfilePage() {
                 key={id}
                 onClick={() => setActiveTab(id as 'profile' | 'security' | 'activity')}
                 className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${activeTab === id ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
-                style={activeTab === id ? { background: '#1E5FBE' } : {}}
+                style={activeTab === id ? { background: '#0D1F4A' } : {}}
               >
                 {label}
               </button>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                 ) : (
                   <div className="flex gap-2">
                     <button onClick={() => setEditMode(false)} className="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-200 text-slate-500 cursor-pointer whitespace-nowrap">Cancel</button>
-                    <button onClick={handleSaveProfile} className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>Save Changes</button>
+                    <button onClick={handleSaveProfile} className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>Save Changes</button>
                   </div>
                 )}
               </div>
@@ -408,7 +408,7 @@ export default function ProfilePage() {
                     onClick={handleChangePassword}
                     disabled={passwordLoading}
                     className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap disabled:opacity-60"
-                    style={{ background: 'linear-gradient(135deg, #0A1F4A, #1E5FBE)' }}
+                    style={{ background: 'linear-gradient(135deg, #07101F, #0D1F4A)' }}
                   >
                     {passwordLoading ? 'Updating Password...' : 'Update Password'}
                   </button>
@@ -425,8 +425,8 @@ export default function ProfilePage() {
                     { device: 'Chrome on MacBook', location: 'Kumasi, Ghana', time: 'Apr 20, 2026', current: false, icon: 'ri-macbook-line' },
                   ].map((session, i) => (
                     <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#1E5FBE15' }}>
-                        <i className={`${session.icon} text-sm`} style={{ color: '#1E5FBE' }} />
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#0D1F4A15' }}>
+                        <i className={`${session.icon} text-sm`} style={{ color: '#0D1F4A' }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold text-slate-800">{session.device}</p>

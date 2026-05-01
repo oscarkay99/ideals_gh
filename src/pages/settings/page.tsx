@@ -71,7 +71,7 @@ export default function SettingsPage() {
   const [phone, setPhone] = useState('+233 24 000 0000');
   const [whatsapp, setWhatsapp] = useState('+233 24 000 0000');
   const [address, setAddress] = useState('Accra Mall, Accra, Ghana');
-  const [primaryColor, setPrimaryColor] = useState('#1E5FBE');
+  const [primaryColor, setPrimaryColor] = useState('#0D1F4A');
   const [autoFollowUp, setAutoFollowUp] = useState(true);
   const [lowStockAlert, setLowStockAlert] = useState(true);
   const [paymentReminder, setPaymentReminder] = useState(false);
@@ -144,7 +144,7 @@ export default function SettingsPage() {
             <span className="text-xs text-slate-400">{saved ? '✓ Changes saved successfully' : 'Unsaved changes'}</span>
             <div className="flex items-center gap-3">
               <button className="text-sm text-slate-500 hover:text-slate-700 cursor-pointer">Discard</button>
-              <button onClick={handleSave} className="px-5 py-2 text-white text-sm font-semibold rounded-xl cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+              <button onClick={handleSave} className="px-5 py-2 text-white text-sm font-semibold rounded-xl cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
                 Save Changes
               </button>
             </div>

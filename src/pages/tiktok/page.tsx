@@ -161,7 +161,7 @@ export default function TikTokPage() {
                         className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${selectedConvId === chat.id ? 'bg-slate-50' : 'hover:bg-slate-50/50'}`}
                       >
                         <div className="relative flex-shrink-0">
-                          <img src={chat.avatar} alt={chat.name} className="w-10 h-10 rounded-full object-cover" />
+                          <img loading="lazy" decoding="async" src={chat.avatar} alt={chat.name} className="w-10 h-10 rounded-full object-cover" />
                           {chat.online && <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white" style={{ background: '#25F4EE' }} />}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -193,7 +193,7 @@ export default function TikTokPage() {
                         >
                           <div className="relative flex-shrink-0">
                             {conv.contact?.avatar_url ? (
-                              <img src={conv.contact.avatar_url} className="w-10 h-10 rounded-full object-cover" alt={name} />
+                              <img loading="lazy" decoding="async" src={conv.contact.avatar_url} className="w-10 h-10 rounded-full object-cover" alt={name} />
                             ) : (
                               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-cyan-400 flex items-center justify-center text-white text-xs font-bold">
                                 {getInitials(name)}
@@ -230,7 +230,7 @@ export default function TikTokPage() {
                     return mockChat ? (
                       <>
                         <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-                          <img src={mockChat.avatar} alt={mockChat.name} className="w-10 h-10 rounded-full object-cover" />
+                          <img loading="lazy" decoding="async" src={mockChat.avatar} alt={mockChat.name} className="w-10 h-10 rounded-full object-cover" />
                           <div>
                             <p className="text-sm font-semibold text-slate-800">{mockChat.name}</p>
                             <p className="text-xs text-slate-400">{mockChat.followerCount.toLocaleString()} followers · {mockChat.online ? 'Online' : 'Offline'}</p>

@@ -31,7 +31,7 @@ export default function TemplatesSection({ templates, editingTemplate, onEditTog
           <h3 className="text-sm font-bold text-slate-800">Message Templates</h3>
           <p className="text-xs text-slate-400 mt-0.5">Used for WhatsApp, SMS, and automated messages</p>
         </div>
-        <button onClick={onNewTemplate} className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+        <button onClick={onNewTemplate} className="px-4 py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
           <i className="ri-add-line mr-1" /> New Template
         </button>
       </div>

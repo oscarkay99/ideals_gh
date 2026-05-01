@@ -26,7 +26,7 @@ export default function QuoteModal({ cartItems, subtotal, deliveryFee, total, on
         </div>
         <div className="text-center mb-5">
           <div className="w-10 h-10 rounded-xl overflow-hidden mx-auto mb-2">
-            <img src="https://public.readdy.ai/ai/img_res/7bf43506-9df4-4671-b4ee-9c6d6fc6f9c0.png" alt="GadgetFlow" className="w-full h-full object-cover" />
+            <img loading="lazy" decoding="async" src="https://public.readdy.ai/ai/img_res/7bf43506-9df4-4671-b4ee-9c6d6fc6f9c0.png" alt="GadgetFlow" className="w-full h-full object-cover" />
           </div>
           <p className="text-sm font-bold text-slate-800">GadgetFlow</p>
           <p className="text-[10px] text-slate-400">Quote #Q-2026-0089 · Valid until Apr 30, 2026</p>

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { inventoryProducts, inventoryStats } from '@/mocks/inventory';
+import { inventoryStats } from '@/mocks/inventory';
+import { useInventory } from '@/hooks/useInventory';
 import ProductDetail from './components/ProductDetail';
+import AddProductModal from './components/AddProductModal';
 
 const conditionConfig: Record<string, { label: string; color: string; dot: string }> = {
   'New': { label: 'New', color: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' },
@@ -11,17 +13,19 @@ const conditionConfig: Record<string, { label: string; color: string; dot: strin
 };
 
 export default function InventoryPage() {
+  const { products, add } = useInventory();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
 
-  const filtered = inventoryProducts.filter((p) => {
+  const filtered = products.filter((p) => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase());
     const matchFilter = filter === 'all' || p.condition === filter || (filter === 'low' && p.stock <= 2) || (filter === 'out' && p.stock === 0);
     return matchSearch && matchFilter;
   });
 
-  const product = selected ? inventoryProducts.find((p) => p.id === selected) : null;
+  const product = selected ? products.find((p) => p.id === selected) : null;
 
   return (
     <AdminLayout title="Inventory" subtitle="Manage products, stock, and suppliers">
@@ -71,10 +75,12 @@ export default function InventoryPage() {
             </button>
           ))}
         </div>
-        <button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap">
-          <div className="w-4 h-4 flex items-center justify-center">
-            <i className="ri-add-line text-sm" />
-          </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center gap-2 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
+          style={{ background: '#0D1F4A' }}
+        >
+          <i className="ri-add-line text-sm" />
           Add Product
         </button>
       </div>
@@ -145,6 +151,7 @@ export default function InventoryPage() {
       </div>
 
       {product && <ProductDetail product={product} onClose={() => setSelected(null)} />}
+      {showAdd && <AddProductModal onSave={add} onClose={() => setShowAdd(false)} />}
     </AdminLayout>
   );
 }

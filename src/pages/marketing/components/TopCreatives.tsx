@@ -25,7 +25,7 @@ export default function TopCreatives() {
             <div key={c.id} className="flex items-center gap-3 group cursor-pointer">
               <span className="text-xs font-bold text-slate-300 w-4 flex-shrink-0">#{i + 1}</span>
               <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-50">
-                <img src={c.image} alt={c.title} className="w-full h-full object-cover object-top" />
+                <img loading="lazy" decoding="async" src={c.image} alt={c.title} className="w-full h-full object-cover object-top" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-slate-800 truncate">{c.title}</p>

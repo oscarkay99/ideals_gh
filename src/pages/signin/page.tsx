@@ -52,7 +52,7 @@ function TransparentLogo() {
       style={{
         width: '260px',
         height: 'auto',
-        filter: 'drop-shadow(0 0 24px rgba(30,95,190,0.5)) drop-shadow(0 0 10px rgba(245,166,35,0.28))',
+        filter: 'drop-shadow(0 0 24px rgba(245,166,35,0.4)) drop-shadow(0 0 10px rgba(245,166,35,0.28))',
       }}
     />
   );
@@ -68,9 +68,9 @@ function IDealsLogoMark({ size = 40 }: { size?: number }) {
         </linearGradient>
       </defs>
       <path d="M32 88 Q5 58 30 22" stroke="url(#goldArcLogin)" strokeWidth="13" strokeLinecap="round" fill="none" />
-      <path d="M88 65 C88 88 74 102 55 102 C36 102 22 88 22 65 C22 42 36 30 55 30 C74 30 88 42 88 65 Z" fill="#1E5FBE" />
+      <path d="M88 65 C88 88 74 102 55 102 C36 102 22 88 22 65 C22 42 36 30 55 30 C74 30 88 42 88 65 Z" fill="#0D1F4A" />
       <path d="M38 90 Q55 76 72 86" stroke="white" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <circle cx="63" cy="16" r="13" fill="#1E5FBE" />
+      <circle cx="63" cy="16" r="13" fill="#0D1F4A" />
     </svg>
   );
 }
@@ -172,7 +172,7 @@ export default function SignInPage() {
         </div>
 
         {/* Glow orbs */}
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(30,95,190,0.25) 0%, transparent 70%)' }} />
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.12) 0%, transparent 70%)' }} />
         <div className="absolute bottom-1/3 right-1/4 w-56 h-56 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(245,166,35,0.18) 0%, transparent 70%)' }} />
         {/* Content */}
         <div className="relative z-10 flex min-h-screen flex-col px-12 py-10">
@@ -218,7 +218,7 @@ export default function SignInPage() {
       <div className="relative flex min-h-screen items-stretch justify-center px-6 py-8 lg:px-10 lg:py-10">
 
         {/* Subtle bg texture */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(30,95,190,0.08) 0%, transparent 60%)' }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 60% 40%, rgba(7,16,31,0.08) 0%, transparent 60%)' }} />
 
         <div className="relative z-10 flex w-full max-w-[440px] flex-col justify-center">
           <div className="rounded-[32px] border border-white/10 bg-white/[0.035] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.28)] backdrop-blur-xl lg:p-8">
@@ -245,7 +245,7 @@ export default function SignInPage() {
                 <div>
                   <label className="text-xs font-semibold text-white/70 block mb-2">Email Address</label>
                   <div className={`relative rounded-xl transition-all duration-200 ${emailFocused ? 'ring-2' : ''}`}
-                    style={emailFocused ? { outline: '2px solid #1E5FBE' } : {}}>
+                    style={emailFocused ? { outline: '2px solid #0D1F4A' } : {}}>
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 flex items-center justify-center">
                       <i className={`ri-mail-line text-sm transition-colors ${emailFocused ? '' : 'text-white/30'}`} style={emailFocused ? { color: '#F5A623' } : {}} />
                     </div>
@@ -258,8 +258,8 @@ export default function SignInPage() {
                       placeholder="you@idealstechhub.com"
                       className="w-full pl-10 pr-4 py-3.5 rounded-xl text-sm text-white placeholder:text-white/25 focus:outline-none transition-all"
                       style={{
-                        background: emailFocused ? 'rgba(30,95,190,0.15)' : 'rgba(255,255,255,0.06)',
-                        border: emailFocused ? '1px solid rgba(30,95,190,0.6)' : '1px solid rgba(255,255,255,0.1)',
+                        background: emailFocused ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.06)',
+                        border: emailFocused ? '1px solid rgba(245,166,35,0.6)' : '1px solid rgba(255,255,255,0.1)',
                       }}
                     />
                   </div>
@@ -291,8 +291,8 @@ export default function SignInPage() {
                       placeholder="Enter your password"
                       className="w-full pl-10 pr-12 py-3.5 rounded-xl text-sm text-white placeholder:text-white/25 focus:outline-none transition-all"
                       style={{
-                        background: passwordFocused ? 'rgba(30,95,190,0.15)' : 'rgba(255,255,255,0.06)',
-                        border: passwordFocused ? '1px solid rgba(30,95,190,0.6)' : '1px solid rgba(255,255,255,0.1)',
+                        background: passwordFocused ? 'rgba(245,166,35,0.1)' : 'rgba(255,255,255,0.06)',
+                        border: passwordFocused ? '1px solid rgba(245,166,35,0.6)' : '1px solid rgba(255,255,255,0.1)',
                       }}
                     />
                     <button
@@ -318,9 +318,9 @@ export default function SignInPage() {
                   type="submit"
                   disabled={loading}
                   className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all cursor-pointer whitespace-nowrap relative overflow-hidden group"
-                  style={{ background: loading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #1E5FBE 0%, #0A1F4A 100%)', border: '1px solid rgba(30,95,190,0.5)' }}
+                  style={{ background: loading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0D1F4A 0%, #07101F 100%)', border: '1px solid rgba(245,166,35,0.4)' }}
                 >
-                  <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'linear-gradient(135deg, #2570D4 0%, #1E5FBE 100%)' }} />
+                  <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'linear-gradient(135deg, #2B6DD4 0%, #0D1F4A 100%)' }} />
                   <span className="relative flex items-center justify-center gap-2">
                     {loading ? (
                       <><i className="ri-loader-4-line animate-spin" /> Signing in...</>
@@ -342,7 +342,7 @@ export default function SignInPage() {
 
                   <div className="space-y-2">
                     {[
-                      { name: 'Kwame Asante', role: 'Admin', email: 'admin@idealstechhub.com', password: 'admin123', avatar: 'KA', color: '#1E5FBE' },
+                      { name: 'Kwame Asante', role: 'Admin', email: 'admin@idealstechhub.com', password: 'admin123', avatar: 'KA', color: '#0D1F4A' },
                       { name: 'Kofi Mensah', role: 'Sales Manager', email: 'kofi@idealstechhub.com', password: 'kofi123', avatar: 'KM', color: '#F5A623' },
                       { name: 'Ama Owusu', role: 'Technician', email: 'ama@idealstechhub.com', password: 'ama123', avatar: 'AO', color: '#E05A2B' },
                     ].map(u => (
@@ -425,7 +425,7 @@ export default function SignInPage() {
                   type="submit"
                   disabled={forgotLoading}
                   className="w-full py-3.5 rounded-xl text-sm font-bold text-white transition-all cursor-pointer whitespace-nowrap"
-                  style={{ background: forgotLoading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #1E5FBE 0%, #0A1F4A 100%)', border: '1px solid rgba(30,95,190,0.5)' }}
+                  style={{ background: forgotLoading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #0D1F4A 0%, #07101F 100%)', border: '1px solid rgba(245,166,35,0.4)' }}
                 >
                   {forgotLoading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -464,7 +464,7 @@ export default function SignInPage() {
               <button
                 onClick={() => setView('signin')}
                 className="w-full py-3.5 rounded-xl text-sm font-bold text-white cursor-pointer whitespace-nowrap"
-                style={{ background: 'linear-gradient(135deg, #1E5FBE 0%, #0A1F4A 100%)', border: '1px solid rgba(30,95,190,0.5)' }}
+                style={{ background: 'linear-gradient(135deg, #0D1F4A 0%, #07101F 100%)', border: '1px solid rgba(245,166,35,0.4)' }}
               >
                 Back to Sign In
               </button>

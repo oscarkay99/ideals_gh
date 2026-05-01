@@ -8,7 +8,7 @@ const tabs = ['Purchase Orders', 'Suppliers'];
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   delivered: { label: 'Delivered', color: '#25D366', bg: '#25D36615' },
-  in_transit: { label: 'In Transit', color: '#1E5FBE', bg: '#1E5FBE15' },
+  in_transit: { label: 'In Transit', color: '#0D1F4A', bg: '#0D1F4A15' },
   pending: { label: 'Pending', color: '#F5A623', bg: '#F5A62315' },
   cancelled: { label: 'Cancelled', color: '#E05A2B', bg: '#E05A2B15' },
 };
@@ -25,11 +25,11 @@ export default function SuppliersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
         {[
-          { label: 'Total Suppliers', value: `${supplierStats.totalSuppliers}`, icon: 'ri-store-2-line', color: '#1E5FBE' },
+          { label: 'Total Suppliers', value: `${supplierStats.totalSuppliers}`, icon: 'ri-store-2-line', color: '#0D1F4A' },
           { label: 'Active Orders', value: `${supplierStats.activeOrders}`, icon: 'ri-file-list-3-line', color: '#F5A623' },
           { label: 'Month Spend', value: `GHS ${(supplierStats.totalSpentMonth / 1000).toFixed(0)}K`, icon: 'ri-money-dollar-circle-line', color: '#E05A2B' },
-          { label: 'Pending Deliveries', value: `${supplierStats.pendingDeliveries}`, icon: 'ri-truck-line', color: '#0A1F4A' },
-          { label: 'Avg Lead Time', value: supplierStats.avgLeadTime, icon: 'ri-time-line', color: '#154290' },
+          { label: 'Pending Deliveries', value: `${supplierStats.pendingDeliveries}`, icon: 'ri-truck-line', color: '#07101F' },
+          { label: 'Avg Lead Time', value: supplierStats.avgLeadTime, icon: 'ri-time-line', color: '#1552A8' },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-2xl p-4 border border-slate-100">
             <div className="flex items-center gap-2 mb-2">
@@ -51,7 +51,7 @@ export default function SuppliersPage() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${activeTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
-              style={activeTab === tab ? { background: '#1E5FBE' } : {}}
+              style={activeTab === tab ? { background: '#0D1F4A' } : {}}
             >
               {tab}
             </button>
@@ -60,7 +60,7 @@ export default function SuppliersPage() {
         <button
           onClick={() => setShowNewPO(true)}
           className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap"
-          style={{ background: '#1E5FBE' }}
+          style={{ background: '#0D1F4A' }}
         >
           <i className="ri-add-line mr-1" /> New Purchase Order
         </button>
@@ -117,8 +117,8 @@ export default function SuppliersPage() {
           {suppliers.map(supplier => (
             <div key={supplier.id} className="bg-white rounded-2xl p-5 border border-slate-100">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#1E5FBE15' }}>
-                  <i className="ri-store-2-line text-sm" style={{ color: '#1E5FBE' }} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#0D1F4A15' }}>
+                  <i className="ri-store-2-line text-sm" style={{ color: '#0D1F4A' }} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-800 truncate">{supplier.name}</p>
@@ -150,9 +150,9 @@ export default function SuppliersPage() {
               </div>
               <div className="flex items-center justify-between text-xs mb-3">
                 <span className="text-slate-500">Total Value</span>
-                <span className="font-bold" style={{ color: '#1E5FBE' }}>{supplier.totalValue}</span>
+                <span className="font-bold" style={{ color: '#0D1F4A' }}>{supplier.totalValue}</span>
               </div>
-              <button onClick={() => setShowNewPO(true)} className="w-full py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+              <button onClick={() => setShowNewPO(true)} className="w-full py-2 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
                 Create Purchase Order
               </button>
             </div>

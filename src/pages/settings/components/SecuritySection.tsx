@@ -51,8 +51,8 @@ export default function SecuritySection() {
         <div className="space-y-3">
           {sessions.map((session, i) => (
             <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#1E5FBE15' }}>
-                <i className="ri-computer-line text-sm" style={{ color: '#1E5FBE' }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#0D1F4A15' }}>
+                <i className="ri-computer-line text-sm" style={{ color: '#0D1F4A' }} />
               </div>
               <div className="flex-1">
                 <p className="text-xs font-semibold text-slate-800">{session.device}</p>

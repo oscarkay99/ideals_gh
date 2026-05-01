@@ -41,7 +41,7 @@ export default function IgPosts({ posts, onNewPost }: IgPostsProps) {
           <div key={post.id} className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
             <div className="flex gap-4 p-4">
               <div className="relative flex-shrink-0">
-                <img src={post.thumbnail} alt={post.type} className="w-20 h-20 rounded-xl object-cover object-top" />
+                <img loading="lazy" decoding="async" src={post.thumbnail} alt={post.type} className="w-20 h-20 rounded-xl object-cover object-top" />
                 <span
                   className="absolute top-1 left-1 text-[9px] text-white px-1.5 py-0.5 rounded-full font-bold uppercase"
                   style={{ background: igGradient }}
@@ -59,7 +59,7 @@ export default function IgPosts({ posts, onNewPost }: IgPostsProps) {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] text-slate-400">Reach: <strong className="text-slate-700">{post.reach.toLocaleString()}</strong></span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: '#EEF4FF', color: '#1E5FBE' }}>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(7,16,31,0.06)', color: '#0D1F4A' }}>
                     {post.leads} leads
                   </span>
                   <span className="text-[10px] text-slate-400 ml-auto">{post.postedAt}</span>

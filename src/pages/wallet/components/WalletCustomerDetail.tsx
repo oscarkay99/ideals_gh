@@ -43,7 +43,7 @@ export default function WalletCustomerDetail({ customer, onTopUp }: Props) {
 
   return (
     <div className="lg:col-span-2 space-y-4">
-      <div className="rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #0A1F4A 0%, #1E5FBE 100%)' }}>
+      <div className="rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(135deg, #07101F 0%, #0D1F4A 100%)' }}>
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className={`w-12 h-12 rounded-full ${customer.avatarColor} flex items-center justify-center text-white font-bold`}>
@@ -63,7 +63,7 @@ export default function WalletCustomerDetail({ customer, onTopUp }: Props) {
           <button
             onClick={onTopUp}
             className="px-4 py-2 text-white rounded-xl text-sm font-semibold cursor-pointer whitespace-nowrap hover:opacity-90"
-            style={{ background: '#1E5FBE' }}
+            style={{ background: '#0D1F4A' }}
           >
             <i className="ri-add-circle-line mr-1" />Top Up
           </button>

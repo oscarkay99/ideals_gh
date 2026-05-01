@@ -44,13 +44,10 @@ export default function PaymentsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2">
-            <TransactionTable />
-          </div>
-          <div>
-            <VerificationQueue />
-          </div>
+        <TransactionTable />
+
+        <div className="mt-5">
+          <VerificationQueue />
         </div>
       </div>
     </AdminLayout>

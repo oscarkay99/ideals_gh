@@ -22,7 +22,7 @@ export const calendarEvents = [
     time: '10:30',
     duration: 30,
     status: 'confirmed',
-    color: '#1E5FBE',
+    color: '#0D1F4A',
     notes: 'Wants to compare S24 vs S24 Ultra',
   },
   {
@@ -61,7 +61,7 @@ export const calendarEvents = [
     time: '16:00',
     duration: 30,
     status: 'confirmed',
-    color: '#0A1F4A',
+    color: '#07101F',
     notes: 'Weekly team sync, discuss sales targets',
   },
   {
@@ -87,7 +87,7 @@ export const calendarEvents = [
     time: '11:00',
     duration: 30,
     status: 'pending',
-    color: '#1E5FBE',
+    color: '#0D1F4A',
     notes: 'First-time customer, wants financing options',
   },
   {
@@ -126,7 +126,7 @@ export const calendarEvents = [
     time: '10:00',
     duration: 240,
     status: 'confirmed',
-    color: '#154290',
+    color: '#1552A8',
     notes: 'DHL pickup for Kumasi delivery',
   },
   {
@@ -152,7 +152,7 @@ export const calendarEvents = [
     time: '15:00',
     duration: 60,
     status: 'confirmed',
-    color: '#0A1F4A',
+    color: '#07101F',
     notes: 'Training on new Samsung A55 and Redmi Note 13 Pro',
   },
 ];

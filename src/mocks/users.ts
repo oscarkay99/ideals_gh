@@ -30,11 +30,11 @@ export const roleLabels: Record<UserRole, string> = {
 };
 
 export const roleColors: Record<UserRole, string> = {
-  admin: '#1E5FBE',
+  admin: '#0D1F4A',
   sales_manager: '#F5A623',
   sales_rep: '#25D366',
   technician: '#E05A2B',
-  inventory_manager: '#0A1F4A',
+  inventory_manager: '#07101F',
 };
 
 export const systemUsers: SystemUser[] = [

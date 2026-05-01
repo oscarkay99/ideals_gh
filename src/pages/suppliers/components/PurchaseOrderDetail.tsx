@@ -1,6 +1,6 @@
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   delivered:  { label: 'Delivered',   color: '#25D366', bg: '#25D36615' },
-  in_transit: { label: 'In Transit',  color: '#1E5FBE', bg: '#1E5FBE15' },
+  in_transit: { label: 'In Transit',  color: '#0D1F4A', bg: '#0D1F4A15' },
   pending:    { label: 'Pending',     color: '#F5A623', bg: '#F5A62315' },
   cancelled:  { label: 'Cancelled',   color: '#E05A2B', bg: '#E05A2B15' },
 };
@@ -67,7 +67,7 @@ export default function PurchaseOrderDetail({ order }: Props) {
       </div>
       <div className="flex justify-between text-sm font-bold pt-3 border-t border-slate-100 mb-4">
         <span>Total</span>
-        <span style={{ color: '#1E5FBE' }}>GHS {order.totalValue.toLocaleString()}</span>
+        <span style={{ color: '#0D1F4A' }}>GHS {order.totalValue.toLocaleString()}</span>
       </div>
       {order.notes && (
         <div className="bg-slate-50 rounded-xl p-3 mb-4">
@@ -76,7 +76,7 @@ export default function PurchaseOrderDetail({ order }: Props) {
         </div>
       )}
       {order.status === 'in_transit' && (
-        <button className="w-full py-2.5 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+        <button className="w-full py-2.5 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
           Mark as Delivered
         </button>
       )}

@@ -115,7 +115,7 @@ export default function UserFormModal({
                     <div
                       onClick={() => onTogglePermission(perm)}
                       className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 cursor-pointer border transition-all ${checked ? 'border-transparent' : 'border-slate-300 bg-white'}`}
-                      style={checked ? { background: roleColors[editingUser.role as UserRole] || '#1E5FBE' } : {}}
+                      style={checked ? { background: roleColors[editingUser.role as UserRole] || '#0D1F4A' } : {}}
                     >
                       {checked && <i className="ri-check-line text-white text-[10px]" />}
                     </div>
@@ -150,7 +150,7 @@ export default function UserFormModal({
             <button
               onClick={onSave}
               className="flex-1 py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap"
-              style={{ background: '#1E5FBE' }}
+              style={{ background: '#0D1F4A' }}
             >
               {isEditing ? 'Save Changes' : 'Create User'}
             </button>

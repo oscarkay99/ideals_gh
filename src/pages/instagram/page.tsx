@@ -154,7 +154,7 @@ export default function InstagramPage() {
                     >
                       <div className="relative flex-shrink-0">
                         {contact?.avatar_url ? (
-                          <img src={contact.avatar_url} className="w-10 h-10 rounded-full object-cover" alt={name} />
+                          <img loading="lazy" decoding="async" src={contact.avatar_url} className="w-10 h-10 rounded-full object-cover" alt={name} />
                         ) : (
                           <div className={`w-10 h-10 rounded-full ${getAvatarColor(conv.id)} flex items-center justify-center text-white text-xs font-bold`}>
                             {getInitials(contact?.display_name ?? null)}

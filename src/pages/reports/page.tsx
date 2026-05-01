@@ -3,11 +3,11 @@ import AdminLayout from '@/components/feature/AdminLayout';
 import ReportHistory from './components/ReportHistory';
 
 const reportTypes = [
-  { id: 'sales', name: 'Sales Report', icon: 'ri-shopping-bag-3-line', color: '#1E5FBE', desc: 'Revenue, orders, top products, payment methods' },
-  { id: 'inventory', name: 'Inventory Report', icon: 'ri-archive-line', color: '#0A1F4A', desc: 'Stock levels, fast movers, restock alerts' },
+  { id: 'sales', name: 'Sales Report', icon: 'ri-shopping-bag-3-line', color: '#0D1F4A', desc: 'Revenue, orders, top products, payment methods' },
+  { id: 'inventory', name: 'Inventory Report', icon: 'ri-archive-line', color: '#07101F', desc: 'Stock levels, fast movers, restock alerts' },
   { id: 'customers', name: 'Customer Report', icon: 'ri-group-line', color: '#F5A623', desc: 'LTV, segments, retention, new vs returning' },
   { id: 'repairs', name: 'Repairs Report', icon: 'ri-tools-line', color: '#E05A2B', desc: 'Turnaround time, revenue, technician performance' },
-  { id: 'expenses', name: 'P&L Statement', icon: 'ri-calculator-line', color: '#154290', desc: 'Revenue vs expenses, profit margins, YTD' },
+  { id: 'expenses', name: 'P&L Statement', icon: 'ri-calculator-line', color: '#1552A8', desc: 'Revenue vs expenses, profit margins, YTD' },
   { id: 'team', name: 'Team Performance', icon: 'ri-team-line', color: '#25D366', desc: 'Sales per rep, close rates, response times' },
   { id: 'marketing', name: 'Marketing Report', icon: 'ri-megaphone-line', color: '#FE2C55', desc: 'Campaign ROI, leads by channel, conversion rates' },
   { id: 'loyalty', name: 'Loyalty Report', icon: 'ri-vip-crown-line', color: '#F5A623', desc: 'Points issued, redeemed, tier distribution' },
@@ -23,13 +23,13 @@ const prebuiltReports = [
 ];
 
 const kpiData = [
-  { label: 'Total Revenue (Apr)', value: 'GHS 84,320', change: '+12.4%', up: true, color: '#1E5FBE' },
-  { label: 'Total Orders', value: '109', change: '+8.2%', up: true, color: '#0A1F4A' },
+  { label: 'Total Revenue (Apr)', value: 'GHS 84,320', change: '+12.4%', up: true, color: '#0D1F4A' },
+  { label: 'Total Orders', value: '109', change: '+8.2%', up: true, color: '#07101F' },
   { label: 'Avg Order Value', value: 'GHS 773', change: '+3.8%', up: true, color: '#F5A623' },
   { label: 'Gross Profit', value: 'GHS 9,430', change: '+24.1%', up: true, color: '#25D366' },
-  { label: 'Profit Margin', value: '11.2%', change: '+1.8pp', up: true, color: '#154290' },
+  { label: 'Profit Margin', value: '11.2%', change: '+1.8pp', up: true, color: '#1552A8' },
   { label: 'New Customers', value: '34', change: '+18.5%', up: true, color: '#E05A2B' },
-  { label: 'Repair Revenue', value: 'GHS 12,400', change: '+6.3%', up: true, color: '#1A52A8' },
+  { label: 'Repair Revenue', value: 'GHS 12,400', change: '+6.3%', up: true, color: '#0E3D8A' },
   { label: 'Leads Converted', value: '23', change: '-4.2%', up: false, color: '#F5A623' },
 ];
 
@@ -71,7 +71,7 @@ export default function ReportsPage() {
             key={id}
             onClick={() => setActiveTab(id as 'overview' | 'generate' | 'history')}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${activeTab === id ? 'text-white' : 'text-slate-500 hover:text-slate-700'}`}
-            style={activeTab === id ? { background: '#1E5FBE' } : {}}
+            style={activeTab === id ? { background: '#0D1F4A' } : {}}
           >
             {label}
           </button>
@@ -134,7 +134,7 @@ export default function ReportsPage() {
                   key={rt.id}
                   onClick={() => setSelectedReport(rt.id)}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all cursor-pointer text-left ${selectedReport === rt.id ? 'text-white' : 'hover:bg-slate-50'}`}
-                  style={selectedReport === rt.id ? { background: '#1E5FBE' } : {}}
+                  style={selectedReport === rt.id ? { background: '#0D1F4A' } : {}}
                 >
                   <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: selectedReport === rt.id ? 'rgba(255,255,255,0.2)' : `${rt.color}15` }}>
                     <i className={`${rt.icon} text-xs`} style={{ color: selectedReport === rt.id ? '#fff' : rt.color }} />
@@ -178,7 +178,7 @@ export default function ReportsPage() {
                         key={f}
                         onClick={() => setFormat(f)}
                         className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${format === f ? 'text-white' : 'bg-slate-50 text-slate-600 border border-slate-200'}`}
-                        style={format === f ? { background: '#1E5FBE' } : {}}
+                        style={format === f ? { background: '#0D1F4A' } : {}}
                       >
                         {f}
                       </button>
@@ -211,7 +211,7 @@ export default function ReportsPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+                  <button className="flex-1 py-2.5 rounded-xl text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
                     <i className="ri-download-line mr-1" /> Download {format}
                   </button>
                   <button className="flex-1 py-2.5 rounded-xl text-xs font-semibold border border-slate-200 text-slate-600 cursor-pointer whitespace-nowrap">
@@ -227,7 +227,7 @@ export default function ReportsPage() {
                 onClick={handleGenerate}
                 disabled={generating}
                 className="w-full py-4 rounded-2xl text-sm font-bold text-white cursor-pointer whitespace-nowrap transition-all"
-                style={{ background: generating ? '#94A3B8' : 'linear-gradient(135deg, #0A1F4A, #1E5FBE)' }}
+                style={{ background: generating ? '#94A3B8' : 'linear-gradient(135deg, #07101F, #0D1F4A)' }}
               >
                 {generating ? (
                   <span className="flex items-center justify-center gap-2">

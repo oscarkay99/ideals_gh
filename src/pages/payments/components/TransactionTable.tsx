@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { transactions as initialTransactions } from '@/mocks/payments';
+import { useTransactions } from '@/hooks/useTransactions';
 
-const statusConfig: Record<string, { label: string; color: string }> = {
-  verified: { label: 'Verified', color: 'bg-emerald-100 text-emerald-700' },
-  pending: { label: 'Pending', color: 'bg-amber-100 text-amber-700' },
-  failed: { label: 'Failed', color: 'bg-red-100 text-red-600' },
-  needs_review: { label: 'Needs Review', color: 'bg-slate-100 text-slate-600' },
+const statusConfig: Record<string, { label: string; dot: string; badge: string; text: string }> = {
+  verified:     { label: 'Verified',     dot: '#10B981', badge: 'rgba(16,185,129,0.1)',  text: '#059669' },
+  pending:      { label: 'Pending',      dot: '#F59E0B', badge: 'rgba(245,166,35,0.12)', text: '#B8860B' },
+  failed:       { label: 'Failed',       dot: '#EF4444', badge: 'rgba(239,68,68,0.1)',   text: '#DC2626' },
+  needs_review: { label: 'Needs Review', dot: '#8B5CF6', badge: 'rgba(139,92,246,0.1)', text: '#7C3AED' },
 };
 
 const methodIcons: Record<string, string> = {
@@ -15,131 +15,287 @@ const methodIcons: Record<string, string> = {
   Card: 'ri-bank-card-line',
 };
 
+const itemsByProduct: Record<string, Array<{ name: string; qty: number; price: string }>> = {
+  'iPhone 15 Pro Max': [{ name: 'iPhone 15 Pro Max 256GB', qty: 1, price: 'GHS 7,800' }, { name: 'Apple Care+', qty: 1, price: 'GHS 400' }],
+  'Samsung Galaxy S24': [{ name: 'Samsung Galaxy S24 128GB', qty: 1, price: 'GHS 3,900' }, { name: 'Screen Protector', qty: 1, price: 'GHS 180' }, { name: 'Cover Case', qty: 1, price: 'GHS 120' }],
+  'MacBook Air M2': [{ name: 'MacBook Air M2 8GB/256GB', qty: 1, price: 'GHS 11,800' }, { name: 'USB-C Hub', qty: 1, price: 'GHS 600' }],
+  'AirPods Pro 2': [{ name: 'AirPods Pro (2nd Gen)', qty: 1, price: 'GHS 1,600' }],
+  'iPad Pro 12.9"': [{ name: 'iPad Pro 12.9" M2 WiFi', qty: 1, price: 'GHS 3,200' }, { name: 'Apple Pencil 2', qty: 1, price: 'GHS 300' }],
+  'Samsung Galaxy S24 Ultra': [{ name: 'Samsung S24 Ultra 256GB', qty: 1, price: 'GHS 6,400' }, { name: 'S Pen Case', qty: 1, price: 'GHS 280' }, { name: 'Screen Protector', qty: 1, price: 'GHS 120' }],
+  'Apple Watch Series 9': [{ name: 'Apple Watch Series 9 GPS', qty: 1, price: 'GHS 2,000' }, { name: 'Extra Band', qty: 1, price: 'GHS 200' }],
+  'MacBook Pro 14"': [{ name: 'MacBook Pro 14" M3 16GB', qty: 1, price: 'GHS 9,200' }, { name: 'USB-C Hub', qty: 1, price: 'GHS 600' }],
+};
+
 export default function TransactionTable() {
+  const { transactions, verify } = useTransactions();
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
-  const [transactions, setTransactions] = useState(initialTransactions);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>('');
 
-  const approve = (id: string) => setTransactions(prev => prev.map(t => t.id === id ? { ...t, status: 'verified' } : t));
+  const approve = (id: string) => verify(id, 'verified');
 
   const filtered = transactions.filter((t) => {
     const matchStatus = filter === 'all' || t.status === filter;
-    const matchSearch = t.customer.toLowerCase().includes(search.toLowerCase()) || t.reference.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = !search || t.customer.toLowerCase().includes(search.toLowerCase()) || t.reference.toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;
   });
 
+  const selected = transactions.find(t => t.id === selectedId) ?? transactions[0];
+  const items = selected ? (itemsByProduct[selected.product] ?? [{ name: selected.product, qty: 1, price: selected.amount }]) : [];
+  const sc = selected ? statusConfig[selected.status] : statusConfig.pending;
+
+  const filters = ['all', 'verified', 'pending', 'needs_review', 'failed'];
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-5 border-b border-slate-100">
-        <h3 className="text-sm font-semibold text-slate-800 flex-1">Transactions</h3>
-        <div className="flex items-center gap-2 flex-wrap">
-          {['all', 'verified', 'pending', 'needs_review', 'failed'].map((s) => (
+    <div
+      className="rounded-2xl overflow-hidden flex"
+      style={{
+        background: 'white',
+        border: '1px solid rgba(7,16,31,0.07)',
+        boxShadow: '0 1px 3px rgba(7,16,31,0.04), 0 8px 32px rgba(7,16,31,0.06)',
+        height: '620px',
+      }}
+    >
+      {/* ── LEFT: Transaction list ─────────────────────────────────── */}
+      <div className="flex flex-col w-[300px] flex-shrink-0" style={{ borderRight: '1px solid rgba(7,16,31,0.07)' }}>
+        {/* List header */}
+        <div className="px-4 pt-4 pb-3" style={{ borderBottom: '1px solid rgba(7,16,31,0.06)' }}>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[14px] font-bold" style={{ color: '#07101F' }}>Transactions</h3>
             <button
-              key={s}
-              onClick={() => setFilter(s)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
-                filter === s ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-              }`}
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-white text-sm cursor-pointer"
+              style={{ background: '#0D1F4A' }}
             >
-              {s === 'all' ? 'All' : statusConfig[s]?.label}
+              <i className="ri-add-line" />
             </button>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2">
-          <div className="w-4 h-4 flex items-center justify-center text-slate-400">
-            <i className="ri-search-line text-sm" />
           </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent text-sm text-slate-600 placeholder-slate-400 outline-none w-32"
-          />
+          {/* Filter pills */}
+          <div className="flex gap-1.5 flex-wrap">
+            {filters.map(f => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className="text-[10px] font-semibold px-2 py-1 rounded-full cursor-pointer transition-all whitespace-nowrap"
+                style={filter === f
+                  ? { background: '#0D1F4A', color: 'white' }
+                  : { background: 'rgba(7,16,31,0.06)', color: 'rgba(7,16,31,0.5)' }
+                }
+              >
+                {f === 'all' ? 'All' : statusConfig[f]?.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* List */}
+        <div className="flex-1 overflow-y-auto">
+          {filtered.map((txn) => {
+            const s = statusConfig[txn.status];
+            const isSelected = txn.id === selectedId;
+            return (
+              <button
+                key={txn.id}
+                onClick={() => setSelectedId(txn.id)}
+                className="w-full text-left px-4 py-3.5 cursor-pointer transition-all block"
+                style={{
+                  borderBottom: '1px solid rgba(7,16,31,0.05)',
+                  background: isSelected ? 'rgba(7,16,31,0.04)' : 'transparent',
+                  borderLeft: isSelected ? '3px solid #F5A623' : '3px solid transparent',
+                }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="text-[12px] font-bold" style={{ color: '#07101F' }}>{txn.id}</span>
+                      <span
+                        className="text-[9px] font-bold px-1.5 py-0.5 rounded-full"
+                        style={{ background: s.badge, color: s.text }}
+                      >
+                        {s.label}
+                      </span>
+                    </div>
+                    <p className="text-[11px] truncate" style={{ color: 'rgba(7,16,31,0.55)' }}>{txn.product}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: 'rgba(7,16,31,0.38)' }}>{txn.customer}</p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-[12px] font-bold" style={{ color: '#07101F' }}>{txn.amount}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: 'rgba(7,16,31,0.38)' }}>{txn.date.split(',')[0]}</p>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+          {filtered.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-32 gap-2">
+              <i className="ri-inbox-line text-2xl" style={{ color: 'rgba(7,16,31,0.2)' }} />
+              <p className="text-xs" style={{ color: 'rgba(7,16,31,0.35)' }}>No transactions found</p>
+            </div>
+          )}
+        </div>
+
+        {/* Search */}
+        <div className="px-4 py-3" style={{ borderTop: '1px solid rgba(7,16,31,0.06)' }}>
+          <div
+            className="flex items-center gap-2 rounded-xl px-3 py-2"
+            style={{ background: 'rgba(7,16,31,0.05)', border: '1px solid rgba(7,16,31,0.07)' }}
+          >
+            <i className="ri-search-line text-sm" style={{ color: 'rgba(7,16,31,0.35)' }} />
+            <input
+              type="text"
+              placeholder="Search order…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-transparent text-[12px] outline-none flex-1 min-w-0"
+              style={{ color: '#07101F' }}
+            />
+          </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
-              {['ID', 'Customer', 'Product', 'Amount', 'Method', 'Status', 'Date', 'Actions'].map((h) => (
-                <th key={h} className="text-left text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((txn, i) => (
-              <>
-                <tr key={txn.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/30'}`}>
-                  <td className="px-4 py-3 text-xs font-mono text-slate-500">{txn.id}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
-                        {txn.customer[0]}
-                      </div>
-                      <span className="text-xs font-medium text-slate-800 whitespace-nowrap">{txn.customer}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-slate-600 max-w-[140px] truncate">{txn.product}</td>
-                  <td className="px-4 py-3 text-xs font-bold text-slate-900 whitespace-nowrap">{txn.amount}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5 whitespace-nowrap">
-                      <div className="w-4 h-4 flex items-center justify-center text-slate-500">
-                        <i className={`${methodIcons[txn.method]} text-xs`} />
-                      </div>
-                      <span className="text-xs text-slate-600">{txn.method}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`text-[10px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${statusConfig[txn.status].color}`}>
-                      {statusConfig[txn.status].label}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{txn.date}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() => setExpandedId(expandedId === txn.id ? null : txn.id)}
-                        className={`w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer transition-all ${expandedId === txn.id ? 'bg-blue-50 text-blue-500' : 'hover:bg-slate-100 text-slate-400 hover:text-slate-600'}`}
+      {/* ── RIGHT: Detail panel ────────────────────────────────────── */}
+      {selected ? (
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Breadcrumb */}
+          <div
+            className="px-6 py-3 flex items-center gap-2"
+            style={{ borderBottom: '1px solid rgba(7,16,31,0.06)' }}
+          >
+            <i className="ri-time-line text-sm" style={{ color: 'rgba(7,16,31,0.35)' }} />
+            <span className="text-[11px]" style={{ color: 'rgba(7,16,31,0.4)' }}>Transactions</span>
+            <i className="ri-arrow-right-s-line text-sm" style={{ color: 'rgba(7,16,31,0.25)' }} />
+            <span className="text-[11px] font-semibold" style={{ color: '#07101F' }}>Payment Detail</span>
+            <div className="ml-auto flex items-center gap-2">
+              <button className="w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer" style={{ background: 'rgba(7,16,31,0.05)' }}>
+                <i className="ri-more-2-line text-sm" style={{ color: 'rgba(7,16,31,0.4)' }} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-6 py-5">
+            {/* Order header */}
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-[20px] font-bold" style={{ color: '#07101F' }}>{selected.id}</h2>
+              <span
+                className="text-[11px] font-bold px-3 py-1.5 rounded-full"
+                style={{ background: sc.badge, color: sc.text }}
+              >
+                <span
+                  className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle"
+                  style={{ background: sc.dot }}
+                />
+                {sc.label}
+              </span>
+            </div>
+
+            {/* Details grid */}
+            <div
+              className="rounded-2xl p-4 mb-4"
+              style={{ background: 'rgba(7,16,31,0.03)', border: '1px solid rgba(7,16,31,0.06)' }}
+            >
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(7,16,31,0.4)' }}>Details</p>
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { label: 'Customer',  value: selected.customer },
+                  { label: 'Method',    value: selected.method },
+                  { label: 'Date',      value: selected.date },
+                  { label: 'Payment',   value: sc.label },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <p className="text-[10px] mb-0.5" style={{ color: 'rgba(7,16,31,0.38)' }}>{label}</p>
+                    <p className="text-[12px] font-bold" style={{ color: '#07101F' }}>{value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3" style={{ borderTop: '1px solid rgba(7,16,31,0.06)' }}>
+                <p className="text-[10px] mb-0.5" style={{ color: 'rgba(7,16,31,0.38)' }}>Reference</p>
+                <p className="text-[11px] font-mono font-semibold" style={{ color: '#0D1F4A' }}>{selected.reference}</p>
+              </div>
+            </div>
+
+            {/* Line items */}
+            <div
+              className="rounded-2xl p-4 mb-4"
+              style={{ border: '1px solid rgba(7,16,31,0.06)' }}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'rgba(7,16,31,0.4)' }}>Order info</p>
+                <div className="flex justify-between text-[10px]" style={{ color: 'rgba(7,16,31,0.35)' }}>
+                  <span className="mr-6">Items</span>
+                  <span>Price</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                {items.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ background: 'rgba(7,16,31,0.05)' }}
                       >
-                        <i className="ri-eye-line text-sm" />
-                      </button>
-                      {txn.status === 'pending' && (
-                        <button
-                          onClick={() => approve(txn.id)}
-                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 cursor-pointer transition-all"
-                          title="Approve transaction"
-                        >
-                          <i className="ri-checkbox-circle-line text-sm" />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-                {expandedId === txn.id && (
-                  <tr className="bg-blue-50/40 border-b border-blue-100">
-                    <td colSpan={8} className="px-6 py-3 text-xs text-slate-600">
-                      <div className="flex flex-wrap gap-6">
-                        <span><strong className="text-slate-700">Reference:</strong> {txn.reference}</span>
-                        <span><strong className="text-slate-700">Product:</strong> {txn.product}</span>
-                        <span><strong className="text-slate-700">Customer:</strong> {txn.customer}</span>
-                        <span><strong className="text-slate-700">Amount:</strong> {txn.amount}</span>
-                        <span><strong className="text-slate-700">Method:</strong> {txn.method}</span>
+                        <i className="ri-box-3-line text-sm" style={{ color: 'rgba(7,16,31,0.4)' }} />
                       </div>
-                    </td>
-                  </tr>
-                )}
-              </>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                      <div>
+                        <p className="text-[12px] font-semibold" style={{ color: '#07101F' }}>{item.name}</p>
+                        {item.qty > 1 && <p className="text-[10px]" style={{ color: 'rgba(7,16,31,0.4)' }}>{item.qty}×</p>}
+                      </div>
+                    </div>
+                    <p className="text-[12px] font-bold flex-shrink-0" style={{ color: '#07101F' }}>{item.price}</p>
+                  </div>
+                ))}
+              </div>
+              <div
+                className="flex items-center justify-between mt-4 pt-3"
+                style={{ borderTop: '1px solid rgba(7,16,31,0.07)' }}
+              >
+                <p className="text-[13px] font-bold" style={{ color: '#07101F' }}>Total</p>
+                <p className="text-[16px] font-black" style={{ color: '#07101F' }}>{selected.amount}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <div className="px-6 py-4" style={{ borderTop: '1px solid rgba(7,16,31,0.07)' }}>
+            {selected.status === 'pending' || selected.status === 'needs_review' ? (
+              <button
+                onClick={() => approve(selected.id)}
+                className="w-full py-3.5 rounded-2xl text-[13px] font-bold text-white cursor-pointer transition-all hover:opacity-90"
+                style={{ background: 'linear-gradient(135deg, #F5A623, #D4890A)' }}
+              >
+                <i className="ri-checkbox-circle-line mr-2" />
+                Mark as Verified — {selected.amount}
+              </button>
+            ) : selected.status === 'verified' ? (
+              <div className="flex gap-3">
+                <button
+                  className="flex-1 py-3 rounded-2xl text-[12px] font-bold cursor-pointer transition-all"
+                  style={{ background: 'rgba(7,16,31,0.06)', color: '#0D1F4A' }}
+                >
+                  <i className="ri-printer-line mr-1.5" />Print Receipt
+                </button>
+                <button
+                  className="flex-1 py-3 rounded-2xl text-[12px] font-bold cursor-pointer transition-all"
+                  style={{ background: 'rgba(239,68,68,0.08)', color: '#DC2626' }}
+                >
+                  <i className="ri-refund-line mr-1.5" />Issue Refund
+                </button>
+              </div>
+            ) : (
+              <button
+                className="w-full py-3.5 rounded-2xl text-[13px] font-bold cursor-pointer transition-all"
+                style={{ background: 'rgba(239,68,68,0.08)', color: '#DC2626' }}
+              >
+                <i className="ri-close-circle-line mr-2" />
+                Transaction Failed — Contact Customer
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center flex-col gap-3">
+          <i className="ri-file-list-3-line text-4xl" style={{ color: 'rgba(7,16,31,0.15)' }} />
+          <p className="text-sm" style={{ color: 'rgba(7,16,31,0.3)' }}>Select a transaction to view details</p>
+        </div>
+      )}
     </div>
   );
 }

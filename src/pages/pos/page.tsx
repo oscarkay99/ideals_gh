@@ -9,6 +9,8 @@ import {
   productMetrics, getTodaySummary, customerIntelligence,
   detectAnomalies, type AnomalyAlert,
 } from '@/mocks/posIntelligence';
+import { recordSaleTransaction } from '@/hooks/useLearnedPatterns';
+import { useAuth } from '@/hooks/useAuth';
 import AiReceiptModal from './components/AiReceiptModal';
 import IntelligencePanel from './components/IntelligencePanel';
 import AiChat from './components/AiChat';
@@ -126,6 +128,7 @@ export default function POSPage() {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const summary = getTodaySummary();
+  const { user } = useAuth();
 
   // ── Filtered products ────────────────────────────────────────────────────────
 
@@ -234,6 +237,27 @@ export default function POSPage() {
     const methodLabel = paymentMethod === 'momo' ? `MoMo (${momoNumber || '—'})` : paymentMethod === 'split' ? `Split (Cash: ${formatGHS(Number(splitCash))})` : paymentMethod === 'cash' ? 'Cash' : 'Card';
     setCompletedSale({ cart, customer, total: totalWithPlan, tradeIn, method: methodLabel, plan: plan.label });
     setShowReceipt(true);
+
+    // Record to Supabase for ML pattern learning (fire-and-forget)
+    const sessionId = crypto.randomUUID();
+    void recordSaleTransaction({
+      sessionId,
+      items: cart.map(item => {
+        const effectivePrice = item.product.price * (1 - item.discount / 100);
+        return {
+          productId: item.product.id,
+          productName: item.product.name,
+          category: item.product.category,
+          quantity: item.qty,
+          unitPrice: item.product.price,
+          unitCost: item.product.cost,
+          discountPct: item.discount,
+        };
+      }),
+      paymentMethod: methodLabel,
+      customerId: customer?.id ?? null,
+      cashierId: user?.id,
+    });
   }
 
   function newSale() {
@@ -256,7 +280,7 @@ export default function POSPage() {
       {/* ── Top stats bar ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {[
-          { label: "Today's Revenue", value: formatGHSShort(summary.revenue), sub: `${summary.growthPct >= 0 ? '+' : ''}${summary.growthPct}% vs yesterday`, icon: 'ri-money-dollar-circle-line', color: '#1E5FBE', positive: summary.growthPct >= 0 },
+          { label: "Today's Revenue", value: formatGHSShort(summary.revenue), sub: `${summary.growthPct >= 0 ? '+' : ''}${summary.growthPct}% vs yesterday`, icon: 'ri-money-dollar-circle-line', color: '#0D1F4A', positive: summary.growthPct >= 0 },
           { label: 'Transactions', value: String(summary.transactions), sub: `${formatGHSShort(summary.avgOrder)} avg order`, icon: 'ri-receipt-line', color: '#10b981', positive: true },
           { label: "Today's Profit", value: formatGHSShort(summary.profit), sub: `${Math.round((summary.profit / Math.max(summary.revenue, 1)) * 100)}% margin`, icon: 'ri-line-chart-line', color: '#f59e0b', positive: true },
           { label: 'Reorder Alerts', value: String(productMetrics.filter(m => m.reorderAlert).length), sub: 'items need restocking', icon: 'ri-alarm-warning-line', color: productMetrics.some(m => m.reorderAlert) ? '#ef4444' : '#10b981', positive: !productMetrics.some(m => m.reorderAlert) },
@@ -283,8 +307,8 @@ export default function POSPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${activeTab === tab.id ? 'text-white shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:border-[#1E5FBE] hover:text-[#1E5FBE]'}`}
-            style={activeTab === tab.id ? { background: 'linear-gradient(135deg, #1E5FBE, #3b82f6)' } : {}}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer ${activeTab === tab.id ? 'text-white shadow-sm' : 'bg-white text-slate-500 border border-slate-200 hover:border-[#0D1F4A] hover:text-[#0D1F4A]'}`}
+            style={activeTab === tab.id ? { background: 'linear-gradient(135deg, #0D1F4A, #3b82f6)' } : {}}
           >
             <i className={tab.icon} />{tab.label}
             {tab.id === 'intelligence' && (
@@ -344,7 +368,7 @@ export default function POSPage() {
               <div className="flex gap-2 flex-wrap">
                 {CATEGORIES.map(cat => (
                   <button key={cat} onClick={() => setCategory(cat)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${category === cat ? 'bg-[#1E5FBE] text-white' : 'bg-white text-slate-500 border border-slate-200 hover:border-[#1E5FBE] hover:text-[#1E5FBE]'}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer transition-all ${category === cat ? 'bg-[#0D1F4A] text-white' : 'bg-white text-slate-500 border border-slate-200 hover:border-[#0D1F4A] hover:text-[#0D1F4A]'}`}
                   >{cat}</button>
                 ))}
               </div>
@@ -384,14 +408,14 @@ export default function POSPage() {
                         key={p.id}
                         onClick={() => p.stock > 0 && addToCart(p)}
                         disabled={p.stock === 0}
-                        className={`group relative bg-white rounded-2xl border p-3 flex flex-col items-center gap-2 text-left transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${qty > 0 ? 'border-[#1E5FBE] ring-2 ring-[#1E5FBE]/20' : 'border-slate-100 hover:border-slate-300 hover:shadow-sm'}`}
+                        className={`group relative bg-white rounded-2xl border p-3 flex flex-col items-center gap-2 text-left transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${qty > 0 ? 'border-[#0D1F4A] ring-2 ring-[#0D1F4A]/20' : 'border-slate-100 hover:border-slate-300 hover:shadow-sm'}`}
                       >
                         <VelocityBadge productId={p.id} />
                         {qty > 0 && (
-                          <span className="absolute top-2 right-2 bg-[#1E5FBE] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{qty}</span>
+                          <span className="absolute top-2 right-2 bg-[#0D1F4A] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{qty}</span>
                         )}
                         <img
-                          src={p.image} alt={p.name}
+loading="lazy" decoding="async"                           src={p.image} alt={p.name}
                           className="w-14 h-14 object-contain rounded-xl bg-slate-50 mt-2"
                           onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f1f5f9" width="100" height="100" rx="12"/><text y=".9em" font-size="60" x="50%" text-anchor="middle">📱</text></svg>'; }}
                         />
@@ -424,7 +448,7 @@ export default function POSPage() {
                     <p className="text-xs font-semibold text-slate-800 truncate">{s.customer}</p>
                     <p className="text-[10px] text-slate-500 truncate">{s.items}</p>
                     <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs font-bold text-[#1E5FBE]">{formatGHS(s.total)}</span>
+                      <span className="text-xs font-bold text-[#0D1F4A]">{formatGHS(s.total)}</span>
                       <span className="text-[9px] text-slate-400">{s.time}</span>
                     </div>
                   </div>
@@ -442,8 +466,8 @@ export default function POSPage() {
               {customer ? (
                 <div>
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[#1E5FBE]/10 flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-[#1E5FBE]">{customer.name[0]}</span>
+                    <div className="w-9 h-9 rounded-full bg-[#0D1F4A]/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm font-bold text-[#0D1F4A]">{customer.name[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -455,7 +479,7 @@ export default function POSPage() {
                       <p className="text-[11px] text-slate-500">{customer.phone}</p>
                       <div className="flex gap-3 mt-1 text-[10px] text-slate-500">
                         <span><i className="ri-vip-crown-line text-amber-500 mr-0.5" />{customer.loyaltyPoints} pts</span>
-                        <span><i className="ri-shopping-bag-3-line text-[#1E5FBE] mr-0.5" />{customer.purchaseCount} orders</span>
+                        <span><i className="ri-shopping-bag-3-line text-[#0D1F4A] mr-0.5" />{customer.purchaseCount} orders</span>
                         {customer.openRepairs > 0 && <span className="text-rose-500"><i className="ri-tools-line mr-0.5" />{customer.openRepairs} repair</span>}
                       </div>
                       {loyaltyDiscount > 0 && (
@@ -489,13 +513,13 @@ export default function POSPage() {
                     value={customerQuery}
                     onChange={e => setCustomerQuery(e.target.value)}
                     placeholder="Search by name or phone…"
-                    className="w-full bg-slate-50 rounded-xl pl-9 pr-3 py-2 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#1E5FBE]/30"
+                    className="w-full bg-slate-50 rounded-xl pl-9 pr-3 py-2 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#0D1F4A]/30"
                   />
                   {customerSuggestions.length > 0 && (
                     <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden">
                       {customerSuggestions.map(c => (
                         <button key={c.id} onClick={() => { setCustomer(c); setCustomerQuery(''); setCustomerSuggestions([]); }} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer text-left">
-                          <div className="w-7 h-7 rounded-full bg-[#1E5FBE]/10 flex items-center justify-center text-xs font-bold text-[#1E5FBE]">{c.name[0]}</div>
+                          <div className="w-7 h-7 rounded-full bg-[#0D1F4A]/10 flex items-center justify-center text-xs font-bold text-[#0D1F4A]">{c.name[0]}</div>
                           <div>
                             <p className="text-xs font-semibold text-slate-800">{c.name}</p>
                             <p className="text-[10px] text-slate-400">{c.phone} · {c.loyaltyPoints} pts</p>
@@ -526,7 +550,7 @@ export default function POSPage() {
                     return (
                       <div key={item.product.id} className="bg-slate-50 rounded-xl p-2.5">
                         <div className="flex items-start gap-2">
-                          <img src={item.product.image} alt={item.product.name} className="w-10 h-10 object-contain rounded-lg bg-white flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f8fafc" width="100" height="100" rx="12"/></svg>'; }} />
+                          <img loading="lazy" decoding="async" src={item.product.image} alt={item.product.name} className="w-10 h-10 object-contain rounded-lg bg-white flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f8fafc" width="100" height="100" rx="12"/></svg>'; }} />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-800 leading-tight truncate">{item.product.name}</p>
                             <div className="flex items-center gap-2 mt-0.5">
@@ -566,9 +590,9 @@ export default function POSPage() {
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {upsells.map(p => (
                     <button key={p.id} onClick={() => addToCart(p)} className="flex-shrink-0 bg-white rounded-xl p-2 flex flex-col items-center gap-1 w-20 border border-indigo-100 hover:border-indigo-300 transition-all cursor-pointer">
-                      <img src={p.image} alt={p.name} className="w-10 h-10 object-contain" onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f8fafc" width="100" height="100" rx="12"/></svg>'; }} />
+                      <img loading="lazy" decoding="async" src={p.image} alt={p.name} className="w-10 h-10 object-contain" onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f8fafc" width="100" height="100" rx="12"/></svg>'; }} />
                       <p className="text-[9px] font-semibold text-slate-700 text-center line-clamp-2 leading-tight">{p.name}</p>
-                      <p className="text-[10px] font-bold text-[#1E5FBE]">{formatGHS(p.price)}</p>
+                      <p className="text-[10px] font-bold text-[#0D1F4A]">{formatGHS(p.price)}</p>
                     </button>
                   ))}
                 </div>
@@ -577,7 +601,7 @@ export default function POSPage() {
 
             {/* Trade-in */}
             {!tradeIn && !showTradeIn && (
-              <button onClick={() => setShowTradeIn(true)} className="bg-white rounded-2xl border border-dashed border-slate-200 p-3 flex items-center gap-2 text-slate-500 hover:border-[#1E5FBE] hover:text-[#1E5FBE] transition-all cursor-pointer text-xs font-medium">
+              <button onClick={() => setShowTradeIn(true)} className="bg-white rounded-2xl border border-dashed border-slate-200 p-3 flex items-center gap-2 text-slate-500 hover:border-[#0D1F4A] hover:text-[#0D1F4A] transition-all cursor-pointer text-xs font-medium">
                 <i className="ri-exchange-line" />Add Trade-In Device
               </button>
             )}
@@ -598,7 +622,7 @@ export default function POSPage() {
                 </select>
                 <div className="grid grid-cols-2 gap-2">
                   {tradeInConditions.map(c => (
-                    <button key={c.id} onClick={() => setTradeInCondition(c.id)} className={`px-2 py-2 rounded-xl text-xs font-semibold text-left border transition-all cursor-pointer ${tradeInCondition === c.id ? 'bg-[#1E5FBE] text-white border-[#1E5FBE]' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{c.label}</button>
+                    <button key={c.id} onClick={() => setTradeInCondition(c.id)} className={`px-2 py-2 rounded-xl text-xs font-semibold text-left border transition-all cursor-pointer ${tradeInCondition === c.id ? 'bg-[#0D1F4A] text-white border-[#0D1F4A]' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{c.label}</button>
                   ))}
                 </div>
                 {tradeInEstimate !== null && (
@@ -609,7 +633,7 @@ export default function POSPage() {
                 )}
                 <div className="flex gap-2">
                   <button onClick={() => setShowTradeIn(false)} className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-500 cursor-pointer hover:bg-slate-50">Cancel</button>
-                  <button onClick={applyTradeIn} disabled={!tradeInDevice || !tradeInCondition} className="flex-1 px-3 py-2 rounded-xl bg-[#1E5FBE] text-white text-xs font-semibold disabled:opacity-50 cursor-pointer">Apply</button>
+                  <button onClick={applyTradeIn} disabled={!tradeInDevice || !tradeInCondition} className="flex-1 px-3 py-2 rounded-xl bg-[#0D1F4A] text-white text-xs font-semibold disabled:opacity-50 cursor-pointer">Apply</button>
                 </div>
               </div>
             )}
@@ -641,7 +665,7 @@ export default function POSPage() {
                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Payment Plan</p>
                 <div className="grid grid-cols-4 gap-1.5">
                   {installmentPlans.map(pl => (
-                    <button key={pl.id} onClick={() => setSelectedPlan(pl.id)} className={`py-2 rounded-xl text-[10px] font-semibold border transition-all cursor-pointer text-center ${selectedPlan === pl.id ? 'bg-[#1E5FBE] text-white border-[#1E5FBE]' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{pl.label}</button>
+                    <button key={pl.id} onClick={() => setSelectedPlan(pl.id)} className={`py-2 rounded-xl text-[10px] font-semibold border transition-all cursor-pointer text-center ${selectedPlan === pl.id ? 'bg-[#0D1F4A] text-white border-[#0D1F4A]' : 'bg-slate-50 text-slate-600 border-slate-200'}`}>{pl.label}</button>
                   ))}
                 </div>
               </div>
@@ -691,7 +715,7 @@ export default function POSPage() {
               onClick={completeSale}
               disabled={cart.length === 0}
               className="w-full py-4 rounded-2xl text-white font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all hover:opacity-90 flex items-center justify-center gap-2"
-              style={{ background: cart.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #1E5FBE 0%, #1a53a8 100%)' }}
+              style={{ background: cart.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #0D1F4A 0%, #1a53a8 100%)' }}
             >
               <i className="ri-checkbox-circle-line text-lg" />
               Complete Sale · {formatGHS(totalWithPlan)}

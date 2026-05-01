@@ -68,7 +68,7 @@ export default function TrustSection() {
                 <p className="text-sm text-slate-700 leading-relaxed mb-5">&ldquo;{t.text}&rdquo;</p>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                    <img src={t.avatar} alt={t.name} className="w-full h-full object-cover object-top" />
+                    <img loading="lazy" decoding="async" src={t.avatar} alt={t.name} className="w-full h-full object-cover object-top" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-slate-800">{t.name}</p>
@@ -136,7 +136,7 @@ export default function TrustSection() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <img
-                src="https://public.readdy.ai/ai/img_res/7bf43506-9df4-4671-b4ee-9c6d6fc6f9c0.png"
+loading="lazy" decoding="async"                 src="https://public.readdy.ai/ai/img_res/7bf43506-9df4-4671-b4ee-9c6d6fc6f9c0.png"
                 alt="GadgetFlow"
                 className="w-7 h-7 rounded-lg object-cover"
               />

@@ -16,7 +16,7 @@ export default function ExpensesPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         {[
-          { label: 'Monthly Revenue', value: `GHS ${expenseStats.totalRevenue.toLocaleString()}`, icon: 'ri-money-dollar-circle-line', color: '#1E5FBE' },
+          { label: 'Monthly Revenue', value: `GHS ${expenseStats.totalRevenue.toLocaleString()}`, icon: 'ri-money-dollar-circle-line', color: '#0D1F4A' },
           { label: 'Total Expenses', value: `GHS ${expenseStats.totalExpenses.toLocaleString()}`, icon: 'ri-arrow-down-circle-line', color: '#E05A2B' },
           { label: 'Gross Profit', value: `GHS ${expenseStats.grossProfit.toLocaleString()}`, icon: 'ri-arrow-up-circle-line', color: '#25D366' },
           { label: 'Profit Margin', value: `${expenseStats.profitMargin}%`, icon: 'ri-percent-line', color: '#F5A623' },
@@ -34,7 +34,7 @@ export default function ExpensesPage() {
       </div>
 
       {/* YTD Banner */}
-      <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #0A1F4A 0%, #1E5FBE 100%)' }}>
+      <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #07101F 0%, #0D1F4A 100%)' }}>
         <div className="relative">
           <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-1">Year to Date</p>
           <h2 className="text-white text-xl font-bold tracking-tight">GHS {expenseStats.ytdRevenue.toLocaleString()} revenue · GHS {expenseStats.ytdProfit.toLocaleString()} profit</h2>
@@ -62,7 +62,7 @@ export default function ExpensesPage() {
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-700'
               }`}
-              style={activeTab === tab ? { background: '#1E5FBE' } : {}}
+              style={activeTab === tab ? { background: '#0D1F4A' } : {}}
             >
               {tab}
             </button>
@@ -87,7 +87,7 @@ export default function ExpensesPage() {
               {monthlyExpenses.filter(m => m.revenue > 0).map((month) => (
                 <div key={month.month} className="flex-1 flex flex-col items-center gap-1">
                   <div className="w-full flex flex-col gap-1">
-                    <div className="w-full rounded-t-md relative group" style={{ height: `${(month.revenue / 100000) * 160}px`, background: '#1E5FBE' }}>
+                    <div className="w-full rounded-t-md relative group" style={{ height: `${(month.revenue / 100000) * 160}px`, background: '#0D1F4A' }}>
                       <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                         GHS {month.revenue.toLocaleString()}
                       </div>
@@ -105,7 +105,7 @@ export default function ExpensesPage() {
             </div>
             <div className="flex items-center justify-center gap-4 mt-4 text-xs">
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded" style={{ background: '#1E5FBE' }} />
+                <span className="w-3 h-3 rounded" style={{ background: '#0D1F4A' }} />
                 <span className="text-slate-500">Revenue</span>
               </div>
               <div className="flex items-center gap-1.5">

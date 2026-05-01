@@ -64,7 +64,7 @@ export default function AddEventModal({ onClose }: Props) {
             <label className="text-xs text-slate-500 mb-1 block">Notes</label>
             <textarea className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 resize-none" rows={2} placeholder="Optional notes..." />
           </div>
-          <button onClick={onClose} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+          <button onClick={onClose} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
             Add Appointment
           </button>
         </div>

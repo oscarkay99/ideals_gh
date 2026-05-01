@@ -18,7 +18,7 @@ interface Props {
 
 export default function CertificatePreview({ cert }: Props) {
   return (
-    <div className="rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(180deg, #0A1F4A 0%, #1E5FBE 100%)' }}>
+    <div className="rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(180deg, #07101F 0%, #0D1F4A 100%)' }}>
       <div className="flex items-center gap-2 mb-4">
         <div className="w-8 h-8 flex items-center justify-center rounded-lg" style={{ background: 'rgba(245,166,35,0.2)' }}>
           <i className="ri-shield-check-line" style={{ color: '#F5A623' }} />

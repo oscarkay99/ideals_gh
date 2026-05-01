@@ -31,7 +31,7 @@ export default function AddRoleModal({ open, onClose }: AddRoleModalProps) {
               ))}
             </div>
           </div>
-          <button onClick={onClose} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+          <button onClick={onClose} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
             Create Role
           </button>
         </div>

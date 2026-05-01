@@ -10,12 +10,12 @@ import KPIStrip from './components/KPIStrip';
 import { dashboardStats } from '@/mocks/dashboard';
 
 const quickActions = [
-  { label: 'Create Quote', icon: 'ri-file-add-line', style: { background: '#1E5FBE' }, path: '/sales' },
-  { label: 'Add Inventory', icon: 'ri-add-box-line', style: { background: '#0A1F4A' }, path: '/inventory' },
+  { label: 'Create Quote', icon: 'ri-file-add-line', style: { background: '#0D1F4A' }, path: '/sales' },
+  { label: 'Add Inventory', icon: 'ri-add-box-line', style: { background: '#07101F' }, path: '/inventory' },
   { label: 'Log Payment', icon: 'ri-bank-card-line', style: { background: '#F5A623' }, path: '/payments' },
-  { label: 'New Lead', icon: 'ri-user-add-line', style: { background: '#154290' }, path: '/leads' },
-  { label: 'AI Studio', icon: 'ri-sparkling-2-line', style: { background: '#1A52A8' }, path: '/ai-studio' },
-  { label: 'Analytics', icon: 'ri-bar-chart-2-line', style: { background: '#EEF4FF', color: '#1E5FBE' }, path: '/analytics' },
+  { label: 'New Lead', icon: 'ri-user-add-line', style: { background: '#1552A8' }, path: '/leads' },
+  { label: 'AI Studio', icon: 'ri-sparkling-2-line', style: { background: '#0E3D8A' }, path: '/ai-studio' },
+  { label: 'Analytics', icon: 'ri-bar-chart-2-line', style: { background: 'rgba(7,16,31,0.08)', color: '#0D1F4A' }, path: '/analytics' },
 ];
 
 export default function DashboardPage() {
@@ -24,7 +24,7 @@ export default function DashboardPage() {
   return (
     <AdminLayout title="Dashboard" subtitle="Thursday, April 23, 2026 · Accra, Ghana">
       {/* Hero welcome strip */}
-      <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #0A1F4A 0%, #1E5FBE 100%)' }}>
+      <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #07101F 0%, #0D1F4A 50%, #1552A8 100%)' }}>
         <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         <div className="absolute right-20 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full blur-2xl pointer-events-none" style={{ background: 'rgba(245,166,35,0.15)' }} />
         <div className="relative">
@@ -49,10 +49,10 @@ export default function DashboardPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <StatCard label="Total Revenue" value={dashboardStats.revenue.value} change={dashboardStats.revenue.change} trend="up" icon="ri-money-dollar-circle-line" accentColor="#1E5FBE" sub="GHS 80K target" />
+        <StatCard label="Total Revenue" value={dashboardStats.revenue.value} change={dashboardStats.revenue.change} trend="up" icon="ri-money-dollar-circle-line" accentColor="#0D1F4A" sub="GHS 80K target" />
         <StatCard label="Active Leads" value={dashboardStats.leads.value} change={dashboardStats.leads.change} trend="up" icon="ri-user-star-line" accentColor="#F5A623" sub="12 hot, 18 warm" />
         <StatCard label="Stock Alerts" value={dashboardStats.stockAlerts.value} change={dashboardStats.stockAlerts.change} trend="down" icon="ri-alert-line" accentColor="#E05A2B" sub="3 out of stock" />
-        <StatCard label="Pending Payments" value={dashboardStats.pendingPayments.value} change={dashboardStats.pendingPayments.change} trend="up" icon="ri-time-line" accentColor="#154290" sub="7 transactions" />
+        <StatCard label="Pending Payments" value={dashboardStats.pendingPayments.value} change={dashboardStats.pendingPayments.change} trend="up" icon="ri-time-line" accentColor="#1552A8" sub="7 transactions" />
       </div>
 
       {/* Alert Banner */}

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { repairs, repairStats } from '@/mocks/repairs';
+import { repairStats } from '@/mocks/repairs';
+import { useRepairs } from '@/hooks/useRepairs';
 import RepairDetail from './components/RepairDetail';
+import AddRepairModal from './components/AddRepairModal';
 
 const statusConfig: Record<string, { label: string; color: string; dot: string; step: number }> = {
   received:     { label: 'Received',     color: 'bg-slate-100 text-slate-600',    dot: 'bg-slate-400', step: 1 },
@@ -12,8 +14,10 @@ const statusConfig: Record<string, { label: string; color: string; dot: string; 
 };
 
 export default function RepairsPage() {
+  const { repairs, add, updateStatus, addNote } = useRepairs();
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
 
   const filtered = repairs.filter((r) => filter === 'all' || r.status === filter);
   const repair = selected ? repairs.find((r) => r.id === selected) : null;
@@ -60,6 +64,14 @@ export default function RepairsPage() {
             </button>
           ))}
         </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center gap-2 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
+          style={{ background: '#0D1F4A' }}
+        >
+          <i className="ri-add-line text-sm" />
+          New Repair
+        </button>
       </div>
 
       {/* Repair Cards */}
@@ -109,7 +121,15 @@ export default function RepairsPage() {
         })}
       </div>
 
-      {repair && <RepairDetail repair={repair} onClose={() => setSelected(null)} />}
+      {repair && (
+        <RepairDetail
+          repair={repair}
+          onClose={() => setSelected(null)}
+          onUpdateStatus={updateStatus}
+          onAddNote={addNote}
+        />
+      )}
+      {showAdd && <AddRepairModal onSave={add} onClose={() => setShowAdd(false)} />}
     </AdminLayout>
   );
 }

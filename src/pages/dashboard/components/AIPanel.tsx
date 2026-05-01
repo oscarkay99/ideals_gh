@@ -13,13 +13,13 @@ export default function AIPanel() {
   ];
 
   return (
-    <div className="bg-[#0A0F1E] rounded-2xl p-5 text-white h-full flex flex-col relative overflow-hidden">
-      {/* Glow effect */}
-      <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(30,95,190,0.15)' }} />
-      <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(245,166,35,0.12)' }} />
+    <div className="rounded-2xl p-5 text-white h-full flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(160deg, #07101F 0%, #0D1F4A 55%, #1552A8 100%)' }}>
+      {/* Glow effects */}
+      <div className="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(245,166,35,0.1)' }} />
+      <div className="absolute bottom-0 left-0 w-24 h-24 rounded-full blur-3xl pointer-events-none" style={{ background: 'rgba(36,99,190,0.2)' }} />
 
       <div className="relative flex items-center gap-2.5 mb-4">
-        <div className="w-8 h-8 flex items-center justify-center rounded-xl flex-shrink-0" style={{ background: 'linear-gradient(135deg, #F5A623, #1E5FBE)' }}>
+        <div className="w-8 h-8 flex items-center justify-center rounded-xl flex-shrink-0" style={{ background: 'linear-gradient(135deg, #F5A623, #D4890A)' }}>
           <i className="ri-sparkling-2-fill text-white text-sm" />
         </div>
         <div>
@@ -60,7 +60,7 @@ export default function AIPanel() {
       </div>
 
       <div className="relative mt-4 pt-4 border-t border-white/10">
-        <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 text-xs text-white/70 hover:text-white hover:border-white/20 transition-all cursor-pointer whitespace-nowrap" style={{ background: 'linear-gradient(135deg, rgba(30,95,190,0.25), rgba(245,166,35,0.15))' }}>
+        <button className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 text-xs text-white/70 hover:text-white hover:border-white/20 transition-all cursor-pointer whitespace-nowrap" style={{ background: 'linear-gradient(135deg, rgba(245,166,35,0.2), rgba(16,185,129,0.12))' }}>
           <i className="ri-sparkling-2-line text-xs" />
           Generate Full AI Report
         </button>

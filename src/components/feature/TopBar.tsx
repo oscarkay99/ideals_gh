@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Notification } from '@/hooks/useNotifications';
 import { useAuth } from '@/hooks/useAuth';
-import { roleLabels, roleColors } from '@/mocks/users';
+import { roleLabels } from '@/mocks/users';
 
 interface TopBarProps {
   title: string;
@@ -15,14 +15,24 @@ interface TopBarProps {
 }
 
 const typeConfig = {
-  sale: { icon: 'ri-shopping-bag-3-line', color: 'text-emerald-500' },
-  lead: { icon: 'ri-user-star-line', color: 'text-amber-500' },
-  payment: { icon: 'ri-bank-card-line', color: 'text-sky-500' },
-  repair: { icon: 'ri-tools-line', color: 'text-violet-500' },
-  alert: { icon: 'ri-alert-line', color: 'text-rose-500' },
+  sale: { icon: 'ri-shopping-bag-3-line', color: '#10B981', bg: 'rgba(16,185,129,0.1)' },
+  lead: { icon: 'ri-user-star-line', color: '#F59E0B', bg: 'rgba(245,158,11,0.1)' },
+  payment: { icon: 'ri-bank-card-line', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
+  repair: { icon: 'ri-tools-line', color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)' },
+  alert: { icon: 'ri-alert-line', color: '#EF4444', bg: 'rgba(239,68,68,0.1)' },
 };
 
-export default function TopBar({ title, subtitle, notifications = [], unreadCount = 0, onMarkAllRead, isDark, onToggleDark }: TopBarProps) {
+const roleGradients: Record<string, string> = {
+  admin: 'linear-gradient(135deg, #07101F, #2463BE)',
+  sales_manager: 'linear-gradient(135deg, #7C3AED, #A855F7)',
+  sales_rep: 'linear-gradient(135deg, #059669, #34D399)',
+  technician: 'linear-gradient(135deg, #D97706, #F59E0B)',
+  inventory_manager: 'linear-gradient(135deg, #DC2626, #F87171)',
+};
+
+export default function TopBar({
+  title, subtitle, notifications = [], unreadCount = 0, onMarkAllRead, isDark, onToggleDark,
+}: TopBarProps) {
   const [notifOpen, setNotifOpen] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -40,34 +50,61 @@ export default function TopBar({ title, subtitle, notifications = [], unreadCoun
     return `${Math.floor(diff / 3600000)}h ago`;
   };
 
+  const avatarGradient = user?.role ? roleGradients[user.role] : roleGradients.admin;
+
   return (
-    <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-30" style={{ borderBottomColor: '#E8EEF8' }}>
+    <header
+      className="h-16 flex items-center justify-between px-6 sticky top-0 z-30"
+      style={{
+        background: 'var(--topbar-bg)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--topbar-border)',
+        boxShadow: '0 1px 0 rgba(0,0,0,0.03), 0 4px 24px rgba(7,16,31,0.05)',
+      }}
+    >
+      {/* Page title */}
       <div>
-        <h1 className="text-[15px] font-semibold text-slate-800 leading-tight">{title}</h1>
-        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+        <h1 className="text-[15px] font-bold leading-tight" style={{ color: 'var(--text-ink)' }}>{title}</h1>
+        {subtitle && <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-ink-40)' }}>{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Search */}
-        <div className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-56">
-          <div className="w-4 h-4 flex items-center justify-center text-slate-400">
-            <i className="ri-search-line text-sm" />
-          </div>
+        <div
+          className="hidden md:flex items-center gap-2 rounded-2xl px-3.5 py-2 w-60 transition-all duration-200"
+          style={{
+            background: 'var(--surface-raised, rgba(7,16,31,0.06))',
+            border: '1px solid var(--topbar-border)',
+          }}
+          onFocus={() => {}}
+        >
+          <i className="ri-search-line text-sm flex-shrink-0" style={{ color: 'rgba(7,16,31,0.45)' }} />
           <input
             type="text"
-            placeholder="Search anything..."
-            className="bg-transparent text-sm text-slate-600 placeholder-slate-400 outline-none w-full"
+            placeholder="Search anything…"
+            className="bg-transparent text-[13px] outline-none flex-1 min-w-0"
+            style={{ color: '#07101F' }}
           />
+          <div
+            className="hidden md:flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md flex-shrink-0"
+            style={{ background: 'rgba(7,16,31,0.07)', color: 'rgba(7,16,31,0.45)' }}
+          >
+            <i className="ri-command-line text-[9px]" />K
+          </div>
         </div>
 
-        {/* Dark Mode Toggle */}
+        {/* Dark Mode */}
         {onToggleDark && (
           <button
             onClick={onToggleDark}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            title={isDark ? 'Light mode' : 'Dark mode'}
+            className="w-9 h-9 flex items-center justify-center rounded-xl transition-all cursor-pointer"
+            style={{ background: 'rgba(7,16,31,0.06)', color: 'rgba(7,16,31,0.5)' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.1)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.06)'; }}
           >
-            <i className={`${isDark ? 'ri-sun-line' : 'ri-moon-line'} text-base`} />
+            <i className={`${isDark ? 'ri-sun-line' : 'ri-moon-line'} text-[15px]`} />
           </button>
         )}
 
@@ -75,69 +112,137 @@ export default function TopBar({ title, subtitle, notifications = [], unreadCoun
         <div className="relative">
           <button
             onClick={() => setNotifOpen(!notifOpen)}
-            className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
+            className="relative w-9 h-9 flex items-center justify-center rounded-xl transition-all cursor-pointer"
+            style={{ background: 'rgba(7,16,31,0.06)', color: 'rgba(7,16,31,0.5)' }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.1)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.06)'; }}
           >
-            <i className="ri-notification-3-line text-base" />
-            {(unreadCount > 0 || notifications.length === 0) && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: '#F5A623' }} />
-            )}
+            <i className="ri-notification-3-line text-[15px]" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-rose-500 rounded-full text-white text-[9px] flex items-center justify-center px-0.5 font-bold">
+              <span
+                className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full text-white text-[9px] flex items-center justify-center px-1 font-bold"
+                style={{ background: 'linear-gradient(135deg, #EF4444, #F97316)' }}
+              >
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
+            {unreadCount === 0 && (
+              <span
+                className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full"
+                style={{ background: '#F5A623' }}
+              />
+            )}
           </button>
+
           {notifOpen && (
-            <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl border border-slate-100 shadow-xl z-50 overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+            <div
+              className="absolute right-0 top-12 w-[340px] rounded-2xl overflow-hidden z-50"
+              style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'blur(24px)',
+                border: '1px solid var(--topbar-border)',
+                boxShadow: '0 8px 40px rgba(7,16,31,0.12)',
+              }}
+            >
+              <div
+                className="px-4 py-3 flex items-center justify-between"
+                style={{ borderBottom: '1px solid rgba(7,16,31,0.07)' }}
+              >
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-slate-800">Notifications</span>
+                  <span className="text-[13px] font-bold" style={{ color: 'var(--text-ink)' }}>Notifications</span>
                   {unreadCount > 0 && (
-                    <span className="text-[10px] bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full font-bold">{unreadCount} new</span>
+                    <span
+                      className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                      style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}
+                    >
+                      {unreadCount} new
+                    </span>
                   )}
                 </div>
-                <button onClick={onMarkAllRead} className="text-xs cursor-pointer" style={{ color: '#1E5FBE' }}>Mark all read</button>
+                <button
+                  onClick={onMarkAllRead}
+                  className="text-[11px] font-semibold cursor-pointer transition-opacity hover:opacity-70"
+                  style={{ color: '#0D1F4A' }}
+                >
+                  Mark all read
+                </button>
               </div>
+
               <div className="max-h-72 overflow-y-auto">
                 {displayNotifs.map((n) => {
                   const cfg = typeConfig[n.type];
                   return (
-                    <div key={n.id} className={`flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 ${!n.read ? 'bg-emerald-50/30' : ''}`}>
-                      <div className={`w-5 h-5 flex items-center justify-center mt-0.5 flex-shrink-0 ${cfg.color}`}>
+                    <div
+                      key={n.id}
+                      className="flex items-start gap-3 px-4 py-3 cursor-pointer transition-all"
+                      style={{
+                        borderBottom: '1px solid rgba(7,16,31,0.04)',
+                        background: !n.read ? 'rgba(245,166,35,0.04)' : 'transparent',
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.04)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = !n.read ? 'rgba(245,166,35,0.04)' : 'transparent'; }}
+                    >
+                      <div
+                        className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+                        style={{ background: cfg.bg, color: cfg.color }}
+                      >
                         <i className={`${cfg.icon} text-sm`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-700">{n.title}</p>
-                        <p className="text-xs text-slate-500 truncate">{n.message}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{formatTime(n.time)}</p>
+                        <p className="text-[12px] font-semibold leading-tight" style={{ color: '#07101F' }}>{n.title}</p>
+                        <p className="text-[11px] mt-0.5 truncate" style={{ color: 'rgba(10,31,74,0.5)' }}>{n.message}</p>
+                        <p className="text-[10px] mt-1" style={{ color: 'rgba(10,31,74,0.35)' }}>{formatTime(n.time)}</p>
                       </div>
-                      {!n.read && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: '#F5A623' }} />}
+                      {!n.read && (
+                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2" style={{ background: '#F5A623' }} />
+                      )}
                     </div>
                   );
                 })}
               </div>
-              <div className="px-4 py-2 border-t border-slate-100">
-                <button onClick={() => { setNotifOpen(false); navigate('/'); }} className="text-xs text-slate-500 hover:text-slate-700 cursor-pointer">View all activity</button>
+
+              <div
+                className="px-4 py-2.5"
+                style={{ borderTop: '1px solid rgba(7,16,31,0.07)' }}
+              >
+                <button
+                  onClick={() => { setNotifOpen(false); navigate('/'); }}
+                  className="text-[11px] font-medium cursor-pointer transition-opacity hover:opacity-70"
+                  style={{ color: 'rgba(10,31,74,0.45)' }}
+                >
+                  View all activity →
+                </button>
               </div>
             </div>
           )}
         </div>
 
+        {/* Divider */}
+        <div className="w-px h-6 mx-1" style={{ background: 'rgba(7,16,31,0.1)' }} />
+
         {/* Profile */}
         <button
           onClick={() => navigate('/profile')}
-          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 cursor-pointer transition-opacity hover:opacity-80 rounded-2xl px-2 py-1.5"
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.05)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ''; }}
         >
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-            style={{ background: user?.role ? roleColors[user.role] : '#1E5FBE' }}
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0"
+            style={{
+              background: avatarGradient,
+              boxShadow: '0 2px 8px rgba(10,31,74,0.2)',
+            }}
           >
             {user?.avatar ?? 'U'}
           </div>
           <div className="hidden md:block text-left">
-            <p className="text-xs font-semibold text-slate-700 leading-tight">{user?.name ?? 'User'}</p>
-            <p className="text-[10px] text-slate-400">{user?.role ? roleLabels[user.role] : ''}</p>
+            <p className="text-[12px] font-bold leading-tight" style={{ color: 'var(--text-ink)' }}>{user?.name ?? 'User'}</p>
+            <p className="text-[10px] leading-tight mt-0.5" style={{ color: 'var(--text-ink-40)' }}>
+              {user?.role ? roleLabels[user.role] : ''}
+            </p>
           </div>
+          <i className="ri-arrow-down-s-line text-sm hidden md:block" style={{ color: 'var(--text-ink-30)' }} />
         </button>
       </div>
     </header>

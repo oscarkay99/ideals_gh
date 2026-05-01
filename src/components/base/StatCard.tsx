@@ -10,7 +10,7 @@ export function StatCard({ label, value, change, icon, accent, onClick }: StatCa
 
   return (
     <div
-      className={`bg-[#0F2147] border border-[#1E3A6E] rounded-xl p-5 ${onClick ? 'cursor-pointer hover:border-[#1E5FBE]/50 transition-colors' : ''}`}
+      className={`bg-[#0F2147] border border-[#1E3A6E] rounded-xl p-5 ${onClick ? 'cursor-pointer hover:border-[#0D1F4A]/50 transition-colors' : ''}`}
       onClick={onClick}
     >
       <div className="flex items-start justify-between mb-3">

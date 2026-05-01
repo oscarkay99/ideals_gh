@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { leads, leadStats } from '@/mocks/leads';
+import { leadStats } from '@/mocks/leads';
+import { useLeads } from '@/hooks/useLeads';
+import type { LeadStatus } from '@/types/lead';
 import LeadDetail from './components/LeadDetail';
+import AddLeadModal from './components/AddLeadModal';
 
 const statusConfig: Record<string, { label: string; color: string; border: string; bg: string }> = {
   hot: { label: 'Hot', color: 'text-red-600', border: 'border-red-200', bg: 'bg-red-50' },
@@ -18,8 +21,11 @@ const sourceIcons: Record<string, string> = {
 };
 
 export default function LeadsPage() {
+  const { leads, add, move } = useLeads();
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [addStatus, setAddStatus] = useState<LeadStatus>('warm');
 
   const columns = ['hot', 'warm', 'cold'] as const;
 
@@ -67,10 +73,12 @@ export default function LeadsPage() {
             </button>
           ))}
         </div>
-        <button className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap">
-          <div className="w-4 h-4 flex items-center justify-center">
-            <i className="ri-add-line text-sm" />
-          </div>
+        <button
+          onClick={() => { setAddStatus('warm'); setShowAdd(true); }}
+          className="flex items-center gap-2 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap"
+          style={{ background: '#0D1F4A' }}
+        >
+          <i className="ri-add-line text-sm" />
           New Lead
         </button>
       </div>
@@ -87,7 +95,10 @@ export default function LeadsPage() {
                   <span className={`text-xs font-bold uppercase tracking-wider ${cfg.color}`}>{cfg.label}</span>
                   <span className="text-xs bg-white text-slate-500 px-2 py-0.5 rounded-full font-medium">{colLeads.length}</span>
                 </div>
-                <button className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-400 cursor-pointer transition-all">
+                <button
+                  onClick={() => { setAddStatus(col); setShowAdd(true); }}
+                  className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-white/50 text-slate-400 cursor-pointer transition-all"
+                >
                   <i className="ri-add-line text-sm" />
                 </button>
               </div>
@@ -127,14 +138,18 @@ export default function LeadsPage() {
                     )}
                     {/* Hover actions */}
                     <div className="flex items-center gap-1 mt-3 pt-2 border-t border-slate-50 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 cursor-pointer transition-all">
+                      <a href={`tel:${l.phone}`} onClick={(e) => e.stopPropagation()} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-blue-50 text-blue-500 cursor-pointer transition-all">
                         <i className="ri-phone-line text-sm" />
-                      </button>
-                      <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 cursor-pointer transition-all">
-                        <i className="ri-message-3-line text-sm" />
-                      </button>
-                      <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 cursor-pointer transition-all">
-                        <i className="ri-file-add-line text-sm" />
+                      </a>
+                      <a href={`https://wa.me/${l.phone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-emerald-50 text-emerald-500 cursor-pointer transition-all">
+                        <i className="ri-whatsapp-line text-sm" />
+                      </a>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); move(l.id, col === 'hot' ? 'warm' : col === 'warm' ? 'cold' : 'hot'); }}
+                        title="Move to next stage"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 cursor-pointer transition-all"
+                      >
+                        <i className="ri-arrow-right-line text-sm" />
                       </button>
                     </div>
                   </div>
@@ -146,6 +161,13 @@ export default function LeadsPage() {
       </div>
 
       {lead && <LeadDetail lead={lead} onClose={() => setSelected(null)} />}
+      {showAdd && (
+        <AddLeadModal
+          defaultStatus={addStatus}
+          onSave={add}
+          onClose={() => setShowAdd(false)}
+        />
+      )}
     </AdminLayout>
   );
 }

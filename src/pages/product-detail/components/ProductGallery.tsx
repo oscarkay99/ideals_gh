@@ -15,7 +15,7 @@ export default function ProductGallery({ images, condition }: ProductGalleryProp
       {/* Main image */}
       <div className="relative bg-slate-50 rounded-2xl overflow-hidden aspect-square">
         <img
-          src={images[active]}
+loading="lazy" decoding="async"           src={images[active]}
           alt="Product"
           className="w-full h-full object-cover object-top"
         />
@@ -34,7 +34,7 @@ export default function ProductGallery({ images, condition }: ProductGalleryProp
               active === i ? 'border-emerald-500' : 'border-transparent'
             }`}
           >
-            <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover object-top" />
+            <img loading="lazy" decoding="async" src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover object-top" />
           </button>
         ))}
       </div>

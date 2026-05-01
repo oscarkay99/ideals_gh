@@ -197,7 +197,7 @@ export default function ProductInfo() {
               }`}
             >
               <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-50">
-                <img src={addon.image} alt={addon.name} className="w-full h-full object-cover object-top" />
+                <img loading="lazy" decoding="async" src={addon.image} alt={addon.name} className="w-full h-full object-cover object-top" />
               </div>
               <div className="flex-1">
                 <p className="text-xs font-medium text-slate-800">{addon.name}</p>
