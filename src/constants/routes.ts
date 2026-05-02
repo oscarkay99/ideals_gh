@@ -21,7 +21,6 @@ export const ROUTES = {
   WHATSAPP: '/whatsapp',
   INSTAGRAM: '/instagram',
   TIKTOK: '/tiktok',
-  SMS: '/sms',
   PRICE_INTEL: '/price-intel',
   TRADE_IN: '/trade-in',
   DELIVERY: '/delivery',

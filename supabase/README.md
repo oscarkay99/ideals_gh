@@ -15,6 +15,19 @@ The frontend reads:
 
 Those values belong in `.env.local`.
 
+## AI function configuration
+
+The Supabase Edge Functions that power AI replies, AI post generation, POS AI, and weekly AI insights read:
+
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+
+Recommended default:
+
+- `OPENAI_MODEL=gpt-4.1-mini`
+
+If `OPENAI_MODEL` is not set, the functions now default to `gpt-4.1-mini`.
+
 ## Apply the backend schema
 
 Run the SQL in `supabase/migrations/20260423_init_core.sql` inside the Supabase SQL editor, or apply it through the Supabase CLI after linking the project.

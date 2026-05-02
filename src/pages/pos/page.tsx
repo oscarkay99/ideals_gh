@@ -82,13 +82,18 @@ function VelocityBadge({ productId }: { productId: string }) {
   const m = productMetrics.find(x => x.productId === productId);
   if (!m) return null;
   const cfg = {
-    hot:    { label: '🔥', title: 'Hot seller' },
-    steady: { label: '📈', title: 'Steady' },
-    slow:   { label: '🐢', title: 'Slow mover' },
-    new:    { label: '✨', title: 'New' },
+    hot:    { label: 'Hot Seller', title: 'Hot seller', cls: 'bg-rose-50 text-rose-600 border-rose-200' },
+    steady: { label: 'Steady', title: 'Steady mover', cls: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+    slow:   { label: 'Slow Mover', title: 'Slow mover', cls: 'bg-amber-50 text-amber-600 border-amber-200' },
+    new:    { label: 'New', title: 'New arrival', cls: 'bg-sky-50 text-sky-600 border-sky-200' },
   }[m.velocity];
   return (
-    <span title={cfg.title} className="absolute top-2 left-2 text-sm leading-none">{cfg.label}</span>
+    <span
+      title={cfg.title}
+      className={`absolute top-2 left-2 text-[9px] leading-none font-bold px-2 py-1 rounded-full border ${cfg.cls}`}
+    >
+      {cfg.label}
+    </span>
   );
 }
 
@@ -408,25 +413,24 @@ export default function POSPage() {
                         key={p.id}
                         onClick={() => p.stock > 0 && addToCart(p)}
                         disabled={p.stock === 0}
-                        className={`group relative bg-white rounded-2xl border p-3 flex flex-col items-center gap-2 text-left transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${qty > 0 ? 'border-[#0D1F4A] ring-2 ring-[#0D1F4A]/20' : 'border-slate-100 hover:border-slate-300 hover:shadow-sm'}`}
+                        className={`group relative bg-white rounded-2xl border p-3 flex flex-col gap-3 text-left transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${qty > 0 ? 'border-[#0D1F4A] ring-2 ring-[#0D1F4A]/20' : 'border-slate-100 hover:border-slate-300 hover:shadow-sm'}`}
                       >
                         <VelocityBadge productId={p.id} />
                         {qty > 0 && (
                           <span className="absolute top-2 right-2 bg-[#0D1F4A] text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{qty}</span>
                         )}
-                        <img
-loading="lazy" decoding="async"                           src={p.image} alt={p.name}
-                          className="w-14 h-14 object-contain rounded-xl bg-slate-50 mt-2"
-                          onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f1f5f9" width="100" height="100" rx="12"/><text y=".9em" font-size="60" x="50%" text-anchor="middle">📱</text></svg>'; }}
-                        />
-                        <div className="w-full">
-                          <p className="text-[11px] font-semibold text-slate-800 leading-tight line-clamp-2">{p.name}</p>
-                          <div className="flex items-center justify-between mt-1.5">
+                        <div className="w-full mt-8">
+                          <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 mb-2">
+                            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{p.brand}</p>
+                            <p className="text-[11px] font-semibold text-slate-800 leading-tight mt-1 line-clamp-2">{p.name}</p>
+                            <p className="text-[10px] text-slate-500 mt-1">{p.sku}</p>
+                          </div>
+                          <div className="flex items-center justify-between">
                             <p className="text-sm font-bold text-slate-900">{formatGHS(p.price)}</p>
                             <span className={`text-[10px] font-bold ${marginColor(mgn)}`}>{mgn}%</span>
                           </div>
                           <div className="flex items-center justify-between mt-0.5">
-                            <p className="text-[10px] text-slate-400">Stock: {p.stock}</p>
+                            <p className="text-[10px] text-slate-400">{p.category} · Stock: {p.stock}</p>
                             {m && m.daysOfStock < 7 && m.daysOfStock > 0 && (
                               <span className="text-[9px] bg-rose-50 text-rose-600 px-1 py-0.5 rounded-full font-semibold">{m.daysOfStock}d left</span>
                             )}
@@ -550,10 +554,10 @@ loading="lazy" decoding="async"                           src={p.image} alt={p.n
                     return (
                       <div key={item.product.id} className="bg-slate-50 rounded-xl p-2.5">
                         <div className="flex items-start gap-2">
-                          <img loading="lazy" decoding="async" src={item.product.image} alt={item.product.name} className="w-10 h-10 object-contain rounded-lg bg-white flex-shrink-0" onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f8fafc" width="100" height="100" rx="12"/></svg>'; }} />
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-800 leading-tight truncate">{item.product.name}</p>
-                            <div className="flex items-center gap-2 mt-0.5">
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              <span className="text-[10px] text-slate-500">{item.product.sku}</span>
                               <span className="text-[10px] text-slate-500">{formatGHS(item.product.price)}</span>
                               <span className={`text-[10px] font-bold ${marginColor(effectiveMargin)}`}>{effectiveMargin}% margin</span>
                             </div>
@@ -589,9 +593,10 @@ loading="lazy" decoding="async"                           src={p.image} alt={p.n
                 <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-2"><i className="ri-sparkling-2-line mr-1" />AI Suggests</p>
                 <div className="flex gap-2 overflow-x-auto pb-1">
                   {upsells.map(p => (
-                    <button key={p.id} onClick={() => addToCart(p)} className="flex-shrink-0 bg-white rounded-xl p-2 flex flex-col items-center gap-1 w-20 border border-indigo-100 hover:border-indigo-300 transition-all cursor-pointer">
-                      <img loading="lazy" decoding="async" src={p.image} alt={p.name} className="w-10 h-10 object-contain" onError={e => { (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f8fafc" width="100" height="100" rx="12"/></svg>'; }} />
-                      <p className="text-[9px] font-semibold text-slate-700 text-center line-clamp-2 leading-tight">{p.name}</p>
+                    <button key={p.id} onClick={() => addToCart(p)} className="flex-shrink-0 bg-white rounded-xl p-2.5 flex flex-col gap-1.5 w-36 border border-indigo-100 hover:border-indigo-300 transition-all cursor-pointer text-left">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{p.category}</p>
+                      <p className="text-[10px] font-semibold text-slate-700 line-clamp-2 leading-tight">{p.name}</p>
+                      <p className="text-[10px] text-slate-500">{p.sku}</p>
                       <p className="text-[10px] font-bold text-[#0D1F4A]">{formatGHS(p.price)}</p>
                     </button>
                   ))}

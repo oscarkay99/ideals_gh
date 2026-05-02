@@ -7,7 +7,6 @@ export interface PosProduct {
   stock: number;
   category: string;
   type: 'phone' | 'tablet' | 'laptop' | 'audio' | 'accessory' | 'wearable';
-  image: string;
   imei?: boolean;
   brand: string;
 }
@@ -26,22 +25,22 @@ export interface PosCustomer {
 }
 
 export const posProducts: PosProduct[] = [
-  { id: 'p1', name: 'iPhone 15 Pro 256GB', sku: 'APL-IP15P-256', price: 12500, cost: 10200, stock: 4, category: 'Apple', brand: 'Apple', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=iPhone%2015%20Pro%20titanium%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos1&orientation=squarish' },
-  { id: 'p2', name: 'Samsung S24 Ultra 256GB', sku: 'SAM-S24U-256', price: 12800, cost: 10400, stock: 3, category: 'Samsung', brand: 'Samsung', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20S24%20Ultra%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos2&orientation=squarish' },
-  { id: 'p3', name: 'iPhone 14 128GB', sku: 'APL-IP14-128', price: 8200, cost: 6600, stock: 6, category: 'Apple', brand: 'Apple', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=iPhone%2014%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos3&orientation=squarish' },
-  { id: 'p4', name: 'Redmi Note 13 Pro 256GB', sku: 'XMI-RN13P-256', price: 2800, cost: 2100, stock: 12, category: 'Xiaomi', brand: 'Xiaomi', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=Redmi%20Note%2013%20Pro%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos4&orientation=squarish' },
-  { id: 'p5', name: 'Samsung A55 5G 128GB', sku: 'SAM-A55-128', price: 3400, cost: 2650, stock: 8, category: 'Samsung', brand: 'Samsung', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20A55%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos5&orientation=squarish' },
-  { id: 'p6', name: 'Google Pixel 8 Pro 256GB', sku: 'GOO-PX8P-256', price: 9800, cost: 7900, stock: 2, category: 'Google', brand: 'Google', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=Google%20Pixel%208%20Pro%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos6&orientation=squarish' },
-  { id: 'p7', name: 'iPhone 15 128GB', sku: 'APL-IP15-128', price: 10200, cost: 8300, stock: 5, category: 'Apple', brand: 'Apple', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=iPhone%2015%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos7&orientation=squarish' },
-  { id: 'p8', name: 'Tecno Camon 30 Pro', sku: 'TEC-C30P-256', price: 1800, cost: 1350, stock: 15, category: 'Tecno', brand: 'Tecno', type: 'phone', imei: true, image: 'https://readdy.ai/api/search-image?query=Tecno%20Camon%20smartphone%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos8&orientation=squarish' },
-  { id: 'p9', name: 'Apple AirPods Pro 2', sku: 'APL-APP2', price: 1800, cost: 1300, stock: 9, category: 'Accessories', brand: 'Apple', type: 'audio', image: 'https://readdy.ai/api/search-image?query=Apple%20AirPods%20Pro%202%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos9&orientation=squarish' },
-  { id: 'p10', name: 'Samsung 25W Fast Charger', sku: 'SAM-CHG-25W', price: 120, cost: 65, stock: 30, category: 'Accessories', brand: 'Samsung', type: 'accessory', image: 'https://readdy.ai/api/search-image?query=Samsung%20fast%20charger%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos10&orientation=squarish' },
-  { id: 'p11', name: 'Tempered Glass Screen Protector', sku: 'ACC-TG-UNI', price: 35, cost: 12, stock: 100, category: 'Accessories', brand: 'Generic', type: 'accessory', image: 'https://readdy.ai/api/search-image?query=tempered%20glass%20screen%20protector%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos11&orientation=squarish' },
-  { id: 'p12', name: 'Phone Case — Clear TPU', sku: 'ACC-CASE-CLR', price: 45, cost: 18, stock: 80, category: 'Accessories', brand: 'Generic', type: 'accessory', image: 'https://readdy.ai/api/search-image?query=clear%20phone%20case%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos12&orientation=squarish' },
-  { id: 'p13', name: 'Samsung Galaxy Watch 6', sku: 'SAM-GW6-44', price: 2200, cost: 1700, stock: 6, category: 'Samsung', brand: 'Samsung', type: 'wearable', image: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20Watch%206%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos13&orientation=squarish' },
-  { id: 'p14', name: 'Apple Watch SE 2 40mm', sku: 'APL-WSE2-40', price: 3200, cost: 2550, stock: 4, category: 'Apple', brand: 'Apple', type: 'wearable', image: 'https://readdy.ai/api/search-image?query=Apple%20Watch%20SE%202%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos14&orientation=squarish' },
-  { id: 'p15', name: 'USB-C to Lightning Cable 1m', sku: 'ACC-USBC-LTN', price: 80, cost: 30, stock: 60, category: 'Accessories', brand: 'Generic', type: 'accessory', image: 'https://readdy.ai/api/search-image?query=USB-C%20lightning%20cable%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos15&orientation=squarish' },
-  { id: 'p16', name: 'Xiaomi Pad 6 256GB', sku: 'XMI-PAD6-256', price: 4200, cost: 3300, stock: 3, category: 'Xiaomi', brand: 'Xiaomi', type: 'tablet', imei: true, image: 'https://readdy.ai/api/search-image?query=Xiaomi%20Pad%206%20tablet%20product%20shot%20clean%20white%20background%20professional%20photography&width=120&height=120&seq=pos16&orientation=squarish' },
+  { id: 'p1', name: 'iPhone 15 Pro 256GB', sku: 'APL-IP15P-256', price: 12500, cost: 10200, stock: 4, category: 'Apple', brand: 'Apple', type: 'phone', imei: true },
+  { id: 'p2', name: 'Samsung S24 Ultra 256GB', sku: 'SAM-S24U-256', price: 12800, cost: 10400, stock: 3, category: 'Samsung', brand: 'Samsung', type: 'phone', imei: true },
+  { id: 'p3', name: 'iPhone 14 128GB', sku: 'APL-IP14-128', price: 8200, cost: 6600, stock: 6, category: 'Apple', brand: 'Apple', type: 'phone', imei: true },
+  { id: 'p4', name: 'Redmi Note 13 Pro 256GB', sku: 'XMI-RN13P-256', price: 2800, cost: 2100, stock: 12, category: 'Xiaomi', brand: 'Xiaomi', type: 'phone', imei: true },
+  { id: 'p5', name: 'Samsung A55 5G 128GB', sku: 'SAM-A55-128', price: 3400, cost: 2650, stock: 8, category: 'Samsung', brand: 'Samsung', type: 'phone', imei: true },
+  { id: 'p6', name: 'Google Pixel 8 Pro 256GB', sku: 'GOO-PX8P-256', price: 9800, cost: 7900, stock: 2, category: 'Google', brand: 'Google', type: 'phone', imei: true },
+  { id: 'p7', name: 'iPhone 15 128GB', sku: 'APL-IP15-128', price: 10200, cost: 8300, stock: 5, category: 'Apple', brand: 'Apple', type: 'phone', imei: true },
+  { id: 'p8', name: 'Tecno Camon 30 Pro', sku: 'TEC-C30P-256', price: 1800, cost: 1350, stock: 15, category: 'Tecno', brand: 'Tecno', type: 'phone', imei: true },
+  { id: 'p9', name: 'Apple AirPods Pro 2', sku: 'APL-APP2', price: 1800, cost: 1300, stock: 9, category: 'Accessories', brand: 'Apple', type: 'audio' },
+  { id: 'p10', name: 'Samsung 25W Fast Charger', sku: 'SAM-CHG-25W', price: 120, cost: 65, stock: 30, category: 'Accessories', brand: 'Samsung', type: 'accessory' },
+  { id: 'p11', name: 'Tempered Glass Screen Protector', sku: 'ACC-TG-UNI', price: 35, cost: 12, stock: 100, category: 'Accessories', brand: 'Generic', type: 'accessory' },
+  { id: 'p12', name: 'Phone Case — Clear TPU', sku: 'ACC-CASE-CLR', price: 45, cost: 18, stock: 80, category: 'Accessories', brand: 'Generic', type: 'accessory' },
+  { id: 'p13', name: 'Samsung Galaxy Watch 6', sku: 'SAM-GW6-44', price: 2200, cost: 1700, stock: 6, category: 'Samsung', brand: 'Samsung', type: 'wearable' },
+  { id: 'p14', name: 'Apple Watch SE 2 40mm', sku: 'APL-WSE2-40', price: 3200, cost: 2550, stock: 4, category: 'Apple', brand: 'Apple', type: 'wearable' },
+  { id: 'p15', name: 'USB-C to Lightning Cable 1m', sku: 'ACC-USBC-LTN', price: 80, cost: 30, stock: 60, category: 'Accessories', brand: 'Generic', type: 'accessory' },
+  { id: 'p16', name: 'Xiaomi Pad 6 256GB', sku: 'XMI-PAD6-256', price: 4200, cost: 3300, stock: 3, category: 'Xiaomi', brand: 'Xiaomi', type: 'tablet', imei: true },
 ];
 
 export const posCustomers: PosCustomer[] = [

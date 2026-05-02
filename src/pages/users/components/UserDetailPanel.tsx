@@ -1,7 +1,7 @@
 import { roleLabels, roleColors } from '@/mocks/users';
 import type { SystemUser } from '@/mocks/users';
 
-const allPermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
+const allPermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
 const statusConfig = {
   active: { label: 'Active', color: '#25D366', bg: '#25D36615' },

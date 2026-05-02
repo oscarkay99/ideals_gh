@@ -30,15 +30,9 @@ export default function FeaturedProducts() {
             <div
               key={product.id}
               onClick={() => navigate(`/store/product/${product.id}`)}
-              className="bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group"
+              className="bg-white border border-slate-100 rounded-2xl p-4 hover:shadow-lg transition-all duration-300 cursor-pointer group"
             >
-              {/* Image */}
-              <div className="relative bg-slate-50 aspect-square overflow-hidden">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                />
+              <div className="relative">
                 <div className={`absolute top-3 right-3 text-[10px] font-semibold px-2.5 py-1 rounded-full ${conditionColors[product.condition]}`}>
                   {product.condition}
                 </div>
@@ -47,13 +41,19 @@ export default function FeaturedProducts() {
                     {product.badge}
                   </div>
                 )}
+                <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-5 mb-4 min-h-[152px] flex flex-col justify-between">
+                  <div className="flex items-center justify-between gap-2 pr-20">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">{product.category}</p>
+                    <span className="text-[10px] font-semibold text-slate-500">{product.stock} in stock</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900 leading-tight">{product.name}</h3>
+                    <p className="mt-2 text-[11px] leading-relaxed text-slate-500">Text-first product record with warranty and live stock details.</p>
+                  </div>
+                </div>
               </div>
 
-              {/* Info */}
-              <div className="p-4">
-                <p className="text-xs text-slate-400 mb-1">{product.category}</p>
-                <h3 className="text-sm font-semibold text-slate-800 leading-tight mb-2 line-clamp-2">{product.name}</h3>
-
+              <div className="space-y-3">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-3 h-3 flex items-center justify-center text-emerald-500">
                     <i className="ri-shield-check-line text-xs" />
@@ -68,9 +68,7 @@ export default function FeaturedProducts() {
                       <p className="text-xs text-slate-400 line-through">{product.originalPrice}</p>
                     )}
                   </div>
-                  <div className={`text-[10px] font-medium ${product.stock <= 2 ? 'text-amber-600' : 'text-emerald-600'}`}>
-                    {product.stock <= 2 ? `Only ${product.stock} left` : 'In Stock'}
-                  </div>
+                  <div className={`text-[10px] font-medium ${product.stock <= 2 ? 'text-amber-600' : 'text-emerald-600'}`}>{product.stock <= 2 ? `Only ${product.stock} left` : 'Available now'}</div>
                 </div>
 
                 <button onClick={() => navigate('/store/product-detail')} className="mt-3 w-full py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-700 transition-all cursor-pointer whitespace-nowrap">

@@ -90,12 +90,12 @@ export default function SalesPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {cartProducts.map((p) => (
                 <div key={p.id} className="flex items-center gap-3 p-3 border border-slate-100 rounded-xl hover:border-slate-200 transition-all">
-                  <div className="w-14 h-14 rounded-xl bg-slate-50 overflow-hidden flex-shrink-0">
-                    <img loading="lazy" decoding="async" src={p.image} alt={p.name} className="w-full h-full object-cover object-top" />
+                  <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 text-slate-500">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.08em]">Item</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-slate-800 truncate">{p.name}</p>
-                    <p className="text-[10px] text-slate-400">{p.condition} · {p.stock} left</p>
+                    <p className="text-[10px] text-slate-400">{p.id} · {p.condition} · {p.stock} left</p>
                     <p className="text-xs font-bold text-slate-900 mt-0.5">GHS {p.price.toLocaleString()}</p>
                   </div>
                   <button

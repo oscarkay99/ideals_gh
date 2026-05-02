@@ -11,8 +11,8 @@ const conditions = ['New', 'Used - Excellent', 'Used - Good', 'Refurbished'];
 
 export default function AddProductModal({ onSave, onClose }: Props) {
   const [form, setForm] = useState({
-    name: '', category: 'Phones', condition: 'New',
-    price: '', stock: 1, location: '', supplier: '',
+    name: '', category: 'Phones', color: '', condition: 'New',
+    price: '', stock: 1, imei: '', location: '', supplier: '',
   });
 
   const set = (k: string, v: unknown) => setForm(p => ({ ...p, [k]: v }));
@@ -59,6 +59,13 @@ export default function AddProductModal({ onSave, onClose }: Props) {
               </select>
             </div>
           </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Device Color</label>
+            <input value={form.color} onChange={e => set('color', e.target.value)}
+              className="w-full text-sm rounded-xl px-3 py-2 outline-none"
+              style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
+              placeholder="Natural Titanium, Black, Silver" />
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Price *</label>
@@ -73,6 +80,13 @@ export default function AddProductModal({ onSave, onClose }: Props) {
                 className="w-full text-sm rounded-xl px-3 py-2 outline-none"
                 style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }} />
             </div>
+          </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>IMEI / Serial Number</label>
+            <input value={form.imei} onChange={e => set('imei', e.target.value)}
+              className="w-full text-sm rounded-xl px-3 py-2 outline-none"
+              style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
+              placeholder="358123456789012 or C02XYZ123456" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

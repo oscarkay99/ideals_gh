@@ -2,6 +2,7 @@ interface InventoryProduct {
   id: string;
   name: string;
   category: string;
+  color?: string;
   condition: string;
   price: string;
   stock: number;
@@ -28,11 +29,10 @@ export default function ProductDetail({ product, onClose }: Props) {
               <i className="ri-close-line text-base" />
             </button>
           </div>
-          <div className="w-full h-40 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
-            <i className="ri-smartphone-line text-4xl text-slate-300" />
-          </div>
           <h4 className="text-base font-bold text-slate-900 mb-1">{product.name}</h4>
-          <p className="text-xs text-slate-400 mb-4">{product.id} · {product.category}</p>
+          <p className="text-xs text-slate-400 mb-4">
+            {product.id} · {product.category}{product.color ? ` · ${product.color}` : ''}
+          </p>
 
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="bg-slate-50 rounded-xl p-3">
@@ -50,6 +50,10 @@ export default function ProductDetail({ product, onClose }: Props) {
             <div className="bg-slate-50 rounded-xl p-3">
               <p className="text-[10px] text-slate-400 uppercase">Location</p>
               <p className="text-xs text-slate-700">{product.location}</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-3">
+              <p className="text-[10px] text-slate-400 uppercase">Color</p>
+              <p className="text-xs text-slate-700">{product.color || 'Not specified'}</p>
             </div>
           </div>
 

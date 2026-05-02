@@ -14,8 +14,8 @@ export interface SystemUser {
 }
 
 export const rolePermissions: Record<UserRole, string[]> = {
-  admin: ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'],
-  sales_manager: ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'SMS', 'Marketing', 'Reports', 'Loyalty', 'Calendar', 'Team'],
+  admin: ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'],
+  sales_manager: ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Marketing', 'Reports', 'Loyalty', 'Calendar', 'Team'],
   sales_rep: ['Dashboard', 'POS', 'Inventory', 'Leads', 'Sales', 'Customers', 'Calendar'],
   technician: ['Dashboard', 'Repairs', 'Warranty', 'Inventory', 'Customers', 'Calendar'],
   inventory_manager: ['Dashboard', 'Inventory', 'Suppliers', 'Delivery', 'Reports', 'Analytics'],

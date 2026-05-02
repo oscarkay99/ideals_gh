@@ -2,7 +2,7 @@ import { roleLabels, roleColors } from '@/mocks/users';
 import type { SystemUser } from '@/mocks/users';
 import type { UserRole } from '@/hooks/useAuth';
 
-const allPermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
+const allPermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
 interface UserFormModalProps {
   open: boolean;

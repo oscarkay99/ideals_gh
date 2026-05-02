@@ -2,8 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { roleLabels } from '@/mocks/users';
-import { canAccessModule, type AppModule } from '@/utils/access';
+import { canAccessModule } from '@/utils/access';
 import idealsTechHubLogo from '@/assets/ideals-tech-hub-logo.png';
+import { navGroups, publicItems } from './navigation';
 
 function TransparentLogo({ width = 150 }: { width?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,69 +48,6 @@ function TransparentLogo({ width = 150 }: { width?: number }) {
     />
   );
 }
-
-const navGroups = [
-  {
-    label: 'Core',
-    items: [
-      { label: 'Dashboard', icon: 'ri-dashboard-3-line', path: '/', module: 'Dashboard' as AppModule },
-      { label: 'Analytics', icon: 'ri-bar-chart-2-line', path: '/analytics', module: 'Analytics' as AppModule },
-      { label: 'AI Studio', icon: 'ri-sparkling-2-line', path: '/ai-studio', module: 'AI Studio' as AppModule },
-    ],
-  },
-  {
-    label: 'Commerce',
-    items: [
-      { label: 'POS', icon: 'ri-store-3-line', path: '/pos', module: 'POS' as AppModule },
-      { label: 'Inventory', icon: 'ri-archive-line', path: '/inventory', module: 'Inventory' as AppModule },
-      { label: 'Leads', icon: 'ri-user-star-line', path: '/leads', module: 'Leads' as AppModule },
-      { label: 'Sales', icon: 'ri-shopping-bag-3-line', path: '/sales', module: 'Sales' as AppModule },
-      { label: 'Payments', icon: 'ri-bank-card-line', path: '/payments', module: 'Payments' as AppModule },
-      { label: 'Customers', icon: 'ri-group-line', path: '/customers', module: 'Customers' as AppModule },
-      { label: 'Repairs', icon: 'ri-tools-line', path: '/repairs', module: 'Repairs' as AppModule },
-      { label: 'Warranty', icon: 'ri-shield-check-line', path: '/warranty', module: 'Warranty' as AppModule },
-    ],
-  },
-  {
-    label: 'Intelligence',
-    items: [
-      { label: 'SMS', icon: 'ri-message-3-line', path: '/sms', module: 'SMS' as AppModule },
-      { label: 'Price Intel', icon: 'ri-line-chart-line', path: '/price-intel', module: 'Price Intel' as AppModule },
-      { label: 'Trade-In', icon: 'ri-exchange-line', path: '/trade-in', module: 'Trade-In' as AppModule },
-      { label: 'Delivery', icon: 'ri-truck-line', path: '/delivery', module: 'Delivery' as AppModule },
-    ],
-  },
-  {
-    label: 'Finance',
-    items: [
-      { label: 'Wallet', icon: 'ri-wallet-3-line', path: '/wallet', module: 'Wallet' as AppModule },
-      { label: 'Expenses', icon: 'ri-calculator-line', path: '/expenses', module: 'Expenses' as AppModule },
-      { label: 'Suppliers', icon: 'ri-store-2-line', path: '/suppliers', module: 'Suppliers' as AppModule },
-      { label: 'Reports', icon: 'ri-file-chart-line', path: '/reports', module: 'Reports' as AppModule },
-      { label: 'Marketing', icon: 'ri-megaphone-line', path: '/marketing', module: 'Marketing' as AppModule },
-    ],
-  },
-  {
-    label: 'Growth',
-    items: [
-      { label: 'Loyalty', icon: 'ri-vip-crown-line', path: '/loyalty', module: 'Loyalty' as AppModule },
-      { label: 'Calendar', icon: 'ri-calendar-event-line', path: '/calendar', module: 'Calendar' as AppModule },
-    ],
-  },
-  {
-    label: 'Operations',
-    items: [
-      { label: 'Authentication', icon: 'ri-shield-check-line', path: '/authentication', module: 'Authentication' as AppModule },
-      { label: 'Team', icon: 'ri-team-line', path: '/team', module: 'Team' as AppModule },
-      { label: 'Users', icon: 'ri-user-settings-line', path: '/users', module: 'Users' as AppModule },
-      { label: 'Settings', icon: 'ri-settings-4-line', path: '/settings', module: 'Settings' as AppModule },
-    ],
-  },
-];
-
-const publicItems = [
-  { label: 'Storefront', icon: 'ri-store-2-line', path: '/store' },
-];
 
 const roleGradients: Record<string, string> = {
   admin: 'linear-gradient(135deg, #07101F, #2463BE)',

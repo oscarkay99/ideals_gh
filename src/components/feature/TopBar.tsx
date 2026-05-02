@@ -1,26 +1,23 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { Notification } from '@/hooks/useNotifications';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { roleLabels } from '@/mocks/users';
+import { inventoryProducts } from '@/mocks/inventory';
 
 interface TopBarProps {
   title: string;
   subtitle?: string;
-  notifications?: Notification[];
-  unreadCount?: number;
-  onMarkAllRead?: () => void;
-  isDark?: boolean;
-  onToggleDark?: () => void;
 }
 
-const typeConfig = {
-  sale: { icon: 'ri-shopping-bag-3-line', color: '#10B981', bg: 'rgba(16,185,129,0.1)' },
-  lead: { icon: 'ri-user-star-line', color: '#F59E0B', bg: 'rgba(245,158,11,0.1)' },
-  payment: { icon: 'ri-bank-card-line', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
-  repair: { icon: 'ri-tools-line', color: '#8B5CF6', bg: 'rgba(139,92,246,0.1)' },
-  alert: { icon: 'ri-alert-line', color: '#EF4444', bg: 'rgba(239,68,68,0.1)' },
-};
+interface DeviceSearchItem {
+  id: string;
+  name: string;
+  category: string;
+  color?: string;
+  condition: string;
+  imei?: string;
+  stock: number;
+}
 
 const roleGradients: Record<string, string> = {
   admin: 'linear-gradient(135deg, #07101F, #2463BE)',
@@ -31,26 +28,107 @@ const roleGradients: Record<string, string> = {
 };
 
 export default function TopBar({
-  title, subtitle, notifications = [], unreadCount = 0, onMarkAllRead, isDark, onToggleDark,
+  title, subtitle,
 }: TopBarProps) {
-  const [notifOpen, setNotifOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
-
-  const displayNotifs = notifications.length > 0 ? notifications.slice(0, 8) : [
-    { id: 'default-1', type: 'alert' as const, title: 'Low Stock', message: 'Samsung Galaxy S24 — only 1 unit left', time: new Date(), read: false },
-    { id: 'default-2', type: 'payment' as const, title: 'Payment Pending', message: 'GHS 4,200 payment pending verification', time: new Date(), read: false },
-    { id: 'default-3', type: 'lead' as const, title: 'Leads Waiting', message: '5 leads uncontacted for 48+ hours', time: new Date(), read: true },
-  ];
-
-  const formatTime = (date: Date) => {
-    const diff = Date.now() - date.getTime();
-    if (diff < 60000) return 'just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    return `${Math.floor(diff / 3600000)}h ago`;
-  };
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const avatarGradient = user?.role ? roleGradients[user.role] : roleGradients.admin;
+  const searchableItems = useMemo<DeviceSearchItem[]>(() => inventoryProducts, []);
+
+  const filteredItems = useMemo(() => {
+    const trimmedQuery = query.trim().toLowerCase();
+    if (!trimmedQuery) return searchableItems.slice(0, 8);
+
+    return searchableItems
+      .map((device) => {
+        const nameScore = device.name.toLowerCase().includes(trimmedQuery) ? 3 : 0;
+        const imeiScore = device.imei?.toLowerCase().includes(trimmedQuery) ? 3 : 0;
+        const colorScore = device.color?.toLowerCase().includes(trimmedQuery) ? 2 : 0;
+        const categoryScore = device.category.toLowerCase().includes(trimmedQuery) ? 1 : 0;
+        return { item: device, score: nameScore + imeiScore + colorScore + categoryScore };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name))
+      .map(({ item }) => item)
+      .slice(0, 8);
+  }, [query, searchableItems]);
+
+  useEffect(() => {
+    setIsOpen(false);
+    setQuery('');
+    setActiveIndex(0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!searchWrapRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        inputRef.current?.focus();
+        setIsOpen(true);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('keydown', handleShortcut);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('keydown', handleShortcut);
+    };
+  }, []);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query]);
+
+  const openResult = (item: DeviceSearchItem) => {
+    const lookup = item.imei && item.imei !== '—' ? item.imei : item.name;
+    navigate(`/inventory?search=${encodeURIComponent(lookup)}&selected=${encodeURIComponent(item.id)}`);
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen && ['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key)) {
+      setIsOpen(true);
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((prev) => (prev + 1) % Math.max(filteredItems.length, 1));
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((prev) => (prev - 1 + Math.max(filteredItems.length, 1)) % Math.max(filteredItems.length, 1));
+      return;
+    }
+
+    if (event.key === 'Enter' && filteredItems[activeIndex]) {
+      event.preventDefault();
+      openResult(filteredItems[activeIndex]);
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+      inputRef.current?.blur();
+    }
+  };
 
   return (
     <header
@@ -72,19 +150,27 @@ export default function TopBar({
       <div className="flex items-center gap-2">
         {/* Search */}
         <div
-          className="hidden md:flex items-center gap-2 rounded-2xl px-3.5 py-2 w-60 transition-all duration-200"
+          ref={searchWrapRef}
+          className="hidden md:flex relative items-center gap-2 rounded-2xl px-3.5 py-2 w-60 transition-all duration-200"
           style={{
             background: 'var(--surface-raised, rgba(7,16,31,0.06))',
             border: '1px solid var(--topbar-border)',
           }}
-          onFocus={() => {}}
         >
           <i className="ri-search-line text-sm flex-shrink-0" style={{ color: 'rgba(7,16,31,0.45)' }} />
           <input
+            ref={inputRef}
             type="text"
-            placeholder="Search anything…"
+            value={query}
+            placeholder="Search devices…"
             className="bg-transparent text-[13px] outline-none flex-1 min-w-0"
             style={{ color: '#07101F' }}
+            onFocus={() => setIsOpen(true)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setIsOpen(true);
+            }}
+            onKeyDown={handleKeyDown}
           />
           <div
             className="hidden md:flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md flex-shrink-0"
@@ -92,126 +178,50 @@ export default function TopBar({
           >
             <i className="ri-command-line text-[9px]" />K
           </div>
-        </div>
 
-        {/* Dark Mode */}
-        {onToggleDark && (
-          <button
-            onClick={onToggleDark}
-            title={isDark ? 'Light mode' : 'Dark mode'}
-            className="w-9 h-9 flex items-center justify-center rounded-xl transition-all cursor-pointer"
-            style={{ background: 'rgba(7,16,31,0.06)', color: 'rgba(7,16,31,0.5)' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.1)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.06)'; }}
-          >
-            <i className={`${isDark ? 'ri-sun-line' : 'ri-moon-line'} text-[15px]`} />
-          </button>
-        )}
-
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => setNotifOpen(!notifOpen)}
-            className="relative w-9 h-9 flex items-center justify-center rounded-xl transition-all cursor-pointer"
-            style={{ background: 'rgba(7,16,31,0.06)', color: 'rgba(7,16,31,0.5)' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.1)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.06)'; }}
-          >
-            <i className="ri-notification-3-line text-[15px]" />
-            {unreadCount > 0 && (
-              <span
-                className="absolute -top-1 -right-1 min-w-[16px] h-4 rounded-full text-white text-[9px] flex items-center justify-center px-1 font-bold"
-                style={{ background: 'linear-gradient(135deg, #EF4444, #F97316)' }}
-              >
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-            {unreadCount === 0 && (
-              <span
-                className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full"
-                style={{ background: '#F5A623' }}
-              />
-            )}
-          </button>
-
-          {notifOpen && (
+          {isOpen && (
             <div
-              className="absolute right-0 top-12 w-[340px] rounded-2xl overflow-hidden z-50"
+              className="absolute left-0 top-full mt-2 w-80 rounded-2xl overflow-hidden z-50"
               style={{
                 background: 'var(--card-bg)',
-                backdropFilter: 'blur(24px)',
                 border: '1px solid var(--topbar-border)',
-                boxShadow: '0 8px 40px rgba(7,16,31,0.12)',
+                boxShadow: '0 12px 40px rgba(7,16,31,0.14)',
+                backdropFilter: 'blur(24px)',
               }}
             >
-              <div
-                className="px-4 py-3 flex items-center justify-between"
-                style={{ borderBottom: '1px solid rgba(7,16,31,0.07)' }}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-bold" style={{ color: 'var(--text-ink)' }}>Notifications</span>
-                  {unreadCount > 0 && (
-                    <span
-                      className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
-                      style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}
-                    >
-                      {unreadCount} new
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={onMarkAllRead}
-                  className="text-[11px] font-semibold cursor-pointer transition-opacity hover:opacity-70"
-                  style={{ color: '#0D1F4A' }}
-                >
-                  Mark all read
-                </button>
+              <div className="px-3 py-2 border-b border-slate-100 text-[11px]" style={{ color: 'var(--text-ink-40)' }}>
+                {query.trim() ? `Devices matching "${query.trim()}"` : 'Recent device index'}
               </div>
-
-              <div className="max-h-72 overflow-y-auto">
-                {displayNotifs.map((n) => {
-                  const cfg = typeConfig[n.type];
+              <div className="py-1">
+                {filteredItems.length > 0 ? filteredItems.map((item, index) => {
+                  const isActive = index === activeIndex;
                   return (
-                    <div
-                      key={n.id}
-                      className="flex items-start gap-3 px-4 py-3 cursor-pointer transition-all"
-                      style={{
-                        borderBottom: '1px solid rgba(7,16,31,0.04)',
-                        background: !n.read ? 'rgba(245,166,35,0.04)' : 'transparent',
-                      }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.04)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = !n.read ? 'rgba(245,166,35,0.04)' : 'transparent'; }}
+                    <button
+                      key={item.path}
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() => openResult(item)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors"
+                      style={{ background: isActive ? 'rgba(13,31,74,0.06)' : 'transparent' }}
                     >
-                      <div
-                        className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                        style={{ background: cfg.bg, color: cfg.color }}
-                      >
-                        <i className={`${cfg.icon} text-sm`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-semibold truncate" style={{ color: 'var(--text-ink)' }}>{item.name}</p>
+                        <p className="text-[10px] truncate" style={{ color: 'var(--text-ink-40)' }}>
+                          {item.category}{item.color ? ` · ${item.color}` : ''} · {item.condition} · Stock {item.stock}
+                        </p>
+                        <p className="text-[10px] truncate" style={{ color: 'var(--text-ink-40)' }}>
+                          {item.imei && item.imei !== '—' ? `IMEI/Serial: ${item.imei}` : `Record: ${item.id}`}
+                        </p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[12px] font-semibold leading-tight" style={{ color: '#07101F' }}>{n.title}</p>
-                        <p className="text-[11px] mt-0.5 truncate" style={{ color: 'rgba(10,31,74,0.5)' }}>{n.message}</p>
-                        <p className="text-[10px] mt-1" style={{ color: 'rgba(10,31,74,0.35)' }}>{formatTime(n.time)}</p>
-                      </div>
-                      {!n.read && (
-                        <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-2" style={{ background: '#F5A623' }} />
-                      )}
-                    </div>
+                    </button>
                   );
-                })}
-              </div>
-
-              <div
-                className="px-4 py-2.5"
-                style={{ borderTop: '1px solid rgba(7,16,31,0.07)' }}
-              >
-                <button
-                  onClick={() => { setNotifOpen(false); navigate('/'); }}
-                  className="text-[11px] font-medium cursor-pointer transition-opacity hover:opacity-70"
-                  style={{ color: 'rgba(10,31,74,0.45)' }}
-                >
-                  View all activity →
-                </button>
+                }) : (
+                  <div className="px-3 py-4 text-center">
+                    <p className="text-[12px] font-semibold" style={{ color: 'var(--text-ink)' }}>No matching devices</p>
+                    <p className="text-[10px] mt-1" style={{ color: 'var(--text-ink-40)' }}>Try a model, color, or IMEI/serial number.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}

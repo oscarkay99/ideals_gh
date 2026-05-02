@@ -6,6 +6,7 @@ export interface InventoryProduct {
   id: string;
   name: string;
   category: string;
+  color?: string;
   condition: string;
   price: string;
   stock: number;

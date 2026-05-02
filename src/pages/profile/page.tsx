@@ -7,7 +7,7 @@ import type { UserRole } from '@/hooks/useAuth';
 import { canAccessModule } from '@/utils/access';
 import { isSupabaseConfigured, supabase } from '@/services/supabase';
 
-const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'SMS', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
+const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
 const activityLog = [
   { id: 1, action: 'Signed in', detail: 'Chrome on Windows · Accra, Ghana', time: 'Today, 9:42 AM', icon: 'ri-login-box-line', color: '#0D1F4A' },

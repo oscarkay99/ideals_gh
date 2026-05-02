@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { OPENAI_MODEL } from '../_shared/openai.ts';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -76,12 +77,12 @@ Deno.serve(async (req) => {
       slow_hour: `${slowHour}:00`,
     };
 
-    // Ask GPT-4o-mini for three narrative insights
+    // Ask OpenAI for three narrative insights using the shared model setting
     const completion = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: OPENAI_MODEL,
         temperature: 0.6,
         messages: [
           {

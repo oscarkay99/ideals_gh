@@ -13,7 +13,6 @@ export type AppModule =
   | 'Customers'
   | 'Repairs'
   | 'Warranty'
-  | 'SMS'
   | 'Marketing'
   | 'Price Intel'
   | 'Trade-In'

@@ -15,8 +15,8 @@ export const recentSales = [
 ];
 
 export const cartProducts = [
-  { id: 'P001', name: 'iPhone 15 Pro Max 256GB', condition: 'New', price: 8200, stock: 3, image: 'https://readdy.ai/api/search-image?query=iPhone%2015%20Pro%20Max%20titanium%20smartphone%20on%20clean%20white%20marble%20surface%20with%20soft%20studio%20lighting%2C%20premium%20product%20photography%2C%20minimalist%20background%2C%20ultra%20sharp%20detail&width=200&height=200&seq=cart1&orientation=squarish' },
-  { id: 'P002', name: 'MacBook Air M2 8GB/256GB', condition: 'New', price: 12400, stock: 5, image: 'https://readdy.ai/api/search-image?query=MacBook%20Air%20M2%20silver%20laptop%20open%20on%20clean%20white%20desk%20with%20soft%20ambient%20lighting%2C%20premium%20product%20photography%2C%20minimalist%20background&width=200&height=200&seq=cart2&orientation=squarish' },
-  { id: 'P003', name: 'Samsung Galaxy S24 Ultra', condition: 'New', price: 6800, stock: 1, image: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20S24%20Ultra%20black%20smartphone%20standing%20upright%20on%20white%20surface%20with%20clean%20studio%20lighting%2C%20premium%20product%20photography%2C%20minimalist%20background&width=200&height=200&seq=cart3&orientation=squarish' },
-  { id: 'P004', name: 'AirPods Pro 2nd Gen', condition: 'New', price: 1600, stock: 8, image: 'https://readdy.ai/api/search-image?query=Apple%20AirPods%20Pro%202nd%20generation%20white%20earbuds%20with%20case%20on%20clean%20white%20surface%2C%20premium%20product%20photography%2C%20minimalist%20background%2C%20soft%20shadows&width=200&height=200&seq=cart4&orientation=squarish' },
+  { id: 'P001', name: 'iPhone 15 Pro Max 256GB', condition: 'New', price: 8200, stock: 3 },
+  { id: 'P002', name: 'MacBook Air M2 8GB/256GB', condition: 'New', price: 12400, stock: 5 },
+  { id: 'P003', name: 'Samsung Galaxy S24 Ultra', condition: 'New', price: 6800, stock: 1 },
+  { id: 'P004', name: 'AirPods Pro 2nd Gen', condition: 'New', price: 1600, stock: 8 },
 ];

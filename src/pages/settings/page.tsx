@@ -4,7 +4,6 @@ import SettingsSidebar from './components/SettingsSidebar';
 import BrandingSection from './components/BrandingSection';
 import OperationsSection from './components/OperationsSection';
 import TemplatesSection from './components/TemplatesSection';
-import NotificationsSection from './components/NotificationsSection';
 import TeamRolesSection from './components/TeamRolesSection';
 import AutomationSection from './components/AutomationSection';
 import IntegrationsSection from './components/IntegrationsSection';
@@ -15,7 +14,6 @@ const sections = [
   { id: 'branding', label: 'Branding', icon: 'ri-palette-line' },
   { id: 'operations', label: 'Operations', icon: 'ri-settings-4-line' },
   { id: 'templates', label: 'Templates', icon: 'ri-file-text-line' },
-  { id: 'notifications', label: 'Notifications', icon: 'ri-notification-3-line' },
   { id: 'team', label: 'Team & Roles', icon: 'ri-team-line' },
   { id: 'automation', label: 'Automation', icon: 'ri-robot-line' },
   { id: 'integrations', label: 'Integrations', icon: 'ri-plug-line' },
@@ -72,10 +70,6 @@ export default function SettingsPage() {
   const [whatsapp, setWhatsapp] = useState('+233 24 000 0000');
   const [address, setAddress] = useState('Accra Mall, Accra, Ghana');
   const [primaryColor, setPrimaryColor] = useState('#0D1F4A');
-  const [autoFollowUp, setAutoFollowUp] = useState(true);
-  const [lowStockAlert, setLowStockAlert] = useState(true);
-  const [paymentReminder, setPaymentReminder] = useState(false);
-  const [repairUpdates, setRepairUpdates] = useState(true);
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [automations, setAutomations] = useState(automationRules);
   const [showAddRole, setShowAddRole] = useState(false);
@@ -113,15 +107,6 @@ export default function SettingsPage() {
               templates={messageTemplates}
               editingTemplate={editingTemplate}
               onEditToggle={(id) => setEditingTemplate(editingTemplate === id ? null : id)}
-            />
-          )}
-
-          {activeSection === 'notifications' && (
-            <NotificationsSection
-              autoFollowUp={autoFollowUp} setAutoFollowUp={setAutoFollowUp}
-              lowStockAlert={lowStockAlert} setLowStockAlert={setLowStockAlert}
-              paymentReminder={paymentReminder} setPaymentReminder={setPaymentReminder}
-              repairUpdates={repairUpdates} setRepairUpdates={setRepairUpdates}
             />
           )}
 

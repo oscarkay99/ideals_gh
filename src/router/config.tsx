@@ -23,7 +23,6 @@ import TradeInPage from "../pages/tradein/page";
 import PriceIntelPage from "../pages/priceintel/page";
 import WalletPage from "../pages/wallet/page";
 import DeliveryPage from "../pages/delivery/page";
-import SMSPage from "../pages/sms/page";
 import LoyaltyPage from "../pages/loyalty/page";
 import ExpensesPage from "../pages/expenses/page";
 import CalendarPage from "../pages/calendar/page";
@@ -61,7 +60,6 @@ const routes: RouteObject[] = [
       { path: "/price-intel", element: <AuthGuard requiredModule="Price Intel"><PriceIntelPage /></AuthGuard> },
       { path: "/wallet", element: <AuthGuard requiredModule="Wallet"><WalletPage /></AuthGuard> },
       { path: "/delivery", element: <AuthGuard requiredModule="Delivery"><DeliveryPage /></AuthGuard> },
-      { path: "/sms", element: <AuthGuard requiredModule="SMS"><SMSPage /></AuthGuard> },
       { path: "/loyalty", element: <AuthGuard requiredModule="Loyalty"><LoyaltyPage /></AuthGuard> },
       { path: "/expenses", element: <AuthGuard requiredModule="Expenses"><ExpensesPage /></AuthGuard> },
       { path: "/calendar", element: <AuthGuard requiredModule="Calendar"><CalendarPage /></AuthGuard> },

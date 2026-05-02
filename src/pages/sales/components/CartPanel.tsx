@@ -10,7 +10,6 @@ const methodIcons: Record<string, string> = {
 interface CartItem {
   id: string;
   name: string;
-  image: string;
   price: number;
   qty: number;
   lineTotal: number;
@@ -72,12 +71,12 @@ export default function CartPanel({ cartItems, delivery, payment, subtotal, deli
           <div className="space-y-3 mb-4">
             {cartItems.map((item) => (
               <div key={item.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                <div className="w-10 h-10 rounded-lg bg-white overflow-hidden flex-shrink-0">
-                  <img loading="lazy" decoding="async" src={item.image} alt={item.name} className="w-full h-full object-cover object-top" />
+                <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0 text-slate-500">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.08em]">Rec</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-slate-800 truncate">{item.name}</p>
-                  <p className="text-[10px] text-slate-400">GHS {item.price.toLocaleString()} each</p>
+                  <p className="text-[10px] text-slate-400">{item.id} · GHS {item.price.toLocaleString()} each</p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => onUpdateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-200 text-slate-500 cursor-pointer">

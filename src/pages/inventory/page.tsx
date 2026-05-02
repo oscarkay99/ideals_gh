@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { inventoryStats } from '@/mocks/inventory';
 import { useInventory } from '@/hooks/useInventory';
 import ProductDetail from './components/ProductDetail';
 import AddProductModal from './components/AddProductModal';
+import { useSearchParams } from 'react-router-dom';
 
 const conditionConfig: Record<string, { label: string; color: string; dot: string }> = {
   'New': { label: 'New', color: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' },
@@ -14,13 +15,26 @@ const conditionConfig: Record<string, { label: string; color: string; dot: strin
 
 export default function InventoryPage() {
   const { products, add } = useInventory();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
+  useEffect(() => {
+    const incomingSearch = searchParams.get('search') || '';
+    const incomingSelected = searchParams.get('selected');
+    if (incomingSearch) setSearch(incomingSearch);
+    if (incomingSelected) setSelected(incomingSelected);
+  }, [searchParams]);
+
   const filtered = products.filter((p) => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch =
+      p.name.toLowerCase().includes(q) ||
+      p.id.toLowerCase().includes(q) ||
+      p.color?.toLowerCase().includes(q) ||
+      p.imei?.toLowerCase().includes(q);
     const matchFilter = filter === 'all' || p.condition === filter || (filter === 'low' && p.stock <= 2) || (filter === 'out' && p.stock === 0);
     return matchSearch && matchFilter;
   });
@@ -58,7 +72,18 @@ export default function InventoryPage() {
             type="text"
             placeholder="Search products..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              const next = e.target.value;
+              setSearch(next);
+              const nextParams = new URLSearchParams(searchParams);
+              if (next) {
+                nextParams.set('search', next);
+              } else {
+                nextParams.delete('search');
+              }
+              nextParams.delete('selected');
+              setSearchParams(nextParams, { replace: true });
+            }}
             className="bg-transparent text-sm text-slate-600 outline-none w-full"
           />
         </div>
@@ -102,14 +127,11 @@ export default function InventoryPage() {
                 return (
                   <tr key={p.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/20'}`}>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0">
-                          <i className="ri-smartphone-line text-lg" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-slate-800">{p.name}</p>
-                          <p className="text-[10px] text-slate-400">{p.id} · {p.category}</p>
-                        </div>
+                      <div>
+                        <p className="text-xs font-semibold text-slate-800">{p.name}</p>
+                        <p className="text-[10px] text-slate-400">
+                          {p.id} · {p.category}{p.color ? ` · ${p.color}` : ''}{p.imei ? ` · ${p.imei}` : ''}
+                        </p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
