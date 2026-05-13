@@ -75,10 +75,4 @@ export const storageMultipliers: Record<string, number> = {
   '1TB': 1.15,
 };
 
-export const recentTradeIns = [
-  { customer: 'Kwame A.', device: 'iPhone 13 Pro', condition: 'Good', value: 2600, date: 'Apr 22' },
-  { customer: 'Abena O.', device: 'Samsung S22', condition: 'Excellent', value: 1600, date: 'Apr 21' },
-  { customer: 'Kofi M.', device: 'iPhone 12', condition: 'Fair', value: 900, date: 'Apr 20' },
-  { customer: 'Ama D.', device: 'Pixel 7 Pro', condition: 'Good', value: 1312, date: 'Apr 19' },
-  { customer: 'Yaw B.', device: 'Galaxy S23', condition: 'Excellent', value: 2000, date: 'Apr 18' },
-];
+export const recentTradeIns: never[] = [];
