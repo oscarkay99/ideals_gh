@@ -4,7 +4,7 @@ import { priceIntelProducts, priceAlerts } from '@/mocks/priceintel';
 import PriceDetail from './components/PriceDetail';
 
 export default function PriceIntelPage() {
-  const [selectedProduct, setSelectedProduct] = useState(priceIntelProducts[0]);
+  const [selectedProduct, setSelectedProduct] = useState(priceIntelProducts[0] ?? null);
   const [alertDismissed, setAlertDismissed] = useState<string[]>([]);
 
   const positionConfig = {
@@ -56,14 +56,20 @@ export default function PriceIntelPage() {
         {/* Product List */}
         <div className="space-y-3">
           <h3 className="text-sm font-bold text-slate-800">Tracked Products</h3>
-          {priceIntelProducts.map(product => {
+          {priceIntelProducts.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-slate-100 p-8 flex flex-col items-center text-center">
+              <i className="ri-line-chart-line text-3xl text-slate-200 mb-3" />
+              <p className="text-sm font-semibold text-slate-600 mb-1">No products tracked</p>
+              <p className="text-xs text-slate-400">Add products to monitor competitor pricing and market position.</p>
+            </div>
+          ) : priceIntelProducts.map(product => {
             const pos = positionConfig[product.position as keyof typeof positionConfig];
             const diff = product.ourPrice - product.marketAvg;
             return (
               <button
                 key={product.id}
                 onClick={() => setSelectedProduct(product)}
-                className={`w-full bg-white rounded-2xl border p-4 text-left hover:border-emerald-300 transition-all cursor-pointer ${selectedProduct.id === product.id ? 'border-emerald-400' : 'border-slate-100'}`}
+                className={`w-full bg-white rounded-2xl border p-4 text-left hover:border-emerald-300 transition-all cursor-pointer ${selectedProduct?.id === product.id ? 'border-emerald-400' : 'border-slate-100'}`}
               >
                 <div className="flex items-start justify-between mb-2">
                   <p className="text-sm font-semibold text-slate-800 leading-tight">{product.device}</p>
@@ -92,7 +98,7 @@ export default function PriceIntelPage() {
         </div>
 
         {/* Detail Panel */}
-        <PriceDetail product={selectedProduct} />
+        {selectedProduct && <PriceDetail product={selectedProduct} />}
       </div>
     </AdminLayout>
   );
