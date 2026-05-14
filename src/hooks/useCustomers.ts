@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getCustomers, createCustomer } from '@/services/customers';
-import { customers as mockData } from '@/mocks/customers';
 import type { Customer } from '@/types/customer';
 
 export function useCustomers() {
-  const [customers, setCustomers] = useState<Customer[]>(mockData as Customer[]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getCustomers()
-      .then(data => { if (data.length > 0) setCustomers(data); })
+      .then(data => setCustomers(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

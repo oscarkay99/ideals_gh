@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { calendarEvents } from '@/mocks/calendar';
 
 export interface CalendarEvent {
   id: string;
@@ -16,7 +15,7 @@ export interface CalendarEvent {
 }
 
 export async function getCalendarEvents(): Promise<CalendarEvent[]> {
-  if (!isSupabaseConfigured) return calendarEvents as CalendarEvent[];
+  if (!isSupabaseConfigured) return [];
   const { data, error } = await supabase.from('events').select('*').order('date', { ascending: true });
   if (error) throw new Error(error.message);
   return data ?? [];

@@ -1,9 +1,8 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { repairs } from '@/mocks/repairs';
 import type { Repair, RepairStatus } from '@/types/repair';
 
 export async function getRepairs(): Promise<Repair[]> {
-  if (!isSupabaseConfigured) return repairs as Repair[];
+  if (!isSupabaseConfigured) return [];
   const { data, error } = await supabase.from('repairs').select('*');
   if (error) throw new Error(error.message);
   return data ?? [];

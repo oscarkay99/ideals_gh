@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { inventoryStats } from '@/mocks/inventory';
 import { useInventory } from '@/hooks/useInventory';
 import ProductDetail from './components/ProductDetail';
 import AddProductModal from './components/AddProductModal';
@@ -41,18 +40,29 @@ export default function InventoryPage() {
 
   const product = selected ? products.find((p) => p.id === selected) : null;
 
+  const totalValue = products.reduce((sum, p) => {
+    const n = parseFloat(p.price.replace(/[^0-9.]/g, ''));
+    return sum + (isNaN(n) ? 0 : n * p.stock);
+  }, 0);
+
+  const computedStats = [
+    { label: 'Total Products', value: String(products.length), icon: 'ri-archive-line', accent: 'bg-blue-500' },
+    { label: 'Low Stock Items', value: String(products.filter(p => p.stock > 0 && p.stock <= 2).length), icon: 'ri-alert-line', accent: 'bg-amber-500' },
+    { label: 'Out of Stock', value: String(products.filter(p => p.stock === 0).length), icon: 'ri-close-circle-line', accent: 'bg-red-500' },
+    { label: 'Total Value', value: totalValue > 0 ? `GHS ${totalValue.toLocaleString()}` : 'GHS 0', icon: 'ri-money-dollar-circle-line', accent: 'bg-emerald-500' },
+  ];
+
   return (
     <AdminLayout title="Inventory" subtitle="Manage products, stock, and suppliers">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        {inventoryStats.map((s) => (
+        {computedStats.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-5 border border-slate-100 relative overflow-hidden">
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.accent} rounded-l-2xl`} />
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{s.label}</p>
                 <p className="text-2xl font-bold text-slate-800 mt-1">{s.value}</p>
-                <p className="text-xs text-emerald-600 font-medium mt-1">{s.change}</p>
               </div>
               <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
                 <i className={`${s.icon} text-lg`} />

@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getCalendarEvents, createCalendarEvent } from '@/services/events';
-import { calendarEvents as mockData } from '@/mocks/calendar';
 import type { CalendarEvent } from '@/services/events';
 
 export function useCalendarEvents() {
-  const [events, setEvents] = useState<CalendarEvent[]>(mockData as CalendarEvent[]);
+  const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getCalendarEvents()
-      .then(data => { if (data.length > 0) setEvents(data); })
+      .then(data => setEvents(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

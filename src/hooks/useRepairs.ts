@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getRepairs, createRepair, updateRepairStatus, updateRepairNotes } from '@/services/repairs';
-import { repairs as mockData } from '@/mocks/repairs';
 import type { Repair, RepairStatus } from '@/types/repair';
 
 export function useRepairs() {
-  const [repairs, setRepairs] = useState<Repair[]>(mockData as Repair[]);
+  const [repairs, setRepairs] = useState<Repair[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getRepairs()
-      .then(data => { if (data.length > 0) setRepairs(data); })
+      .then(data => setRepairs(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

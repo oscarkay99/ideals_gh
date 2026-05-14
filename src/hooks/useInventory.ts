@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProducts, updateStock, createProduct } from '@/services/products';
-import { inventoryProducts as mockData } from '@/mocks/inventory';
+import { fetchInventory, addInventoryItem, setInventoryStock } from '@/services/inventory';
 
 export interface InventoryProduct {
   id: string;
@@ -18,21 +17,26 @@ export interface InventoryProduct {
 }
 
 export function useInventory() {
-  const [products, setProducts] = useState<InventoryProduct[]>(mockData as InventoryProduct[]);
+  const [products, setProducts] = useState<InventoryProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProducts()
-      .then(data => { if (data.length > 0) setProducts(data as unknown as InventoryProduct[]); })
+    fetchInventory()
+      .then(data => setProducts(data as unknown as InventoryProduct[]))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const add = async (p: Omit<InventoryProduct, 'id'>) => {
     try {
-      const created = await createProduct(p as never);
-      setProducts(prev => [created as unknown as InventoryProduct, ...prev]);
-      return created as unknown as InventoryProduct;
+      const created = await addInventoryItem({
+        name: p.name, category: p.category, color: p.color,
+        condition: p.condition, price: p.price, stock: p.stock,
+        location: p.location, supplier: p.supplier, imei: p.imei,
+      });
+      const item = created as unknown as InventoryProduct;
+      setProducts(prev => [item, ...prev]);
+      return item;
     } catch {
       const local = { ...p, id: `P${Date.now()}` } as InventoryProduct;
       setProducts(prev => [local, ...prev]);
@@ -42,7 +46,7 @@ export function useInventory() {
 
   const adjustStock = async (id: string, qty: number) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, stock: qty } : p));
-    try { await updateStock(id, qty); } catch { /* optimistic */ }
+    try { await setInventoryStock(id, qty); } catch { /* optimistic */ }
   };
 
   return { products, loading, add, adjustStock };

@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getPurchaseOrders, createPurchaseOrder } from '@/services/purchaseOrders';
-import { purchaseOrders as mockData } from '@/mocks/suppliers';
 import type { PurchaseOrder } from '@/services/purchaseOrders';
 
 export function usePurchaseOrders() {
-  const [orders, setOrders] = useState<PurchaseOrder[]>(mockData as PurchaseOrder[]);
+  const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getPurchaseOrders()
-      .then(data => { if (data.length > 0) setOrders(data); })
+      .then(data => setOrders(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

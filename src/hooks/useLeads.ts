@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getLeads, createLead, updateLeadStatus } from '@/services/leads';
-import { leads as mockData } from '@/mocks/leads';
 import type { Lead, LeadStatus } from '@/types/lead';
 
 export function useLeads() {
-  const [leads, setLeads] = useState<Lead[]>(mockData as Lead[]);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getLeads()
-      .then(data => { if (data.length > 0) setLeads(data); })
+      .then(data => setLeads(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

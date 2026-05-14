@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { recentTransactions } from '@/mocks/expenses';
 
 export interface Expense {
   id: string;
@@ -13,7 +12,7 @@ export interface Expense {
 }
 
 export async function getExpenses(): Promise<Expense[]> {
-  if (!isSupabaseConfigured) return recentTransactions as Expense[];
+  if (!isSupabaseConfigured) return [];
   const { data, error } = await supabase.from('expenses').select('*').order('date', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];

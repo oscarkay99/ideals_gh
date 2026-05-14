@@ -1,9 +1,8 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { recentSales } from '@/mocks/sales';
 import type { Sale, SaleStatus } from '@/types/sale';
 
 export async function getSales(): Promise<Sale[]> {
-  if (!isSupabaseConfigured) return recentSales as Sale[];
+  if (!isSupabaseConfigured) return [];
   const { data, error } = await supabase.from('sales').select('*').order('date', { ascending: false });
   if (error) throw new Error(error.message);
   return data ?? [];

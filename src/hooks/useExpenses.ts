@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getExpenses, createExpense } from '@/services/expenses';
-import { recentTransactions as mockData } from '@/mocks/expenses';
 import type { Expense } from '@/services/expenses';
 
 export function useExpenses() {
-  const [expenses, setExpenses] = useState<Expense[]>(mockData as Expense[]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getExpenses()
-      .then(data => { if (data.length > 0) setExpenses(data); })
+      .then(data => setExpenses(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

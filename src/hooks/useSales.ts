@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getSales, createSale } from '@/services/sales';
-import { recentSales as mockData } from '@/mocks/sales';
 import type { Sale } from '@/types/sale';
 
 export function useSales() {
-  const [sales, setSales] = useState<Sale[]>(mockData as Sale[]);
+  const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getSales()
-      .then(data => { if (data.length > 0) setSales(data); })
+      .then(data => setSales(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

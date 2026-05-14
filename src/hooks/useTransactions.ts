@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getTransactions, verifyTransaction } from '@/services/payments';
-import { transactions as mockData } from '@/mocks/payments';
 import type { Transaction, TransactionStatus } from '@/types/payment';
 
 export function useTransactions() {
-  const [transactions, setTransactions] = useState<Transaction[]>(mockData as Transaction[]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getTransactions()
-      .then(data => { if (data.length > 0) setTransactions(data); })
+      .then(data => setTransactions(data))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

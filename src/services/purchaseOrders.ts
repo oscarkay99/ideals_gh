@@ -1,5 +1,4 @@
 import { supabase, isSupabaseConfigured } from './supabase';
-import { purchaseOrders } from '@/mocks/suppliers';
 
 export interface POItem {
   name: string;
@@ -22,7 +21,7 @@ export interface PurchaseOrder {
 }
 
 export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
-  if (!isSupabaseConfigured) return purchaseOrders as PurchaseOrder[];
+  if (!isSupabaseConfigured) return [];
   const { data, error } = await supabase
     .from('purchase_orders')
     .select('*')
