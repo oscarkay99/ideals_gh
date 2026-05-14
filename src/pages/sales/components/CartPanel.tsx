@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 const methodIcons: Record<string, string> = {
   MoMo: 'ri-smartphone-line',
   'Bank Transfer': 'ri-bank-line',
@@ -8,7 +10,6 @@ const methodIcons: Record<string, string> = {
 interface CartItem {
   id: string;
   name: string;
-  image: string;
   price: number;
   qty: number;
   lineTotal: number;
@@ -26,9 +27,24 @@ interface Props {
   onUpdateQty: (id: string, qty: number) => void;
   onRemove: (id: string) => void;
   onGenerateQuote: () => void;
+  onProcessOrder: (customer: string) => void;
 }
 
-export default function CartPanel({ cartItems, delivery, payment, subtotal, deliveryFee, total, onDeliveryChange, onPaymentChange, onUpdateQty, onRemove, onGenerateQuote }: Props) {
+export default function CartPanel({ cartItems, delivery, payment, subtotal, deliveryFee, total, onDeliveryChange, onPaymentChange, onUpdateQty, onRemove, onGenerateQuote, onProcessOrder }: Props) {
+  const [customer, setCustomer] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleComplete = async () => {
+    if (cartItems.length === 0) return;
+    setProcessing(true);
+    await onProcessOrder(customer || 'Walk-in Customer');
+    setProcessing(false);
+    setDone(true);
+    setCustomer('');
+    setTimeout(() => setDone(false), 2000);
+  };
+
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5 sticky top-20">
       <h3 className="text-sm font-semibold text-slate-800 mb-4">Current Sale</h3>
@@ -42,15 +58,25 @@ export default function CartPanel({ cartItems, delivery, payment, subtotal, deli
         </div>
       ) : (
         <>
+          <div className="mb-4">
+            <p className="text-xs text-slate-500 mb-1.5">Customer</p>
+            <input
+              value={customer}
+              onChange={e => setCustomer(e.target.value)}
+              placeholder="Walk-in Customer"
+              className="w-full text-sm rounded-xl px-3 py-2 outline-none border border-slate-200 bg-slate-50 text-slate-700"
+            />
+          </div>
+
           <div className="space-y-3 mb-4">
             {cartItems.map((item) => (
               <div key={item.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl">
-                <div className="w-10 h-10 rounded-lg bg-white overflow-hidden flex-shrink-0">
-                  <img src={item.image} alt={item.name} className="w-full h-full object-cover object-top" />
+                <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center flex-shrink-0 text-slate-500">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.08em]">Rec</span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium text-slate-800 truncate">{item.name}</p>
-                  <p className="text-[10px] text-slate-400">GHS {item.price.toLocaleString()} each</p>
+                  <p className="text-[10px] text-slate-400">{item.id} · GHS {item.price.toLocaleString()} each</p>
                 </div>
                 <div className="flex items-center gap-1">
                   <button onClick={() => onUpdateQty(item.id, item.qty - 1)} className="w-6 h-6 flex items-center justify-center rounded-md hover:bg-slate-200 text-slate-500 cursor-pointer">
@@ -93,7 +119,7 @@ export default function CartPanel({ cartItems, delivery, payment, subtotal, deli
                   key={m}
                   onClick={() => onPaymentChange(m)}
                   className={`flex items-center gap-1.5 py-2 px-2 rounded-xl text-xs transition-all cursor-pointer whitespace-nowrap ${
-                    payment === m ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-slate-50 border border-transparent text-slate-500 hover:bg-slate-100'
+                    payment === m ? 'bg-blue-50 border border-blue-200 text-blue-700' : 'bg-slate-50 border border-transparent text-slate-500 hover:bg-slate-100'
                   }`}
                 >
                   <div className="w-3 h-3 flex items-center justify-center">
@@ -121,11 +147,19 @@ export default function CartPanel({ cartItems, delivery, payment, subtotal, deli
           </div>
 
           <div className="space-y-2">
-            <button onClick={onGenerateQuote} className="w-full py-3 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap">
+            <button
+              onClick={onGenerateQuote}
+              className="w-full py-3 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap"
+            >
               Generate Quote
             </button>
-            <button className="w-full py-3 border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
-              Complete Sale
+            <button
+              onClick={handleComplete}
+              disabled={processing}
+              className="w-full py-3 text-white text-sm font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap"
+              style={{ background: done ? '#10B981' : '#0D1F4A', opacity: processing ? 0.7 : 1 }}
+            >
+              {done ? 'Sale Recorded!' : processing ? 'Processing…' : 'Complete Sale'}
             </button>
           </div>
         </>

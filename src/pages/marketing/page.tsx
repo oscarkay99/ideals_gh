@@ -51,7 +51,7 @@ export default function MarketingPage() {
             <div className="flex-1">
               <p className="text-sm font-semibold text-white">AI Marketing Insight</p>
               <p className="text-xs text-white/60 mt-0.5">
-                WhatsApp is your highest-converting channel at 46% of leads. The iPhone 15 Flash Sale has a 5.1x ROI — consider extending it by 3 days. 3 leads from Instagram went cold this week — a re-engagement broadcast could recover 20–30%.
+                Run your first campaign to unlock AI-powered insights. Connect your channels, launch a broadcast, and get personalized recommendations based on real performance data.
               </p>
             </div>
             <button className="flex items-center gap-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-medium px-4 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap flex-shrink-0">
@@ -71,21 +71,9 @@ export default function MarketingPage() {
               {/* Channel breakdown mini */}
               <div className="bg-white rounded-2xl border border-slate-100 p-5">
                 <h3 className="text-sm font-semibold text-slate-800 mb-4">Active Campaigns</h3>
-                <div className="space-y-3">
-                  {[
-                    { name: 'iPhone 15 Flash Sale', status: 'active', ends: '2 days left', roi: '5.1x', color: 'bg-emerald-500' },
-                    { name: 'MacBook Air M2 Promo', status: 'active', ends: '5 days left', roi: '4.8x', color: 'bg-emerald-500' },
-                    { name: 'Repair Service Awareness', status: 'paused', ends: 'Paused', roi: '3.4x', color: 'bg-red-400' },
-                  ].map((c) => (
-                    <div key={c.name} className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${c.color}`} />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-slate-800 truncate">{c.name}</p>
-                        <p className="text-[10px] text-slate-400">{c.ends}</p>
-                      </div>
-                      <span className="text-xs font-bold text-emerald-600">{c.roi}</span>
-                    </div>
-                  ))}
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <i className="ri-megaphone-line text-2xl text-slate-200 mb-2" />
+                  <p className="text-xs text-slate-400">No active campaigns</p>
                 </div>
               </div>
             </div>
@@ -130,30 +118,11 @@ export default function MarketingPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[
-                    { name: 'Refurbished Phones Drive', budget: 'GHS 500', spent: 'GHS 500', revenue: 'GHS 3,100', roi: '6.2x', leads: 92, cpl: 'GHS 5.4', cvr: '33.7%' },
-                    { name: 'iPhone 15 Flash Sale', budget: 'GHS 800', spent: 'GHS 620', revenue: 'GHS 3,162', roi: '5.1x', leads: 68, cpl: 'GHS 9.1', cvr: '32.4%' },
-                    { name: 'MacBook Air M2 Promo', budget: 'GHS 600', spent: 'GHS 480', revenue: 'GHS 2,304', roi: '4.8x', leads: 44, cpl: 'GHS 10.9', cvr: '31.8%' },
-                    { name: 'Repair Service Awareness', budget: 'GHS 350', spent: 'GHS 210', revenue: 'GHS 714', roi: '3.4x', leads: 38, cpl: 'GHS 5.5', cvr: '31.6%' },
-                  ].map((row, i) => (
-                    <tr key={i} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors">
-                      <td className="px-4 py-3 text-xs font-semibold text-slate-800 whitespace-nowrap">{row.name}</td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{row.budget}</td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{row.spent}</td>
-                      <td className="px-4 py-3 text-xs font-semibold text-slate-800">{row.revenue}</td>
-                      <td className="px-4 py-3 text-xs font-bold text-emerald-600">{row.roi}</td>
-                      <td className="px-4 py-3 text-xs text-slate-700">{row.leads}</td>
-                      <td className="px-4 py-3 text-xs text-slate-600">{row.cpl}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden w-16">
-                            <div className="h-full bg-emerald-500 rounded-full" style={{ width: row.cvr }} />
-                          </div>
-                          <span className="text-xs font-medium text-slate-700">{row.cvr}</span>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center text-xs text-slate-400">
+                      No campaign data yet — launch your first campaign to see ROI breakdown here.
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -181,30 +150,9 @@ export default function MarketingPage() {
               {/* Upcoming events */}
               <div className="bg-white rounded-2xl border border-slate-100 p-5">
                 <h3 className="text-sm font-semibold text-slate-800 mb-4">Upcoming This Week</h3>
-                <div className="space-y-3">
-                  {[
-                    { day: 'Apr 23', label: 'Story Post — iPhone 15', channel: 'instagram', color: 'text-pink-500', icon: 'ri-instagram-line' },
-                    { day: 'Apr 25', label: 'iPhone Flash Sale Ends', channel: 'whatsapp', color: 'text-[#25D366]', icon: 'ri-whatsapp-line' },
-                    { day: 'Apr 27', label: 'Accessories Bundle Launches', channel: 'instagram', color: 'text-pink-500', icon: 'ri-instagram-line' },
-                    { day: 'Apr 28', label: 'MacBook Promo Ends', channel: 'whatsapp', color: 'text-[#25D366]', icon: 'ri-whatsapp-line' },
-                    { day: 'Apr 30', label: 'Monthly Broadcast', channel: 'whatsapp', color: 'text-[#25D366]', icon: 'ri-whatsapp-line' },
-                  ].map((ev, i) => (
-                    <div key={i} className="flex items-center gap-3">
-                      <div className="text-center w-10 flex-shrink-0">
-                        <p className="text-[10px] text-slate-400 leading-tight">{ev.day.split(' ')[0]}</p>
-                        <p className="text-sm font-bold text-slate-800 leading-tight">{ev.day.split(' ')[1]}</p>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-slate-800 truncate">{ev.label}</p>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <div className={`w-3 h-3 flex items-center justify-center ${ev.color}`}>
-                            <i className={`${ev.icon} text-xs`} />
-                          </div>
-                          <span className="text-[10px] text-slate-400 capitalize">{ev.channel}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <i className="ri-calendar-line text-2xl text-slate-200 mb-2" />
+                  <p className="text-xs text-slate-400">No upcoming events</p>
                 </div>
               </div>
 

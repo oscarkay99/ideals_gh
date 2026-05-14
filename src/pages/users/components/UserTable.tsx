@@ -61,7 +61,7 @@ export default function UserTable({
         <button
           onClick={onAddUser}
           className="px-4 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap flex items-center gap-2"
-          style={{ background: '#1E5FBE' }}
+          style={{ background: '#0D1F4A' }}
         >
           <i className="ri-user-add-line" /> Add User
         </button>
@@ -85,7 +85,7 @@ export default function UserTable({
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-slate-800">{user.name}</p>
                     {user.role === 'admin' && (
-                      <i className="ri-shield-star-line text-xs" style={{ color: '#1E5FBE' }} />
+                      <i className="ri-shield-star-line text-xs" style={{ color: '#0D1F4A' }} />
                     )}
                   </div>
                   <p className="text-xs text-slate-400">{user.email}</p>

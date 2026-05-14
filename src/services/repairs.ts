@@ -21,3 +21,9 @@ export async function createRepair(repair: Omit<Repair, 'id'>): Promise<Repair> 
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function updateRepairNotes(id: string, notes: string[]): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase.from('repairs').update({ notes }).eq('id', id);
+  if (error) throw new Error(error.message);
+}

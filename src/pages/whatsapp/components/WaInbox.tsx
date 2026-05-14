@@ -160,7 +160,7 @@ export default function WaInbox({
                         ? 'bg-white text-slate-700 rounded-tl-sm border border-slate-100'
                         : 'text-white rounded-tr-sm'
                     }`}
-                    style={msg.from !== 'customer' ? { background: msg.aiGenerated ? '#1E5FBE' : '#154290' } : {}}
+                    style={msg.from !== 'customer' ? { background: msg.aiGenerated ? '#0D1F4A' : '#1552A8' } : {}}
                   >
                     {msg.text}
                   </div>
@@ -189,19 +189,19 @@ export default function WaInbox({
               <button
                 onClick={onSendMessage}
                 className="w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer hover:opacity-90"
-                style={{ background: '#1E5FBE' }}
+                style={{ background: '#0D1F4A' }}
               >
                 <i className="ri-send-plane-fill text-white text-sm" />
               </button>
             </div>
             <div className="flex items-center gap-3 mt-2">
-              <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#1E5FBE' }}>
+              <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#0D1F4A' }}>
                 <i className="ri-sparkling-2-line" />Generate AI Reply
               </button>
               <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#F5A623' }}>
                 <i className="ri-file-add-line" />Create Quote
               </button>
-              <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#154290' }}>
+              <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#1552A8' }}>
                 <i className="ri-user-star-line" />Convert to Lead
               </button>
             </div>

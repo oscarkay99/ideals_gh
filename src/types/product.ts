@@ -10,7 +10,6 @@ export interface ProductAddOn {
   id: string;
   name: string;
   price: string;
-  image: string;
 }
 
 export interface ProductReview {
@@ -37,14 +36,12 @@ export interface Product {
   originalPrice: string | null;
   stock: number;
   warranty: string;
-  image: string;
   badge: string | null;
 }
 
 export interface ProductDetail extends Product {
   conditionDetails: ConditionDetails;
   warrantyDetails: string;
-  images: string[];
   specs: ProductSpec[];
   addOns: ProductAddOn[];
   reviews: ProductReview[];
@@ -56,7 +53,6 @@ export interface CartProduct {
   condition: ProductCondition;
   price: number;
   stock: number;
-  image: string;
 }
 
 export interface CartItem extends CartProduct {

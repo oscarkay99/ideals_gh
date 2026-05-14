@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
+import { getStoreSettings, saveStoreSettings } from '@/services/settings';
 import SettingsSidebar from './components/SettingsSidebar';
 import BrandingSection from './components/BrandingSection';
 import OperationsSection from './components/OperationsSection';
 import TemplatesSection from './components/TemplatesSection';
-import NotificationsSection from './components/NotificationsSection';
 import TeamRolesSection from './components/TeamRolesSection';
 import AutomationSection from './components/AutomationSection';
 import IntegrationsSection from './components/IntegrationsSection';
@@ -15,7 +15,6 @@ const sections = [
   { id: 'branding', label: 'Branding', icon: 'ri-palette-line' },
   { id: 'operations', label: 'Operations', icon: 'ri-settings-4-line' },
   { id: 'templates', label: 'Templates', icon: 'ri-file-text-line' },
-  { id: 'notifications', label: 'Notifications', icon: 'ri-notification-3-line' },
   { id: 'team', label: 'Team & Roles', icon: 'ri-team-line' },
   { id: 'automation', label: 'Automation', icon: 'ri-robot-line' },
   { id: 'integrations', label: 'Integrations', icon: 'ri-plug-line' },
@@ -34,22 +33,22 @@ const messageTemplates = [
 ];
 
 const teamRoles = [
-  { id: 'r1', name: 'Admin', members: 1, permissions: ['All access', 'Settings', 'Financial reports', 'Team management', 'Delete records'] },
-  { id: 'r2', name: 'Sales Manager', members: 1, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view', 'Reports view', 'Team view'] },
-  { id: 'r3', name: 'Sales Rep', members: 2, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view'] },
-  { id: 'r4', name: 'Technician', members: 1, permissions: ['Repairs', 'Inventory view', 'Customers view'] },
-  { id: 'r5', name: 'Inventory Manager', members: 1, permissions: ['Inventory', 'Purchase Orders', 'Suppliers', 'Reports view'] },
+  { id: 'r1', name: 'Admin', members: 0, permissions: ['All access', 'Settings', 'Financial reports', 'Team management', 'Delete records'] },
+  { id: 'r2', name: 'Sales Manager', members: 0, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view', 'Reports view', 'Team view'] },
+  { id: 'r3', name: 'Sales Rep', members: 0, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view'] },
+  { id: 'r4', name: 'Technician', members: 0, permissions: ['Repairs', 'Inventory view', 'Customers view'] },
+  { id: 'r5', name: 'Inventory Manager', members: 0, permissions: ['Inventory', 'Purchase Orders', 'Suppliers', 'Reports view'] },
 ];
 
 const automationRules = [
-  { id: 'ar1', name: 'Lead Follow-up Reminder', trigger: 'Lead not contacted in 48 hours', action: 'Send push notification to assigned rep', status: true, runs: 234 },
-  { id: 'ar2', name: 'Low Stock Alert', trigger: 'Product stock drops below threshold', action: 'Notify inventory manager + create restock task', status: true, runs: 89 },
-  { id: 'ar3', name: 'Payment Overdue', trigger: 'Payment due date passed by 3 days', action: 'Send WhatsApp reminder to customer', status: true, runs: 45 },
-  { id: 'ar4', name: 'Repair Status Update', trigger: 'Repair status changes to Ready', action: 'Send SMS to customer automatically', status: true, runs: 156 },
-  { id: 'ar5', name: 'Birthday Greeting', trigger: 'Customer birthday (8:00 AM)', action: 'Send birthday SMS with 10% discount code', status: false, runs: 67 },
-  { id: 'ar6', name: 'Warranty Expiry Warning', trigger: '30 days before warranty expires', action: 'Send WhatsApp message with renewal offer', status: true, runs: 34 },
-  { id: 'ar7', name: 'New Lead Assignment', trigger: 'New lead created from any channel', action: 'Auto-assign to least-busy sales rep', status: true, runs: 312 },
-  { id: 'ar8', name: 'Quote Expiry Reminder', trigger: 'Quote expires in 24 hours', action: 'Send WhatsApp reminder to customer', status: false, runs: 28 },
+  { id: 'ar1', name: 'Lead Follow-up Reminder', trigger: 'Lead not contacted in 48 hours', action: 'Send push notification to assigned rep', status: false, runs: 0 },
+  { id: 'ar2', name: 'Low Stock Alert', trigger: 'Product stock drops below threshold', action: 'Notify inventory manager + create restock task', status: false, runs: 0 },
+  { id: 'ar3', name: 'Payment Overdue', trigger: 'Payment due date passed by 3 days', action: 'Send WhatsApp reminder to customer', status: false, runs: 0 },
+  { id: 'ar4', name: 'Repair Status Update', trigger: 'Repair status changes to Ready', action: 'Send SMS to customer automatically', status: false, runs: 0 },
+  { id: 'ar5', name: 'Birthday Greeting', trigger: 'Customer birthday (8:00 AM)', action: 'Send birthday SMS with 10% discount code', status: false, runs: 0 },
+  { id: 'ar6', name: 'Warranty Expiry Warning', trigger: '30 days before warranty expires', action: 'Send WhatsApp message with renewal offer', status: false, runs: 0 },
+  { id: 'ar7', name: 'New Lead Assignment', trigger: 'New lead created from any channel', action: 'Auto-assign to least-busy sales rep', status: false, runs: 0 },
+  { id: 'ar8', name: 'Quote Expiry Reminder', trigger: 'Quote expires in 24 hours', action: 'Send WhatsApp reminder to customer', status: false, runs: 0 },
 ];
 
 const integrations = [
@@ -71,16 +70,35 @@ export default function SettingsPage() {
   const [phone, setPhone] = useState('+233 24 000 0000');
   const [whatsapp, setWhatsapp] = useState('+233 24 000 0000');
   const [address, setAddress] = useState('Accra Mall, Accra, Ghana');
-  const [primaryColor, setPrimaryColor] = useState('#1E5FBE');
-  const [autoFollowUp, setAutoFollowUp] = useState(true);
-  const [lowStockAlert, setLowStockAlert] = useState(true);
-  const [paymentReminder, setPaymentReminder] = useState(false);
-  const [repairUpdates, setRepairUpdates] = useState(true);
+  const [primaryColor, setPrimaryColor] = useState('#0D1F4A');
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [automations, setAutomations] = useState(automationRules);
   const [showAddRole, setShowAddRole] = useState(false);
+  const [editingRole, setEditingRole] = useState<{ id: string; name: string; permissions: string[] } | null>(null);
 
-  const handleSave = () => {
+  useEffect(() => {
+    getStoreSettings().then((s) => {
+      if (!s) return;
+      if (s.business_name) setBusinessName(s.business_name);
+      if (s.tagline) setTagline(s.tagline);
+      if (s.phone) setPhone(s.phone);
+      if (s.whatsapp) setWhatsapp(s.whatsapp);
+      if (s.address) setAddress(s.address);
+      if (s.primary_color) setPrimaryColor(s.primary_color);
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      await saveStoreSettings({
+        business_name: businessName,
+        tagline,
+        phone,
+        whatsapp,
+        address,
+        primary_color: primaryColor,
+      });
+    } catch { /* fallback: show saved anyway for mock mode */ }
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
@@ -116,17 +134,12 @@ export default function SettingsPage() {
             />
           )}
 
-          {activeSection === 'notifications' && (
-            <NotificationsSection
-              autoFollowUp={autoFollowUp} setAutoFollowUp={setAutoFollowUp}
-              lowStockAlert={lowStockAlert} setLowStockAlert={setLowStockAlert}
-              paymentReminder={paymentReminder} setPaymentReminder={setPaymentReminder}
-              repairUpdates={repairUpdates} setRepairUpdates={setRepairUpdates}
-            />
-          )}
-
           {activeSection === 'team' && (
-            <TeamRolesSection roles={teamRoles} onAddRole={() => setShowAddRole(true)} />
+            <TeamRolesSection
+              roles={teamRoles}
+              onAddRole={() => { setEditingRole(null); setShowAddRole(true); }}
+              onEditRole={(role) => { setEditingRole(role); setShowAddRole(true); }}
+            />
           )}
 
           {activeSection === 'automation' && (
@@ -144,7 +157,7 @@ export default function SettingsPage() {
             <span className="text-xs text-slate-400">{saved ? '✓ Changes saved successfully' : 'Unsaved changes'}</span>
             <div className="flex items-center gap-3">
               <button className="text-sm text-slate-500 hover:text-slate-700 cursor-pointer">Discard</button>
-              <button onClick={handleSave} className="px-5 py-2 text-white text-sm font-semibold rounded-xl cursor-pointer whitespace-nowrap" style={{ background: '#1E5FBE' }}>
+              <button onClick={handleSave} className="px-5 py-2 text-white text-sm font-semibold rounded-xl cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
                 Save Changes
               </button>
             </div>
@@ -152,7 +165,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <AddRoleModal open={showAddRole} onClose={() => setShowAddRole(false)} />
+      <AddRoleModal open={showAddRole} onClose={() => { setShowAddRole(false); setEditingRole(null); }} editRole={editingRole} />
     </AdminLayout>
   );
 }

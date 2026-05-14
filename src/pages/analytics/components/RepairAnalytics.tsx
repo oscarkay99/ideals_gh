@@ -1,7 +1,7 @@
 import { repairMetrics, stockHealthData } from '@/mocks/analytics';
 
 export default function RepairAnalytics() {
-  const maxRev = Math.max(...repairMetrics.map((r) => r.revenue));
+  const maxRev = Math.max(...repairMetrics.map((r) => r.revenue), 1);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
@@ -13,8 +13,8 @@ export default function RepairAnalytics() {
             <p className="text-xs text-slate-400 mt-0.5">Monthly repair income trend</p>
           </div>
           <div className="text-right">
-            <p className="text-lg font-bold text-slate-900">GHS 38,300</p>
-            <p className="text-[10px] text-emerald-600 font-semibold">+119% in 6 months</p>
+            <p className="text-lg font-bold text-slate-900">GHS 0</p>
+            <p className="text-[10px] text-slate-400 font-semibold">0% in 6 months</p>
           </div>
         </div>
         <div className="flex items-end gap-2" style={{ height: '100px' }}>
@@ -41,15 +41,15 @@ export default function RepairAnalytics() {
         <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
           <div>
             <p className="text-[10px] text-slate-400">Total Repairs</p>
-            <p className="text-sm font-bold text-slate-800">72 completed</p>
+            <p className="text-sm font-bold text-slate-800">0 completed</p>
           </div>
           <div>
             <p className="text-[10px] text-slate-400">Avg Turnaround</p>
-            <p className="text-sm font-bold text-slate-800">3.2 days</p>
+            <p className="text-sm font-bold text-slate-800">—</p>
           </div>
           <div>
             <p className="text-[10px] text-slate-400">Satisfaction</p>
-            <p className="text-sm font-bold text-emerald-600">96%</p>
+            <p className="text-sm font-bold text-slate-400">—</p>
           </div>
         </div>
       </div>
@@ -59,7 +59,7 @@ export default function RepairAnalytics() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-sm font-bold text-slate-800">Stock Health</h3>
-            <p className="text-xs text-slate-400 mt-0.5">142 total SKUs tracked</p>
+            <p className="text-xs text-slate-400 mt-0.5">0 products tracked</p>
           </div>
           <button className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium">View inventory</button>
         </div>
@@ -76,7 +76,7 @@ export default function RepairAnalytics() {
             <div key={s.label} className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full flex-shrink-0 ${s.color}`} />
               <span className="text-xs text-slate-600 flex-1">{s.label}</span>
-              <span className="text-xs font-bold text-slate-800">{s.value} SKUs</span>
+              <span className="text-xs font-bold text-slate-800">{s.value}</span>
               <span className="text-xs text-slate-400 w-8 text-right">{s.pct}%</span>
             </div>
           ))}
@@ -85,15 +85,15 @@ export default function RepairAnalytics() {
         <div className="space-y-2">
           <div className="flex items-center justify-between py-2 border-b border-slate-50">
             <span className="text-xs text-slate-500">Inventory Value</span>
-            <span className="text-xs font-bold text-slate-800">GHS 284,000</span>
+            <span className="text-xs font-bold text-slate-800">GHS 0</span>
           </div>
           <div className="flex items-center justify-between py-2 border-b border-slate-50">
             <span className="text-xs text-slate-500">Avg Days in Stock</span>
-            <span className="text-xs font-bold text-slate-800">18 days</span>
+            <span className="text-xs font-bold text-slate-400">—</span>
           </div>
           <div className="flex items-center justify-between py-2">
             <span className="text-xs text-slate-500">Fastest Mover</span>
-            <span className="text-xs font-bold text-emerald-600">MacBook Air M2</span>
+            <span className="text-xs font-bold text-slate-400">—</span>
           </div>
         </div>
       </div>

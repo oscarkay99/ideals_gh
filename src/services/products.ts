@@ -21,3 +21,10 @@ export async function updateStock(id: string, quantity: number): Promise<void> {
   const { error } = await supabase.from('products').update({ stock: quantity }).eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
+  if (!isSupabaseConfigured) throw new Error('Supabase not configured');
+  const { data, error } = await supabase.from('products').insert(product).select().single();
+  if (error) throw new Error(error.message);
+  return data;
+}

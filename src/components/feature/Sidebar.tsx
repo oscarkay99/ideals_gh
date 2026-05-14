@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { roleLabels, roleColors } from '@/mocks/users';
-import { canAccessModule, type AppModule } from '@/utils/access';
+import { roleLabels } from '@/mocks/users';
+import { canAccessModule } from '@/utils/access';
 import idealsTechHubLogo from '@/assets/ideals-tech-hub-logo.png';
+import { navGroups, publicItems } from './navigation';
 
 function TransparentLogo({ width = 150 }: { width?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -42,122 +43,52 @@ function TransparentLogo({ width = 150 }: { width?: number }) {
       style={{
         width: `${width}px`,
         height: 'auto',
-        filter: 'drop-shadow(0 0 12px rgba(30,95,190,0.4)) drop-shadow(0 0 6px rgba(245,166,35,0.2))',
+        filter: 'drop-shadow(0 0 8px rgba(245,166,35,0.25)) drop-shadow(0 0 4px rgba(245,166,35,0.2))',
       }}
     />
   );
 }
 
-const navGroups = [
-  {
-    label: 'Core',
-    items: [
-      { label: 'Dashboard', icon: 'ri-dashboard-3-line', path: '/', module: 'Dashboard' as AppModule },
-      { label: 'Analytics', icon: 'ri-bar-chart-2-line', path: '/analytics', module: 'Analytics' as AppModule },
-      { label: 'AI Studio', icon: 'ri-sparkling-2-line', path: '/ai-studio', module: 'AI Studio' as AppModule },
-    ],
-  },
-  {
-    label: 'Commerce',
-    items: [
-      { label: 'POS', icon: 'ri-store-3-line', path: '/pos', module: 'POS' as AppModule },
-      { label: 'Inventory', icon: 'ri-archive-line', path: '/inventory', module: 'Inventory' as AppModule },
-      { label: 'Leads', icon: 'ri-user-star-line', path: '/leads', module: 'Leads' as AppModule },
-      { label: 'Sales', icon: 'ri-shopping-bag-3-line', path: '/sales', module: 'Sales' as AppModule },
-      { label: 'Payments', icon: 'ri-bank-card-line', path: '/payments', module: 'Payments' as AppModule },
-      { label: 'Customers', icon: 'ri-group-line', path: '/customers', module: 'Customers' as AppModule },
-      { label: 'Repairs', icon: 'ri-tools-line', path: '/repairs', module: 'Repairs' as AppModule },
-      { label: 'Warranty', icon: 'ri-shield-check-line', path: '/warranty', module: 'Warranty' as AppModule },
-    ],
-  },
-  {
-    label: 'Intelligence',
-    items: [
-      { label: 'SMS', icon: 'ri-message-3-line', path: '/sms', module: 'SMS' as AppModule },
-      { label: 'Price Intel', icon: 'ri-line-chart-line', path: '/price-intel', module: 'Price Intel' as AppModule },
-      { label: 'Trade-In', icon: 'ri-exchange-line', path: '/trade-in', module: 'Trade-In' as AppModule },
-      { label: 'Delivery', icon: 'ri-truck-line', path: '/delivery', module: 'Delivery' as AppModule },
-    ],
-  },
-  {
-    label: 'Finance',
-    items: [
-      { label: 'Wallet', icon: 'ri-wallet-3-line', path: '/wallet', module: 'Wallet' as AppModule },
-      { label: 'Expenses', icon: 'ri-calculator-line', path: '/expenses', module: 'Expenses' as AppModule },
-      { label: 'Suppliers', icon: 'ri-store-2-line', path: '/suppliers', module: 'Suppliers' as AppModule },
-      { label: 'Reports', icon: 'ri-file-chart-line', path: '/reports', module: 'Reports' as AppModule },
-      { label: 'Marketing', icon: 'ri-megaphone-line', path: '/marketing', module: 'Marketing' as AppModule },
-    ],
-  },
-  {
-    label: 'Growth',
-    items: [
-      { label: 'Loyalty', icon: 'ri-vip-crown-line', path: '/loyalty', module: 'Loyalty' as AppModule },
-      { label: 'Calendar', icon: 'ri-calendar-event-line', path: '/calendar', module: 'Calendar' as AppModule },
-    ],
-  },
-  {
-    label: 'Operations',
-    items: [
-      { label: 'Authentication', icon: 'ri-shield-check-line', path: '/authentication', module: 'Authentication' as AppModule },
-      { label: 'Team', icon: 'ri-team-line', path: '/team', module: 'Team' as AppModule },
-      { label: 'Users', icon: 'ri-user-settings-line', path: '/users', module: 'Users' as AppModule },
-      { label: 'Settings', icon: 'ri-settings-4-line', path: '/settings', module: 'Settings' as AppModule },
-    ],
-  },
-];
+const roleGradients: Record<string, string> = {
+  admin: 'linear-gradient(135deg, #07101F, #2463BE)',
+  sales_manager: 'linear-gradient(135deg, #7C3AED, #A855F7)',
+  sales_rep: 'linear-gradient(135deg, #059669, #34D399)',
+  technician: 'linear-gradient(135deg, #D97706, #F59E0B)',
+  inventory_manager: 'linear-gradient(135deg, #DC2626, #F87171)',
+};
 
-const publicItems = [
-  { label: 'Storefront', icon: 'ri-store-2-line', path: '/store' },
-];
-
-function IDealsLogoMark({ size = 32 }: { size?: number }) {
+function LogoMark({ size = 32 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 110"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width={size} height={size} viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="goldArc" x1="20" y1="90" x2="30" y2="20" gradientUnits="userSpaceOnUse">
+        <linearGradient id="goldArcS" x1="20" y1="90" x2="30" y2="20" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#F5A623" />
           <stop offset="100%" stopColor="#FFD166" />
         </linearGradient>
       </defs>
-      {/* Gold arc swoosh on the left */}
-      <path
-        d="M32 88 Q5 58 30 22"
-        stroke="url(#goldArc)"
-        strokeWidth="13"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Blue body — large rounded teardrop */}
-      <path
-        d="M88 65 C88 88 74 102 55 102 C36 102 22 88 22 65 C22 42 36 30 55 30 C74 30 88 42 88 65 Z"
-        fill="#1E5FBE"
-      />
-      {/* White inner smile cutout */}
-      <path
-        d="M38 90 Q55 76 72 86"
-        stroke="white"
-        strokeWidth="8"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* Blue head circle */}
-      <circle cx="63" cy="16" r="13" fill="#1E5FBE" />
+      <path d="M32 88 Q5 58 30 22" stroke="url(#goldArcS)" strokeWidth="13" strokeLinecap="round" fill="none" />
+      <path d="M88 65 C88 88 74 102 55 102 C36 102 22 88 22 65 C22 42 36 30 55 30 C74 30 88 42 88 65 Z" fill="#0D1F4A" />
+      <path d="M38 90 Q55 76 72 86" stroke="white" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <circle cx="63" cy="16" r="13" fill="#0D1F4A" />
     </svg>
   );
 }
 
-export default function Sidebar() {
+interface SidebarProps {
+  onWidthChange?: (width: number) => void;
+}
+
+export default function Sidebar({ onWidthChange }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    onWidthChange?.(collapsed ? 72 : 260);
+  }, [collapsed, onWidthChange]);
+
   const visibleGroups = navGroups
     .map((group) => ({
       ...group,
@@ -165,133 +96,200 @@ export default function Sidebar() {
     }))
     .filter((group) => group.items.length > 0);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/signin');
-  };
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
-  const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
-  };
+  const handleLogout = () => { logout(); navigate('/signin'); };
+
+  const avatarGradient = user?.role ? roleGradients[user.role] : roleGradients.admin;
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-full flex flex-col z-40 transition-all duration-300 ${collapsed ? 'w-[72px]' : 'w-[260px]'}`}
-      style={{ background: 'linear-gradient(180deg, #0A1F4A 0%, #0F3070 60%, #0A1F4A 100%)' }}
+      className={`fixed left-0 top-0 h-full flex flex-col z-40 transition-[width] duration-300 select-none`}
+      style={{
+        width: collapsed ? 72 : 260,
+        background: 'linear-gradient(170deg, #07101F 0%, #0D1F4A 55%, #07101F 100%)',
+      }}
     >
+      {/* Top shimmer line */}
+      <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, rgba(245,166,35,0.7), rgba(245,166,35,0.3), transparent)' }} />
+
       {/* Logo */}
-      <div className={`flex items-center border-b border-white/10 ${collapsed ? 'justify-center px-3 py-4' : 'px-5 py-4'}`}>
-        {collapsed ? <IDealsLogoMark size={34} /> : <TransparentLogo width={148} />}
+      <div
+        className={`flex items-center flex-shrink-0 ${collapsed ? 'justify-center px-3 py-4' : 'px-5 py-4'}`}
+        style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}
+      >
+        {collapsed ? <LogoMark size={34} /> : <TransparentLogo width={148} />}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto py-3 px-2">
-        {visibleGroups.map((group) => (
-          <div key={group.label} className="mb-3">
+      <nav ref={navRef} className="sidebar-nav flex-1 overflow-y-auto py-3 px-2">
+        {visibleGroups.map((group, gi) => (
+          <div key={group.label} className={gi > 0 ? 'mt-1' : ''}>
             {!collapsed && (
-              <p className="text-white/25 text-[9px] uppercase tracking-widest px-3 pb-1.5 pt-1">{group.label}</p>
+              <div className="flex items-center gap-2 px-3 pt-4 pb-1.5">
+                <span
+                  className="text-[9px] font-bold uppercase tracking-[0.14em]"
+                  style={{ color: 'rgba(245,166,35,0.55)' }}
+                >
+                  {group.label}
+                </span>
+                <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              </div>
+            )}
+            {collapsed && gi > 0 && (
+              <div className="mx-3 my-2 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
             )}
             <div className="space-y-0.5">
-              {group.items.map((item) => (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-150 cursor-pointer whitespace-nowrap group ${
-                    isActive(item.path)
-                      ? 'text-white'
-                      : 'text-white/50 hover:text-white hover:bg-white/5'
-                  } ${collapsed ? 'justify-center' : ''}`}
-                  style={isActive(item.path) ? { background: 'rgba(30, 95, 190, 0.35)' } : {}}
-                  title={collapsed ? item.label : undefined}
-                >
-                  <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                    <i
-                      className={`${item.icon} text-base`}
-                      style={isActive(item.path) ? { color: '#F5A623' } : {}}
-                    />
-                  </div>
-                  {!collapsed && (
-                    <span className={`text-sm font-medium ${isActive(item.path) ? 'text-white' : ''}`}>
-                      {item.label}
-                    </span>
-                  )}
-                  {!collapsed && isActive(item.path) && (
-                    <span className="ml-auto w-1.5 h-1.5 rounded-full" style={{ background: '#F5A623' }} />
-                  )}
-                </button>
-              ))}
+              {group.items.map((item) => {
+                const active = isActive(item.path);
+                return (
+                  <button
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    title={collapsed ? item.label : undefined}
+                    className={`w-full flex items-center gap-3 rounded-xl transition-all duration-150 cursor-pointer group relative overflow-hidden ${
+                      collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2'
+                    }`}
+                    style={active ? { background: '#F5A623', boxShadow: '0 4px 16px rgba(245,166,35,0.35)' } : undefined}
+                    onMouseEnter={(e) => {
+                      if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) (e.currentTarget as HTMLElement).style.background = '';
+                    }}
+                  >
+                    {/* Icon */}
+                    <div className="w-7 h-7 flex items-center justify-center rounded-lg flex-shrink-0">
+                      <i
+                        className={`${item.icon} text-[15px]`}
+                        style={{ color: active ? 'white' : 'rgba(255,255,255,0.32)' }}
+                      />
+                    </div>
+
+                    {/* Label */}
+                    {!collapsed && (
+                      <span
+                        className="text-[13px] font-semibold flex-1 text-left leading-none"
+                        style={{ color: active ? 'white' : 'rgba(255,255,255,0.38)' }}
+                      >
+                        {item.label}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         ))}
 
-        <div className="mt-2">
+        {/* Public */}
+        <div className="mt-1">
           {!collapsed && (
-            <p className="text-white/25 text-[9px] uppercase tracking-widest px-3 pb-1.5">Public</p>
+            <div className="flex items-center gap-2 px-3 pt-4 pb-1.5">
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em]" style={{ color: 'rgba(245,166,35,0.55)' }}>Public</span>
+              <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+            </div>
           )}
-          {publicItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => navigate(item.path)}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-150 cursor-pointer whitespace-nowrap ${
-                isActive(item.path)
-                  ? 'text-white'
-                  : 'text-white/50 hover:text-white hover:bg-white/5'
-              } ${collapsed ? 'justify-center' : ''}`}
-              style={isActive(item.path) ? { background: 'rgba(30, 95, 190, 0.35)' } : {}}
-              title={collapsed ? item.label : undefined}
-            >
-              <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
-                <i
-                  className={`${item.icon} text-base`}
-                  style={isActive(item.path) ? { color: '#F5A623' } : {}}
-                />
-              </div>
-              {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
-            </button>
-          ))}
+          {collapsed && <div className="mx-3 my-2 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />}
+          {publicItems.map((item) => {
+            const active = isActive(item.path);
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                title={collapsed ? item.label : undefined}
+                className={`w-full flex items-center gap-3 rounded-xl transition-all duration-150 cursor-pointer group relative overflow-hidden ${
+                  collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2'
+                }`}
+                style={active ? { background: '#F5A623', boxShadow: '0 4px 16px rgba(245,166,35,0.35)' } : undefined}
+                onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; }}
+                onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLElement).style.background = ''; }}
+              >
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg flex-shrink-0">
+                  <i className={`${item.icon} text-[15px]`} style={{ color: active ? 'white' : 'rgba(255,255,255,0.32)' }} />
+                </div>
+                {!collapsed && (
+                  <span className="text-[13px] font-semibold flex-1 text-left" style={{ color: active ? 'white' : 'rgba(255,255,255,0.38)' }}>
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </nav>
 
-      {/* User info + logout */}
-      <div className="p-3 border-t border-white/10 space-y-1">
-        {user && !collapsed && (
+      {/* Bottom — user + actions */}
+      <div className="flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+        {/* User card */}
+        {user && (
           <button
             onClick={() => navigate('/profile')}
-            className="flex items-center gap-2 px-2 py-2 rounded-xl hover:bg-white/5 transition-colors cursor-pointer w-full text-left"
+            className={`w-full flex items-center rounded-2xl transition-all duration-200 cursor-pointer mb-2 ${collapsed ? 'justify-center p-2' : 'gap-2.5 p-2.5'}`}
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.09)',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
           >
             <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
-              style={{ background: user.role ? roleColors[user.role] : '#1E5FBE' }}
+              className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0 shadow-lg"
+              style={{ background: avatarGradient }}
             >
               {user.avatar}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{user.name}</p>
-              <p className="text-white/40 text-[10px] truncate">{user.role ? roleLabels[user.role] : ''}</p>
-            </div>
-            <i className="ri-arrow-right-s-line text-white/20 text-sm flex-shrink-0" />
+            {!collapsed && (
+              <div className="flex-1 min-w-0 text-left">
+                <p className="text-white text-[12px] font-semibold truncate leading-tight">{user.name}</p>
+                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  {user.role ? roleLabels[user.role] : ''}
+                </p>
+              </div>
+            )}
+            {!collapsed && <i className="ri-arrow-right-s-line text-sm flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }} />}
           </button>
         )}
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-white/40 hover:text-red-400 hover:bg-white/5 transition-all cursor-pointer"
-          title="Sign Out"
-        >
-          <div className="w-5 h-5 flex items-center justify-center">
-            <i className="ri-logout-box-line text-base" />
-          </div>
-          {!collapsed && <span className="text-xs">Sign Out</span>}
-        </button>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-white/40 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
-        >
-          <div className="w-5 h-5 flex items-center justify-center">
-            <i className={`${collapsed ? 'ri-arrow-right-s-line' : 'ri-arrow-left-s-line'} text-base`} />
-          </div>
-          {!collapsed && <span className="text-xs">Collapse</span>}
-        </button>
+
+        {/* Action row */}
+        <div className={`flex ${collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1'}`}>
+          <button
+            onClick={handleLogout}
+            title="Sign Out"
+            className={`flex items-center justify-center gap-1.5 rounded-xl transition-all cursor-pointer ${collapsed ? 'w-10 h-9' : 'flex-1 py-2'}`}
+            style={{ color: 'rgba(255,255,255,0.28)' }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)';
+              (e.currentTarget as HTMLElement).style.color = '#F87171';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = '';
+              (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.28)';
+            }}
+          >
+            <i className="ri-logout-box-line text-sm" />
+            {!collapsed && <span className="text-[11px] font-medium">Sign Out</span>}
+          </button>
+
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className={`flex items-center justify-center gap-1.5 rounded-xl transition-all cursor-pointer ${collapsed ? 'w-10 h-9' : 'flex-1 py-2'}`}
+            style={{ color: 'rgba(255,255,255,0.28)' }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)';
+              (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.background = '';
+              (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.28)';
+            }}
+          >
+            <i className={`${collapsed ? 'ri-arrow-right-double-line' : 'ri-arrow-left-double-line'} text-sm`} />
+            {!collapsed && <span className="text-[11px] font-medium">Collapse</span>}
+          </button>
+        </div>
       </div>
     </aside>
   );

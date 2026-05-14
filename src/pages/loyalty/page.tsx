@@ -7,6 +7,7 @@ const tabs = ['Members', 'Tiers', 'Rewards', 'Analytics'];
 
 export default function LoyaltyPage() {
   const [activeTab, setActiveTab] = useState('Members');
+  const [memberSearch, setMemberSearch] = useState('');
   const [showRedeem, setShowRedeem] = useState(false);
   const [selectedReward, setSelectedReward] = useState('');
 
@@ -20,11 +21,11 @@ export default function LoyaltyPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
         {[
-          { label: 'Total Members', value: loyaltyStats.totalMembers.toLocaleString(), icon: 'ri-group-line', color: '#1E5FBE' },
+          { label: 'Total Members', value: loyaltyStats.totalMembers.toLocaleString(), icon: 'ri-group-line', color: '#0D1F4A' },
           { label: 'Active Members', value: loyaltyStats.activeMembers.toLocaleString(), icon: 'ri-user-follow-line', color: '#25D366' },
           { label: 'Points Issued', value: (loyaltyStats.totalPointsIssued / 1000).toFixed(0) + 'K', icon: 'ri-coin-line', color: '#F5A623' },
           { label: 'Points Redeemed', value: (loyaltyStats.totalPointsRedeemed / 1000).toFixed(0) + 'K', icon: 'ri-exchange-line', color: '#E05A2B' },
-          { label: 'Retention Rate', value: `${loyaltyStats.retentionRate}%`, icon: 'ri-heart-pulse-line', color: '#0A1F4A' },
+          { label: 'Retention Rate', value: `${loyaltyStats.retentionRate}%`, icon: 'ri-heart-pulse-line', color: '#07101F' },
         ].map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-4 border border-slate-100">
             <div className="flex items-center gap-2 mb-2">
@@ -48,7 +49,7 @@ export default function LoyaltyPage() {
               className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 activeTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-700'
               }`}
-              style={activeTab === tab ? { background: '#1E5FBE' } : {}}
+              style={activeTab === tab ? { background: '#0D1F4A' } : {}}
             >
               {tab}
             </button>
@@ -69,13 +70,19 @@ export default function LoyaltyPage() {
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-800">All Members</h3>
             <div className="flex items-center gap-2">
-              <input type="text" placeholder="Search members..." className="px-3 py-2 rounded-lg bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200" />
+              <input
+                type="text"
+                value={memberSearch}
+                onChange={(e) => setMemberSearch(e.target.value)}
+                placeholder="Search members..."
+                className="px-3 py-2 rounded-lg bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              />
             </div>
           </div>
           <div className="divide-y divide-slate-100">
-            {loyaltyCustomers.map((customer) => (
+            {loyaltyCustomers.filter((c) => !memberSearch.trim() || c.name.toLowerCase().includes(memberSearch.toLowerCase())).map((customer) => (
               <div key={customer.id} className="p-4 flex items-center gap-4 hover:bg-slate-50/50 transition-colors">
-                <img src={customer.avatar} alt={customer.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                <img loading="lazy" decoding="async" src={customer.avatar} alt={customer.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-slate-800">{customer.name}</p>
@@ -151,7 +158,7 @@ export default function LoyaltyPage() {
                 <button
                   onClick={() => { setSelectedReward(reward.id); setShowRedeem(true); }}
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white cursor-pointer whitespace-nowrap"
-                  style={{ background: '#1E5FBE' }}
+                  style={{ background: '#0D1F4A' }}
                 >
                   Redeem
                 </button>
@@ -187,10 +194,10 @@ export default function LoyaltyPage() {
             <h3 className="text-sm font-bold text-slate-800 mb-4">Program Performance</h3>
             <div className="space-y-4">
               {[
-                { label: 'Revenue from Loyalty Members', value: `GHS ${loyaltyStats.revenueFromLoyalty.toLocaleString()}`, percent: 62.5, color: '#1E5FBE' },
+                { label: 'Revenue from Loyalty Members', value: `GHS ${loyaltyStats.revenueFromLoyalty.toLocaleString()}`, percent: 62.5, color: '#0D1F4A' },
                 { label: 'Points Redemption Rate', value: `${((loyaltyStats.totalPointsRedeemed / loyaltyStats.totalPointsIssued) * 100).toFixed(1)}%`, percent: 41, color: '#F5A623' },
                 { label: 'Member Retention', value: `${loyaltyStats.retentionRate}%`, percent: loyaltyStats.retentionRate, color: '#25D366' },
-                { label: 'Top Tier Percentage', value: `${loyaltyStats.topTierPercentage}%`, percent: loyaltyStats.topTierPercentage * 5, color: '#0A1F4A' },
+                { label: 'Top Tier Percentage', value: `${loyaltyStats.topTierPercentage}%`, percent: loyaltyStats.topTierPercentage * 5, color: '#07101F' },
               ].map((item) => (
                 <div key={item.label}>
                   <div className="flex items-center justify-between text-xs mb-1">

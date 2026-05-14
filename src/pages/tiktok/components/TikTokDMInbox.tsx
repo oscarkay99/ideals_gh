@@ -40,7 +40,7 @@ export default function TikTokDMInbox({
               }`}
             >
               <div className="relative flex-shrink-0">
-                <img src={chat.avatar} alt={chat.name} className="w-10 h-10 rounded-full object-cover" />
+                <img loading="lazy" decoding="async" src={chat.avatar} alt={chat.name} className="w-10 h-10 rounded-full object-cover" />
                 {chat.online && (
                   <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white" style={{ background: '#25F4EE' }} />
                 )}
@@ -71,7 +71,7 @@ export default function TikTokDMInbox({
         {selectedChat && (
           <>
             <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-              <img src={selectedChat.avatar} alt={selectedChat.name} className="w-10 h-10 rounded-full object-cover" />
+              <img loading="lazy" decoding="async" src={selectedChat.avatar} alt={selectedChat.name} className="w-10 h-10 rounded-full object-cover" />
               <div>
                 <p className="text-sm font-semibold text-slate-800">{selectedChat.name}</p>
                 <p className="text-xs text-slate-400">{selectedChat.followerCount.toLocaleString()} followers · {selectedChat.online ? 'Online' : 'Offline'}</p>

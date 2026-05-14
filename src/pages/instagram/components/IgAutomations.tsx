@@ -57,8 +57,8 @@ const automationRules = [
     response: 'Sends trade-in value estimate and books appointment',
     handled: 89,
     converted: 41,
-    borderColor: '#1E5FBE',
-    bg: '#EEF4FF',
+    borderColor: '#0D1F4A',
+    bg: 'rgba(7,16,31,0.06)',
     icon: 'ri-exchange-line',
   },
 ];

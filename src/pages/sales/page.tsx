@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { salesStats, recentSales, cartProducts } from '@/mocks/sales';
+import { salesStats, cartProducts } from '@/mocks/sales';
+import { useSales } from '@/hooks/useSales';
 import CartPanel from './components/CartPanel';
 import QuoteModal from './components/QuoteModal';
+import type { PaymentMethod, DeliveryType } from '@/types/sale';
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   completed: { label: 'Completed', color: 'bg-emerald-100 text-emerald-700' },
@@ -18,6 +20,7 @@ const methodIcons: Record<string, string> = {
 };
 
 export default function SalesPage() {
+  const { sales, add: createSale } = useSales();
   const [cart, setCart] = useState<{ id: string; qty: number }[]>([]);
   const [delivery, setDelivery] = useState<'pickup' | 'delivery'>('pickup');
   const [payment, setPayment] = useState('MoMo');
@@ -33,6 +36,21 @@ export default function SalesPage() {
 
   const removeFromCart = (id: string) => setCart((prev) => prev.filter((i) => i.id !== id));
   const updateQty = (id: string, qty: number) => setCart((prev) => prev.map((i) => i.id === id ? { ...i, qty: Math.max(1, qty) } : i));
+
+  const handleProcessOrder = async (customer: string) => {
+    if (cartItems.length === 0) return;
+    const itemNames = cartItems.map(i => `${i.name}${i.qty > 1 ? ` x${i.qty}` : ''}`).join(', ');
+    await createSale({
+      customer,
+      items: itemNames,
+      total: `GHS ${total.toLocaleString()}`,
+      method: payment as PaymentMethod,
+      status: 'completed',
+      date: new Date().toLocaleDateString('en-GH', { month: 'short', day: 'numeric', year: 'numeric' }),
+      delivery: delivery === 'pickup' ? 'Pickup' : 'Delivery' as DeliveryType,
+    });
+    setCart([]);
+  };
 
   const cartItems = cart.map((c) => {
     const product = cartProducts.find((p) => p.id === c.id)!;
@@ -72,12 +90,12 @@ export default function SalesPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {cartProducts.map((p) => (
                 <div key={p.id} className="flex items-center gap-3 p-3 border border-slate-100 rounded-xl hover:border-slate-200 transition-all">
-                  <div className="w-14 h-14 rounded-xl bg-slate-50 overflow-hidden flex-shrink-0">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover object-top" />
+                  <div className="w-14 h-14 rounded-xl bg-slate-50 flex items-center justify-center flex-shrink-0 text-slate-500">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.08em]">Item</span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-slate-800 truncate">{p.name}</p>
-                    <p className="text-[10px] text-slate-400">{p.condition} · {p.stock} left</p>
+                    <p className="text-[10px] text-slate-400">{p.id} · {p.condition} · {p.stock} left</p>
                     <p className="text-xs font-bold text-slate-900 mt-0.5">GHS {p.price.toLocaleString()}</p>
                   </div>
                   <button
@@ -107,7 +125,15 @@ export default function SalesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {recentSales.map((s, i) => (
+                  {sales.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-16 text-center text-sm text-slate-400">
+                        <i className="ri-shopping-bag-3-line text-3xl block mb-2 text-slate-200" />
+                        No sales yet. Use the POS to record your first sale.
+                      </td>
+                    </tr>
+                  )}
+                  {sales.map((s, i) => (
                     <tr key={s.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/20'}`}>
                       <td className="px-4 py-3 text-xs font-mono text-slate-500">{s.id}</td>
                       <td className="px-4 py-3 text-xs font-medium text-slate-800">{s.customer}</td>
@@ -147,6 +173,7 @@ export default function SalesPage() {
             onUpdateQty={updateQty}
             onRemove={removeFromCart}
             onGenerateQuote={() => setShowQuote(true)}
+            onProcessOrder={handleProcessOrder}
           />
         </div>
       </div>

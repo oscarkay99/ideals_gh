@@ -1,143 +1,272 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import type { Notification } from '@/hooks/useNotifications';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { roleLabels, roleColors } from '@/mocks/users';
+import { useDarkMode } from '@/hooks/useDarkMode';
+import { roleLabels } from '@/mocks/users';
+import { inventoryProducts } from '@/mocks/inventory';
 
 interface TopBarProps {
   title: string;
   subtitle?: string;
-  notifications?: Notification[];
-  unreadCount?: number;
-  onMarkAllRead?: () => void;
-  isDark?: boolean;
-  onToggleDark?: () => void;
 }
 
-const typeConfig = {
-  sale: { icon: 'ri-shopping-bag-3-line', color: 'text-emerald-500' },
-  lead: { icon: 'ri-user-star-line', color: 'text-amber-500' },
-  payment: { icon: 'ri-bank-card-line', color: 'text-sky-500' },
-  repair: { icon: 'ri-tools-line', color: 'text-violet-500' },
-  alert: { icon: 'ri-alert-line', color: 'text-rose-500' },
+interface DeviceSearchItem {
+  id: string;
+  name: string;
+  category: string;
+  color?: string;
+  condition: string;
+  imei?: string;
+  stock: number;
+}
+
+const roleGradients: Record<string, string> = {
+  admin: 'linear-gradient(135deg, #07101F, #2463BE)',
+  sales_manager: 'linear-gradient(135deg, #7C3AED, #A855F7)',
+  sales_rep: 'linear-gradient(135deg, #059669, #34D399)',
+  technician: 'linear-gradient(135deg, #D97706, #F59E0B)',
+  inventory_manager: 'linear-gradient(135deg, #DC2626, #F87171)',
 };
 
-export default function TopBar({ title, subtitle, notifications = [], unreadCount = 0, onMarkAllRead, isDark, onToggleDark }: TopBarProps) {
-  const [notifOpen, setNotifOpen] = useState(false);
+export default function TopBar({
+  title, subtitle,
+}: TopBarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+  const { isDark, toggle: toggleDark } = useDarkMode();
+  const [query, setQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const displayNotifs = notifications.length > 0 ? notifications.slice(0, 8) : [
-    { id: 'default-1', type: 'alert' as const, title: 'Low Stock', message: 'Samsung Galaxy S24 — only 1 unit left', time: new Date(), read: false },
-    { id: 'default-2', type: 'payment' as const, title: 'Payment Pending', message: 'GHS 4,200 payment pending verification', time: new Date(), read: false },
-    { id: 'default-3', type: 'lead' as const, title: 'Leads Waiting', message: '5 leads uncontacted for 48+ hours', time: new Date(), read: true },
-  ];
+  const avatarGradient = user?.role ? roleGradients[user.role] : roleGradients.admin;
+  const searchableItems = useMemo<DeviceSearchItem[]>(() => inventoryProducts, []);
 
-  const formatTime = (date: Date) => {
-    const diff = Date.now() - date.getTime();
-    if (diff < 60000) return 'just now';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
-    return `${Math.floor(diff / 3600000)}h ago`;
+  const filteredItems = useMemo(() => {
+    const trimmedQuery = query.trim().toLowerCase();
+    if (!trimmedQuery) return searchableItems.slice(0, 8);
+
+    return searchableItems
+      .map((device) => {
+        const nameScore = device.name.toLowerCase().includes(trimmedQuery) ? 3 : 0;
+        const imeiScore = device.imei?.toLowerCase().includes(trimmedQuery) ? 3 : 0;
+        const colorScore = device.color?.toLowerCase().includes(trimmedQuery) ? 2 : 0;
+        const categoryScore = device.category.toLowerCase().includes(trimmedQuery) ? 1 : 0;
+        return { item: device, score: nameScore + imeiScore + colorScore + categoryScore };
+      })
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || a.item.name.localeCompare(b.item.name))
+      .map(({ item }) => item)
+      .slice(0, 8);
+  }, [query, searchableItems]);
+
+  useEffect(() => {
+    setIsOpen(false);
+    setQuery('');
+    setActiveIndex(0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!searchWrapRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleShortcut = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        inputRef.current?.focus();
+        setIsOpen(true);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('keydown', handleShortcut);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('keydown', handleShortcut);
+    };
+  }, []);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query]);
+
+  const openResult = (item: DeviceSearchItem) => {
+    const lookup = item.imei && item.imei !== '—' ? item.imei : item.name;
+    navigate(`/inventory?search=${encodeURIComponent(lookup)}&selected=${encodeURIComponent(item.id)}`);
+    setIsOpen(false);
+    setQuery('');
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!isOpen && ['ArrowDown', 'ArrowUp', 'Enter'].includes(event.key)) {
+      setIsOpen(true);
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((prev) => (prev + 1) % Math.max(filteredItems.length, 1));
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((prev) => (prev - 1 + Math.max(filteredItems.length, 1)) % Math.max(filteredItems.length, 1));
+      return;
+    }
+
+    if (event.key === 'Enter' && filteredItems[activeIndex]) {
+      event.preventDefault();
+      openResult(filteredItems[activeIndex]);
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      setIsOpen(false);
+      inputRef.current?.blur();
+    }
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-100 flex items-center justify-between px-6 sticky top-0 z-30" style={{ borderBottomColor: '#E8EEF8' }}>
+    <header
+      className="h-16 flex items-center justify-between px-6 sticky top-0 z-30"
+      style={{
+        background: 'var(--topbar-bg)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid var(--topbar-border)',
+        boxShadow: '0 1px 0 rgba(0,0,0,0.03), 0 4px 24px rgba(7,16,31,0.05)',
+      }}
+    >
+      {/* Page title */}
       <div>
-        <h1 className="text-[15px] font-semibold text-slate-800 leading-tight">{title}</h1>
-        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+        <h1 className="text-[15px] font-bold leading-tight" style={{ color: 'var(--text-ink)' }}>{title}</h1>
+        {subtitle && <p className="text-[11px] mt-0.5" style={{ color: 'var(--text-ink-40)' }}>{subtitle}</p>}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Search */}
-        <div className="hidden md:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-56">
-          <div className="w-4 h-4 flex items-center justify-center text-slate-400">
-            <i className="ri-search-line text-sm" />
-          </div>
+        <div
+          ref={searchWrapRef}
+          className="hidden md:flex relative items-center gap-2 rounded-2xl px-3.5 py-2 w-60 transition-all duration-200"
+          style={{
+            background: 'var(--surface-raised, rgba(7,16,31,0.06))',
+            border: '1px solid var(--topbar-border)',
+          }}
+        >
+          <i className="ri-search-line text-sm flex-shrink-0" style={{ color: 'rgba(7,16,31,0.45)' }} />
           <input
+            ref={inputRef}
             type="text"
-            placeholder="Search anything..."
-            className="bg-transparent text-sm text-slate-600 placeholder-slate-400 outline-none w-full"
+            value={query}
+            placeholder="Search devices…"
+            className="bg-transparent text-[13px] outline-none flex-1 min-w-0"
+            style={{ color: '#07101F' }}
+            onFocus={() => setIsOpen(true)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setIsOpen(true);
+            }}
+            onKeyDown={handleKeyDown}
           />
-        </div>
-
-        {/* Dark Mode Toggle */}
-        {onToggleDark && (
-          <button
-            onClick={onToggleDark}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
-            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          <div
+            className="hidden md:flex items-center gap-0.5 text-[10px] font-medium px-1.5 py-0.5 rounded-md flex-shrink-0"
+            style={{ background: 'rgba(7,16,31,0.07)', color: 'rgba(7,16,31,0.45)' }}
           >
-            <i className={`${isDark ? 'ri-sun-line' : 'ri-moon-line'} text-base`} />
-          </button>
-        )}
+            <i className="ri-command-line text-[9px]" />K
+          </div>
 
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => setNotifOpen(!notifOpen)}
-            className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
-          >
-            <i className="ri-notification-3-line text-base" />
-            {(unreadCount > 0 || notifications.length === 0) && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full" style={{ background: '#F5A623' }} />
-            )}
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-rose-500 rounded-full text-white text-[9px] flex items-center justify-center px-0.5 font-bold">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
-          {notifOpen && (
-            <div className="absolute right-0 top-11 w-80 bg-white rounded-2xl border border-slate-100 shadow-xl z-50 overflow-hidden">
-              <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-slate-800">Notifications</span>
-                  {unreadCount > 0 && (
-                    <span className="text-[10px] bg-rose-100 text-rose-600 px-1.5 py-0.5 rounded-full font-bold">{unreadCount} new</span>
-                  )}
-                </div>
-                <button onClick={onMarkAllRead} className="text-xs cursor-pointer" style={{ color: '#1E5FBE' }}>Mark all read</button>
+          {isOpen && (
+            <div
+              className="absolute left-0 top-full mt-2 w-80 rounded-2xl overflow-hidden z-50"
+              style={{
+                background: 'var(--card-bg)',
+                border: '1px solid var(--topbar-border)',
+                boxShadow: '0 12px 40px rgba(7,16,31,0.14)',
+                backdropFilter: 'blur(24px)',
+              }}
+            >
+              <div className="px-3 py-2 border-b border-slate-100 text-[11px]" style={{ color: 'var(--text-ink-40)' }}>
+                {query.trim() ? `Devices matching "${query.trim()}"` : 'Recent device index'}
               </div>
-              <div className="max-h-72 overflow-y-auto">
-                {displayNotifs.map((n) => {
-                  const cfg = typeConfig[n.type];
+              <div className="py-1">
+                {filteredItems.length > 0 ? filteredItems.map((item, index) => {
+                  const isActive = index === activeIndex;
                   return (
-                    <div key={n.id} className={`flex items-start gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0 ${!n.read ? 'bg-emerald-50/30' : ''}`}>
-                      <div className={`w-5 h-5 flex items-center justify-center mt-0.5 flex-shrink-0 ${cfg.color}`}>
-                        <i className={`${cfg.icon} text-sm`} />
+                    <button
+                      key={item.path}
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() => openResult(item)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors"
+                      style={{ background: isActive ? 'rgba(13,31,74,0.06)' : 'transparent' }}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[12px] font-semibold truncate" style={{ color: 'var(--text-ink)' }}>{item.name}</p>
+                        <p className="text-[10px] truncate" style={{ color: 'var(--text-ink-40)' }}>
+                          {item.category}{item.color ? ` · ${item.color}` : ''} · {item.condition} · Stock {item.stock}
+                        </p>
+                        <p className="text-[10px] truncate" style={{ color: 'var(--text-ink-40)' }}>
+                          {item.imei && item.imei !== '—' ? `IMEI/Serial: ${item.imei}` : `Record: ${item.id}`}
+                        </p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-700">{n.title}</p>
-                        <p className="text-xs text-slate-500 truncate">{n.message}</p>
-                        <p className="text-[10px] text-slate-400 mt-0.5">{formatTime(n.time)}</p>
-                      </div>
-                      {!n.read && <span className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: '#F5A623' }} />}
-                    </div>
+                    </button>
                   );
-                })}
-              </div>
-              <div className="px-4 py-2 border-t border-slate-100">
-                <button onClick={() => { setNotifOpen(false); navigate('/'); }} className="text-xs text-slate-500 hover:text-slate-700 cursor-pointer">View all activity</button>
+                }) : (
+                  <div className="px-3 py-4 text-center">
+                    <p className="text-[12px] font-semibold" style={{ color: 'var(--text-ink)' }}>No matching devices</p>
+                    <p className="text-[10px] mt-1" style={{ color: 'var(--text-ink-40)' }}>Try a model, color, or IMEI/serial number.</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
         </div>
 
+        {/* Dark mode toggle */}
+        <button
+          onClick={toggleDark}
+          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer"
+          style={{ color: 'var(--text-ink-40)' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.06)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ''; }}
+        >
+          <i className={isDark ? 'ri-sun-line text-base' : 'ri-moon-line text-base'} />
+        </button>
+
+        {/* Divider */}
+        <div className="w-px h-6 mx-1" style={{ background: 'rgba(7,16,31,0.1)' }} />
+
         {/* Profile */}
         <button
           onClick={() => navigate('/profile')}
-          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex items-center gap-2.5 cursor-pointer transition-opacity hover:opacity-80 rounded-2xl px-2 py-1.5"
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.05)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ''; }}
         >
           <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
-            style={{ background: user?.role ? roleColors[user.role] : '#1E5FBE' }}
+            className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0"
+            style={{
+              background: avatarGradient,
+              boxShadow: '0 2px 8px rgba(10,31,74,0.2)',
+            }}
           >
             {user?.avatar ?? 'U'}
           </div>
           <div className="hidden md:block text-left">
-            <p className="text-xs font-semibold text-slate-700 leading-tight">{user?.name ?? 'User'}</p>
-            <p className="text-[10px] text-slate-400">{user?.role ? roleLabels[user.role] : ''}</p>
+            <p className="text-[12px] font-bold leading-tight" style={{ color: 'var(--text-ink)' }}>{user?.name ?? 'User'}</p>
+            <p className="text-[10px] leading-tight mt-0.5" style={{ color: 'var(--text-ink-40)' }}>
+              {user?.role ? roleLabels[user.role] : ''}
+            </p>
           </div>
+          <i className="ri-arrow-down-s-line text-sm hidden md:block" style={{ color: 'var(--text-ink-30)' }} />
         </button>
       </div>
     </header>

@@ -181,7 +181,7 @@ export default function IgInbox({
                         ? 'bg-white text-slate-700 rounded-tl-sm border border-slate-100'
                         : 'text-white rounded-tr-sm'
                     }`}
-                    style={msg.from !== 'customer' ? { background: msg.aiGenerated ? igGradient : '#1E5FBE' } : {}}
+                    style={msg.from !== 'customer' ? { background: msg.aiGenerated ? igGradient : '#0D1F4A' } : {}}
                   >
                     {msg.text}
                   </div>
@@ -225,7 +225,7 @@ export default function IgInbox({
               <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#F5A623' }}>
                 <i className="ri-file-add-line" />Create Quote
               </button>
-              <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#1E5FBE' }}>
+              <button className="text-xs cursor-pointer flex items-center gap-1" style={{ color: '#0D1F4A' }}>
                 <i className="ri-user-star-line" />Convert to Lead
               </button>
               <button className="text-xs cursor-pointer flex items-center gap-1 text-slate-500">
@@ -264,7 +264,7 @@ export default function IgInbox({
           <div className="space-y-2">
             <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Quick Actions</p>
             {[
-              { label: 'Create Quote', icon: 'ri-file-add-line', color: '#1E5FBE' },
+              { label: 'Create Quote', icon: 'ri-file-add-line', color: '#0D1F4A' },
               { label: 'Add to Leads', icon: 'ri-user-star-line', color: '#F5A623' },
               { label: 'View Profile', icon: 'ri-instagram-line', color: '#dc2743' },
               { label: 'Send Catalog', icon: 'ri-store-2-line', color: '#cc2366' },

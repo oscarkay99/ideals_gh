@@ -7,10 +7,10 @@ interface Props {
 }
 
 const typeConfig = {
-  sale: { icon: 'ri-shopping-bag-3-fill', bg: '#1E5FBE', label: 'Sale' },
+  sale: { icon: 'ri-shopping-bag-3-fill', bg: '#0D1F4A', label: 'Sale' },
   lead: { icon: 'ri-user-star-fill', bg: '#F5A623', label: 'Lead' },
-  payment: { icon: 'ri-bank-card-fill', bg: '#154290', label: 'Payment' },
-  repair: { icon: 'ri-tools-fill', bg: '#0A1F4A', label: 'Repair' },
+  payment: { icon: 'ri-bank-card-fill', bg: '#1552A8', label: 'Payment' },
+  repair: { icon: 'ri-tools-fill', bg: '#07101F', label: 'Repair' },
   alert: { icon: 'ri-alert-fill', bg: '#E05A2B', label: 'Alert' },
 };
 

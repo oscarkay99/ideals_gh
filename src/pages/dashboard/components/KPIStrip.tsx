@@ -4,7 +4,7 @@ export default function KPIStrip() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       {/* Category Breakdown */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-100">
+      <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid rgba(7,16,31,0.07)', boxShadow: '0 1px 3px rgba(7,16,31,0.04), 0 6px 24px rgba(7,16,31,0.06)' }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-slate-800">Revenue by Category</h3>
           <span className="text-xs text-slate-400">This month</span>
@@ -26,12 +26,12 @@ export default function KPIStrip() {
         </div>
         <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
           <span className="text-xs text-slate-400">Total Revenue</span>
-          <span className="text-sm font-bold text-slate-900">GHS 84,320</span>
+          <span className="text-sm font-bold text-slate-900">GHS 0</span>
         </div>
       </div>
 
       {/* Payment Methods */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-100">
+      <div className="rounded-2xl p-5" style={{ background: 'white', border: '1px solid rgba(7,16,31,0.07)', boxShadow: '0 1px 3px rgba(7,16,31,0.04), 0 6px 24px rgba(7,16,31,0.06)' }}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-slate-800">Payment Methods</h3>
           <span className="text-xs text-slate-400">This month</span>
@@ -60,7 +60,7 @@ export default function KPIStrip() {
           <div className="w-4 h-4 flex items-center justify-center text-amber-500">
             <i className="ri-smartphone-line text-xs" />
           </div>
-          <span className="text-xs text-slate-500">MoMo dominates at 57% — keep MoMo QR visible in store</span>
+          <span className="text-xs text-slate-500">No payment data yet</span>
         </div>
       </div>
     </div>

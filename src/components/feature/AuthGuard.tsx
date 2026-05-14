@@ -25,7 +25,9 @@ export default function AuthGuard({ children, requiredModule }: AuthGuardProps) 
     }
   }, [hasModuleAccess, isAuthenticated, isLoading, location.pathname, navigate]);
 
-  if (isLoading || !isAuthenticated || !hasModuleAccess) return null;
+  // Block only if we have no user at all (cold start, no stored session)
+  if (isLoading && !isAuthenticated) return null;
+  if (!isAuthenticated || !hasModuleAccess) return null;
 
   return <>{children}</>;
 }

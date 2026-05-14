@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/feature/AdminLayout';
 import StatCard from './components/StatCard';
@@ -10,35 +11,38 @@ import KPIStrip from './components/KPIStrip';
 import { dashboardStats } from '@/mocks/dashboard';
 
 const quickActions = [
-  { label: 'Create Quote', icon: 'ri-file-add-line', style: { background: '#1E5FBE' }, path: '/sales' },
-  { label: 'Add Inventory', icon: 'ri-add-box-line', style: { background: '#0A1F4A' }, path: '/inventory' },
+  { label: 'Create Quote', icon: 'ri-file-add-line', style: { background: '#0D1F4A' }, path: '/sales' },
+  { label: 'Add Inventory', icon: 'ri-add-box-line', style: { background: '#07101F' }, path: '/inventory' },
   { label: 'Log Payment', icon: 'ri-bank-card-line', style: { background: '#F5A623' }, path: '/payments' },
-  { label: 'New Lead', icon: 'ri-user-add-line', style: { background: '#154290' }, path: '/leads' },
-  { label: 'AI Studio', icon: 'ri-sparkling-2-line', style: { background: '#1A52A8' }, path: '/ai-studio' },
-  { label: 'Analytics', icon: 'ri-bar-chart-2-line', style: { background: '#EEF4FF', color: '#1E5FBE' }, path: '/analytics' },
+  { label: 'New Lead', icon: 'ri-user-add-line', style: { background: '#1552A8' }, path: '/leads' },
+  { label: 'AI Studio', icon: 'ri-sparkling-2-line', style: { background: '#0E3D8A' }, path: '/ai-studio' },
+  { label: 'Analytics', icon: 'ri-bar-chart-2-line', style: { background: 'rgba(7,16,31,0.08)', color: '#0D1F4A' }, path: '/analytics' },
 ];
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const dateSubtitle = useMemo(() => {
+    return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date()) + ' · Accra, Ghana';
+  }, []);
 
   return (
-    <AdminLayout title="Dashboard" subtitle="Thursday, April 23, 2026 · Accra, Ghana">
+    <AdminLayout title="Dashboard" subtitle={dateSubtitle}>
       {/* Hero welcome strip */}
-      <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #0A1F4A 0%, #1E5FBE 100%)' }}>
+      <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #07101F 0%, #0D1F4A 50%, #1552A8 100%)' }}>
         <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         <div className="absolute right-20 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full blur-2xl pointer-events-none" style={{ background: 'rgba(245,166,35,0.15)' }} />
         <div className="relative">
-          <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-1">Good morning, Kwame</p>
-          <h2 className="text-white text-xl font-bold tracking-tight">Your store is performing <span style={{ color: '#F5A623' }}>above target</span> this month.</h2>
-          <p className="text-white/50 text-xs mt-1.5">GHS 84,320 revenue · 109 orders · 47 active leads · 6 repairs in queue</p>
+          <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-1">Good morning</p>
+          <h2 className="text-white text-xl font-bold tracking-tight">Welcome to your <span style={{ color: '#F5A623' }}>iDeals Tech Hub</span> dashboard.</h2>
+          <p className="text-white/50 text-xs mt-1.5">Add products, leads, and sales to see live stats here.</p>
         </div>
         <div className="relative hidden md:flex items-center gap-3">
           <div className="text-right">
             <p className="text-white/40 text-[10px] uppercase tracking-wider">Monthly Target</p>
-            <p className="text-white text-lg font-bold">GHS 80,000</p>
+            <p className="text-white text-lg font-bold">GHS —</p>
             <div className="flex items-center gap-1 justify-end mt-0.5">
-              <i className="ri-checkbox-circle-fill text-xs" style={{ color: '#F5A623' }} />
-              <span className="text-xs font-semibold" style={{ color: '#F5A623' }}>105.4% achieved</span>
+              <i className="ri-time-line text-xs" style={{ color: '#F5A623' }} />
+              <span className="text-xs font-semibold" style={{ color: '#F5A623' }}>No target set</span>
             </div>
           </div>
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,166,35,0.2)' }}>
@@ -49,10 +53,10 @@ export default function DashboardPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <StatCard label="Total Revenue" value={dashboardStats.revenue.value} change={dashboardStats.revenue.change} trend="up" icon="ri-money-dollar-circle-line" accentColor="#1E5FBE" sub="GHS 80K target" />
-        <StatCard label="Active Leads" value={dashboardStats.leads.value} change={dashboardStats.leads.change} trend="up" icon="ri-user-star-line" accentColor="#F5A623" sub="12 hot, 18 warm" />
-        <StatCard label="Stock Alerts" value={dashboardStats.stockAlerts.value} change={dashboardStats.stockAlerts.change} trend="down" icon="ri-alert-line" accentColor="#E05A2B" sub="3 out of stock" />
-        <StatCard label="Pending Payments" value={dashboardStats.pendingPayments.value} change={dashboardStats.pendingPayments.change} trend="up" icon="ri-time-line" accentColor="#154290" sub="7 transactions" />
+        <StatCard label="Total Revenue" value={dashboardStats.revenue.value} change={dashboardStats.revenue.change} trend="up" icon="ri-money-dollar-circle-line" accentColor="#0D1F4A" sub="No target set" />
+        <StatCard label="Active Leads" value={dashboardStats.leads.value} change={dashboardStats.leads.change} trend="up" icon="ri-user-star-line" accentColor="#F5A623" sub="0 hot, 0 warm" />
+        <StatCard label="Stock Alerts" value={dashboardStats.stockAlerts.value} change={dashboardStats.stockAlerts.change} trend="down" icon="ri-alert-line" accentColor="#E05A2B" sub="0 out of stock" />
+        <StatCard label="Pending Payments" value={dashboardStats.pendingPayments.value} change={dashboardStats.pendingPayments.change} trend="up" icon="ri-time-line" accentColor="#1552A8" sub="0 transactions" />
       </div>
 
       {/* Alert Banner */}

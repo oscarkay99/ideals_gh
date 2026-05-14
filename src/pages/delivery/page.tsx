@@ -18,7 +18,7 @@ const priorityConfig: Record<string, { color: string; bg: string }> = {
 };
 
 export default function DeliveryPage() {
-  const [selectedOrder, setSelectedOrder] = useState(deliveryOrders[0]);
+  const [selectedOrder, setSelectedOrder] = useState(deliveryOrders[0] ?? null);
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
 
   const filtered = filter === 'all' ? deliveryOrders : deliveryOrders.filter(o => o.status === filter);
@@ -76,7 +76,7 @@ export default function DeliveryPage() {
                 <button
                   key={order.id}
                   onClick={() => setSelectedOrder(order)}
-                  className={`w-full bg-white rounded-2xl border p-4 text-left hover:border-emerald-300 transition-all cursor-pointer ${selectedOrder.id === order.id ? 'border-emerald-400' : 'border-slate-100'}`}
+                  className={`w-full bg-white rounded-2xl border p-4 text-left hover:border-emerald-300 transition-all cursor-pointer ${selectedOrder?.id === order.id ? 'border-emerald-400' : 'border-slate-100'}`}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
@@ -107,7 +107,16 @@ export default function DeliveryPage() {
         </div>
 
         {/* Map + Detail */}
-        <DeliveryDetail order={selectedOrder} drivers={drivers} zones={deliveryZones} />
+        {selectedOrder ? (
+          <DeliveryDetail order={selectedOrder} drivers={drivers} zones={deliveryZones} />
+        ) : (
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 flex items-center justify-center py-24">
+            <div className="text-center">
+              <i className="ri-truck-line text-3xl text-slate-200 block mb-2" />
+              <p className="text-sm text-slate-400">No delivery orders yet.</p>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );

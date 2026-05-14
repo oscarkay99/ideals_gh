@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { OPENAI_MODEL } from '../_shared/openai.ts';
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -37,7 +38,7 @@ async function handleSearch(query: string) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: OPENAI_MODEL,
       temperature: 0,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -61,7 +62,7 @@ async function handleUpsell(cartProducts: { name: string; type: string; brand: s
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: OPENAI_MODEL,
       temperature: 0.3,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -86,7 +87,7 @@ async function handleTradeIn(deviceName: string, condition: string, description:
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: OPENAI_MODEL,
       temperature: 0.2,
       messages: [
         { role: 'system', content: SYSTEM_PROMPT },
@@ -114,7 +115,7 @@ async function handleChat(query: string, context: Record<string, unknown>) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${OPENAI_KEY}` },
     body: JSON.stringify({
-      model: 'gpt-4o-mini',
+      model: OPENAI_MODEL,
       temperature: 0.7,
       messages: [
         { role: 'system', content: CHAT_SYSTEM_PROMPT },

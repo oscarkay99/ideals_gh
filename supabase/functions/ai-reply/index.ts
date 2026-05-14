@@ -1,5 +1,6 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import OpenAI from 'npm:openai';
+import { OPENAI_MODEL } from '../_shared/openai.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -68,9 +69,9 @@ Deno.serve(async (req) => {
       ? `${BUSINESS_CONTEXT}\n\n${matchedRule.ai_prompt}`
       : BUSINESS_CONTEXT;
 
-    // Call OpenAI gpt-4o-mini
+    // Call OpenAI using the shared model setting
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: OPENAI_MODEL,
       max_tokens: 500,
       messages: [
         { role: 'system', content: systemPrompt },

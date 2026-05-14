@@ -1,7 +1,7 @@
 import { monthlyData } from '@/mocks/analytics';
 
 export default function RevenueVsTarget() {
-  const max = Math.max(...monthlyData.map((d) => Math.max(d.revenue, d.target)));
+  const max = Math.max(...monthlyData.map((d) => Math.max(d.revenue, d.target)), 1);
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-100">
@@ -61,15 +61,15 @@ export default function RevenueVsTarget() {
       <div className="grid grid-cols-3 gap-3 mt-5 pt-4 border-t border-slate-50">
         <div>
           <p className="text-[10px] text-slate-400 uppercase tracking-wider">6-Month Total</p>
-          <p className="text-base font-bold text-slate-900 mt-0.5">GHS 399,520</p>
+          <p className="text-base font-bold text-slate-900 mt-0.5">GHS 0</p>
         </div>
         <div>
           <p className="text-[10px] text-slate-400 uppercase tracking-wider">Months Beat Target</p>
-          <p className="text-base font-bold text-emerald-600 mt-0.5">4 / 6</p>
+          <p className="text-base font-bold text-emerald-600 mt-0.5">0 / 0</p>
         </div>
         <div>
           <p className="text-[10px] text-slate-400 uppercase tracking-wider">Best Month</p>
-          <p className="text-base font-bold text-slate-900 mt-0.5">April — GHS 84K</p>
+          <p className="text-base font-bold text-slate-900 mt-0.5">—</p>
         </div>
       </div>
     </div>

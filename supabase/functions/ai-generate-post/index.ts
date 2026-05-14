@@ -1,4 +1,5 @@
 import OpenAI from 'npm:openai';
+import { OPENAI_MODEL } from '../_shared/openai.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,7 +47,7 @@ Respond with valid JSON only:
 }`;
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: OPENAI_MODEL,
       max_tokens: 1200,
       response_format: { type: 'json_object' },
       messages: [{ role: 'user', content: prompt }],

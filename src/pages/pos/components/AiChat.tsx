@@ -187,7 +187,7 @@ export default function AiChat() {
       <button
         onClick={() => setOpen(!open)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full text-white flex items-center justify-center shadow-xl cursor-pointer transition-all hover:scale-105"
-        style={{ background: 'linear-gradient(135deg, #1E5FBE, #6366f1)' }}
+        style={{ background: 'linear-gradient(135deg, #0D1F4A, #6366f1)' }}
         title="AI Sales Assistant"
       >
         {open ? <i className="ri-close-line text-xl" /> : <i className="ri-sparkling-2-line text-xl" />}
@@ -200,7 +200,7 @@ export default function AiChat() {
       {open && (
         <div className="fixed bottom-24 right-6 z-50 w-80 bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col overflow-hidden" style={{ height: 440 }}>
           {/* Header */}
-          <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-100" style={{ background: 'linear-gradient(135deg, #1E5FBE, #6366f1)' }}>
+          <div className="px-4 py-3 flex items-center gap-2 border-b border-slate-100" style={{ background: 'linear-gradient(135deg, #0D1F4A, #6366f1)' }}>
             <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
               <i className="ri-sparkling-2-line text-white text-sm" />
             </div>
@@ -218,7 +218,7 @@ export default function AiChat() {
                 <div
                   className={`max-w-[85%] rounded-2xl px-3 py-2 text-xs leading-relaxed whitespace-pre-line ${
                     m.role === 'user'
-                      ? 'bg-[#1E5FBE] text-white rounded-tr-sm'
+                      ? 'bg-[#0D1F4A] text-white rounded-tr-sm'
                       : 'bg-slate-100 text-slate-800 rounded-tl-sm'
                   }`}
                 >
@@ -260,12 +260,12 @@ export default function AiChat() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)}
               placeholder="Ask anything…"
-              className="flex-1 bg-slate-50 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#1E5FBE]/30"
+              className="flex-1 bg-slate-50 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#0D1F4A]/30"
             />
             <button
               onClick={() => send(input)}
               disabled={!input.trim() || loading}
-              className="w-8 h-8 rounded-xl bg-[#1E5FBE] text-white flex items-center justify-center disabled:opacity-40 cursor-pointer hover:bg-[#1a53a8] flex-shrink-0"
+              className="w-8 h-8 rounded-xl bg-[#0D1F4A] text-white flex items-center justify-center disabled:opacity-40 cursor-pointer hover:bg-[#1a53a8] flex-shrink-0"
             >
               <i className="ri-send-plane-fill text-sm" />
             </button>

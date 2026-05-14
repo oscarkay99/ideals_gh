@@ -60,8 +60,8 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
         .divider { border-top: 2px dashed #334155; margin: 8px 0; }
         .section { margin: 10px 0; }
         .label { color: #64748b; }
-        .warranty-box { border: 1px solid #1E5FBE; border-radius: 6px; padding: 8px; margin-top: 10px; }
-        .warranty-title { color: #1E5FBE; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .warranty-box { border: 1px solid #0D1F4A; border-radius: 6px; padding: 8px; margin-top: 10px; }
+        .warranty-title { color: #0D1F4A; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
         .footer { margin-top: 16px; text-align: center; color: #64748b; font-size: 10px; }
         @media print { body { padding: 8px; } }
       </style>
@@ -105,7 +105,7 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
 
             {/* Shop header */}
             <div className="text-center space-y-0.5">
-              <p className="text-base font-bold text-[#1E5FBE]">iDeals Tech Hub</p>
+              <p className="text-base font-bold text-[#0D1F4A]">iDeals Tech Hub</p>
               <p className="text-[10px] text-slate-500">Accra, Ghana · Tel: +233 XX XXX XXXX</p>
               <p className="text-[10px] text-slate-500">{dateStr} · {timeStr}</p>
               <p className="text-[10px] font-semibold text-slate-700">Receipt: {txn}</p>
@@ -174,20 +174,19 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
               <>
                 <div className="border-t-2 border-dashed border-slate-300" />
                 <div className="space-y-3">
-                  <p className="text-[10px] font-bold text-[#1E5FBE] uppercase tracking-wider">
+                  <p className="text-[10px] font-bold text-[#0D1F4A] uppercase tracking-wider">
                     <i className="ri-shield-check-line mr-1" />Warranty Certificates
                   </p>
                   {warrantyItems.map(item => {
                     const wMonths = warrantyMonths(item.product.type);
                     const expiry = warrantyExpiry(wMonths);
                     return (
-                      <div key={item.product.id} className="border border-[#1E5FBE] rounded-xl p-3 space-y-1.5">
+                      <div key={item.product.id} className="border border-[#0D1F4A] rounded-xl p-3 space-y-1.5">
                         <div className="flex items-center gap-2">
-                          <i className="ri-shield-star-line text-[#1E5FBE]" />
+                          <i className="ri-shield-star-line text-[#0D1F4A]" />
                           <p className="text-xs font-bold text-slate-800">{item.product.name}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                          <div><span className="text-slate-400">SKU</span><p className="font-semibold">{item.product.sku}</p></div>
                           {item.imeiEntered && <div><span className="text-slate-400">IMEI</span><p className="font-semibold font-mono">{item.imeiEntered}</p></div>}
                           <div><span className="text-slate-400">Duration</span><p className="font-semibold text-emerald-600">{wMonths} months</p></div>
                           <div><span className="text-slate-400">Expires</span><p className="font-semibold">{expiry}</p></div>
@@ -242,7 +241,7 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
           <button
             onClick={onNewSale}
             className="flex-1 py-3 rounded-2xl text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #1E5FBE 0%, #1a53a8 100%)' }}
+            style={{ background: 'linear-gradient(135deg, #0D1F4A 0%, #1a53a8 100%)' }}
           >
             <i className="ri-add-line" />New Sale
           </button>

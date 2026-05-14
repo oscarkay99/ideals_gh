@@ -2,6 +2,7 @@ import AdminLayout from '@/components/feature/AdminLayout';
 import PaymentStats from './components/PaymentStats';
 import TransactionTable from './components/TransactionTable';
 import VerificationQueue from './components/VerificationQueue';
+import { paymentMethodBreakdown } from '@/mocks/payments';
 
 export default function PaymentsPage() {
   return (
@@ -28,11 +29,7 @@ export default function PaymentsPage() {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-slate-50">
-            {[
-              { label: 'MTN MoMo', value: 'GHS 48,200', pct: '57%' },
-              { label: 'Bank Transfer', value: 'GHS 22,120', pct: '26%' },
-              { label: 'Cash & Card', value: 'GHS 14,000', pct: '17%' },
-            ].map((m) => (
+            {paymentMethodBreakdown.map((m) => (
               <div key={m.label}>
                 <p className="text-xs text-slate-400">{m.label}</p>
                 <p className="text-sm font-bold text-slate-800">{m.value}</p>
@@ -44,13 +41,10 @@ export default function PaymentsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          <div className="lg:col-span-2">
-            <TransactionTable />
-          </div>
-          <div>
-            <VerificationQueue />
-          </div>
+        <TransactionTable />
+
+        <div className="mt-5">
+          <VerificationQueue />
         </div>
       </div>
     </AdminLayout>

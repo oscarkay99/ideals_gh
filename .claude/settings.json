@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx vite *)",
+      "Bash(supabase secrets *)",
+      "Bash(supabase projects *)",
+      "Bash(supabase link *)",
+      "Bash(supabase orgs *)",
+      "Bash(supabase whoami *)",
+      "Bash(supabase auth *)",
+      "Bash(supabase logout *)",
+      "Bash(supabase functions *)",
+      "Bash(supabase db *)",
+      "Bash(lsof -iTCP -sTCP:LISTEN -P)",
+      "Read(//proc/85440/**)",
+      "Bash(ps -p 85440 -o command=)",
+      "Bash(awk '{print $9, $1}')",
+      "Bash(supabase sql *)",
+      "Bash(git merge feature --no-ff -m ' *)"
+    ],
+    "additionalDirectories": [
+      "/Users/Ox/Desktop"
+    ]
+  }
+}

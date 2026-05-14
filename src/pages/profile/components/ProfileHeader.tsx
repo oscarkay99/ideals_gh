@@ -67,8 +67,8 @@ export default function ProfileHeader({
               onClick={() => onNavigate(item.path)}
               className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
             >
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#1E5FBE15' }}>
-                <i className={`${item.icon} text-xs`} style={{ color: '#1E5FBE' }} />
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#0D1F4A15' }}>
+                <i className={`${item.icon} text-xs`} style={{ color: '#0D1F4A' }} />
               </div>
               <span className="text-xs font-medium text-slate-700">{item.label}</span>
               <i className="ri-arrow-right-s-line text-slate-300 ml-auto" />

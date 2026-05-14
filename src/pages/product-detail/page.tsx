@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StorefrontNav from '@/pages/storefront/components/StorefrontNav';
-import ProductGallery from './components/ProductGallery';
 import ProductInfo from './components/ProductInfo';
 import { productDetail } from '@/mocks/products';
 
@@ -17,8 +16,26 @@ export default function ProductDetailPage() {
 
       <div className="max-w-7xl mx-auto px-6 pt-24 pb-16">
         {/* Main grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-16">
-          <ProductGallery images={productDetail.images} condition={productDetail.condition} />
+        <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 mb-16">
+          <div className="rounded-3xl border border-slate-100 bg-slate-50 p-8 flex flex-col justify-end min-h-[420px]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 mb-3">{productDetail.category}</p>
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-500 text-white">{productDetail.condition}</span>
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200">{productDetail.stock} in stock</span>
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-black text-slate-900 leading-tight tracking-tight">{productDetail.name}</h2>
+            <p className="mt-4 text-sm leading-relaxed text-slate-600">
+              Product records are text-only in this system. Use the specifications, condition notes, and warranty details to evaluate the device.
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              {productDetail.specs.slice(0, 4).map((spec) => (
+                <div key={spec.label} className="rounded-2xl border border-white bg-white/70 px-4 py-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">{spec.label}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-800">{spec.value}</p>
+                </div>
+              ))}
+            </div>
+          </div>
           <ProductInfo />
         </div>
 

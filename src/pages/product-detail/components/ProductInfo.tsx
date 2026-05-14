@@ -196,8 +196,8 @@ export default function ProductInfo() {
                 selectedAddOns.includes(addon.id) ? 'border-emerald-400 bg-emerald-50' : 'border-slate-100 hover:border-slate-200'
               }`}
             >
-              <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-50">
-                <img src={addon.image} alt={addon.name} className="w-full h-full object-cover object-top" />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-slate-100 text-slate-500">
+                <span className="text-[10px] font-bold uppercase tracking-[0.08em]">Add</span>
               </div>
               <div className="flex-1">
                 <p className="text-xs font-medium text-slate-800">{addon.name}</p>
