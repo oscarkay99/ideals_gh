@@ -4,13 +4,7 @@ import { aiInsights } from '@/mocks/dashboard';
 export default function AIPanel() {
   const [expanded, setExpanded] = useState<number | null>(null);
 
-  const insightDetails = [
-    'iPhone 14 Pro Max demand up 34% — 3 leads specifically requested it this week. Consider restocking 5 units from your supplier.',
-    '3 leads from Instagram went cold after 48h. A re-engagement broadcast could recover 20–30% based on past data.',
-    'Kofi Mensah has GHS 2,400 outstanding since Apr 15. A polite WhatsApp reminder typically resolves within 24h.',
-    'MacBook Air M2 sold 6 units in 5 days — fastest mover this month. Current stock: 5 units. Reorder threshold: 3.',
-    'Avg repair turnaround is 3.2 days vs 2.5 industry benchmark. Ama O. handles 56 repairs/month — consider a second technician.',
-  ];
+  const insightDetails: string[] = [];
 
   return (
     <div className="rounded-2xl p-5 text-white h-full flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(160deg, #07101F 0%, #0D1F4A 55%, #1552A8 100%)' }}>
@@ -24,7 +18,7 @@ export default function AIPanel() {
         </div>
         <div>
           <h3 className="text-sm font-bold text-white">AI Intelligence</h3>
-          <p className="text-[10px] text-white/40">Live insights · Apr 23, 2026</p>
+          <p className="text-[10px] text-white/40">Live insights</p>
         </div>
         <div className="ml-auto flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: '#F5A623' }} />

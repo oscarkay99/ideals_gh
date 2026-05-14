@@ -32,17 +32,17 @@ export default function DashboardPage() {
         <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         <div className="absolute right-20 top-1/2 -translate-y-1/2 w-32 h-32 rounded-full blur-2xl pointer-events-none" style={{ background: 'rgba(245,166,35,0.15)' }} />
         <div className="relative">
-          <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-1">Good morning, Kwame</p>
-          <h2 className="text-white text-xl font-bold tracking-tight">Your store is performing <span style={{ color: '#F5A623' }}>above target</span> this month.</h2>
-          <p className="text-white/50 text-xs mt-1.5">GHS 84,320 revenue · 109 orders · 47 active leads · 6 repairs in queue</p>
+          <p className="text-white/50 text-xs font-medium uppercase tracking-widest mb-1">Good morning</p>
+          <h2 className="text-white text-xl font-bold tracking-tight">Welcome to your <span style={{ color: '#F5A623' }}>iDeals Tech Hub</span> dashboard.</h2>
+          <p className="text-white/50 text-xs mt-1.5">Add products, leads, and sales to see live stats here.</p>
         </div>
         <div className="relative hidden md:flex items-center gap-3">
           <div className="text-right">
             <p className="text-white/40 text-[10px] uppercase tracking-wider">Monthly Target</p>
-            <p className="text-white text-lg font-bold">GHS 80,000</p>
+            <p className="text-white text-lg font-bold">GHS —</p>
             <div className="flex items-center gap-1 justify-end mt-0.5">
-              <i className="ri-checkbox-circle-fill text-xs" style={{ color: '#F5A623' }} />
-              <span className="text-xs font-semibold" style={{ color: '#F5A623' }}>105.4% achieved</span>
+              <i className="ri-time-line text-xs" style={{ color: '#F5A623' }} />
+              <span className="text-xs font-semibold" style={{ color: '#F5A623' }}>No target set</span>
             </div>
           </div>
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,166,35,0.2)' }}>
@@ -53,10 +53,10 @@ export default function DashboardPage() {
 
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        <StatCard label="Total Revenue" value={dashboardStats.revenue.value} change={dashboardStats.revenue.change} trend="up" icon="ri-money-dollar-circle-line" accentColor="#0D1F4A" sub="GHS 80K target" />
-        <StatCard label="Active Leads" value={dashboardStats.leads.value} change={dashboardStats.leads.change} trend="up" icon="ri-user-star-line" accentColor="#F5A623" sub="12 hot, 18 warm" />
-        <StatCard label="Stock Alerts" value={dashboardStats.stockAlerts.value} change={dashboardStats.stockAlerts.change} trend="down" icon="ri-alert-line" accentColor="#E05A2B" sub="3 out of stock" />
-        <StatCard label="Pending Payments" value={dashboardStats.pendingPayments.value} change={dashboardStats.pendingPayments.change} trend="up" icon="ri-time-line" accentColor="#1552A8" sub="7 transactions" />
+        <StatCard label="Total Revenue" value={dashboardStats.revenue.value} change={dashboardStats.revenue.change} trend="up" icon="ri-money-dollar-circle-line" accentColor="#0D1F4A" sub="No target set" />
+        <StatCard label="Active Leads" value={dashboardStats.leads.value} change={dashboardStats.leads.change} trend="up" icon="ri-user-star-line" accentColor="#F5A623" sub="0 hot, 0 warm" />
+        <StatCard label="Stock Alerts" value={dashboardStats.stockAlerts.value} change={dashboardStats.stockAlerts.change} trend="down" icon="ri-alert-line" accentColor="#E05A2B" sub="0 out of stock" />
+        <StatCard label="Pending Payments" value={dashboardStats.pendingPayments.value} change={dashboardStats.pendingPayments.change} trend="up" icon="ri-time-line" accentColor="#1552A8" sub="0 transactions" />
       </div>
 
       {/* Alert Banner */}

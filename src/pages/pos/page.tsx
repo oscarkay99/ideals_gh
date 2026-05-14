@@ -165,11 +165,7 @@ export default function POSPage() {
     ).slice(0, 4));
   }, [customerQuery]);
 
-  const customerCI = customer ? customerIntelligence.find(ci => ci.customerId === customer.id.replace('U', 'c').toLowerCase()) ?? customerIntelligence.find(ci => {
-    const names = ['Kwame Asante', 'Ama Owusu', 'Kofi Mensah', 'Abena Frimpong', 'Yaw Darko'];
-    const idx = names.findIndex(n => n === customer.name);
-    return ci.customerId === `c${idx + 1}`;
-  }) : null;
+  const customerCI = customer ? customerIntelligence.find(ci => ci.customerId === customer.id.replace('U', 'c').toLowerCase()) ?? null : null;
 
   // ── Cart math ────────────────────────────────────────────────────────────────
 

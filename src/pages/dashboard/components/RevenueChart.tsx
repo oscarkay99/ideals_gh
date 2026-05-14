@@ -9,12 +9,12 @@ export default function RevenueChart() {
   const data = activeTab === 0
     ? revenueChart.map((d) => ({ label: d.day, value: d.value }))
     : activeTab === 1
-    ? [{ label: 'W1', value: 18200 }, { label: 'W2', value: 22400 }, { label: 'W3', value: 19800 }, { label: 'W4', value: 23920 }]
+    ? [{ label: 'W1', value: 0 }, { label: 'W2', value: 0 }, { label: 'W3', value: 0 }, { label: 'W4', value: 0 }]
     : monthlyRevenue.map((d) => ({ label: d.month, value: d.revenue }));
 
-  const max = Math.max(...data.map((d) => d.value));
-  const total = activeTab === 0 ? 'GHS 92,400' : activeTab === 1 ? 'GHS 84,320' : 'GHS 399,520';
-  const change = activeTab === 0 ? '+12.4%' : activeTab === 1 ? '+7.2%' : '+18.6%';
+  const max = Math.max(...data.map((d) => d.value), 1);
+  const total = 'GHS 0';
+  const change = '0%';
 
   return (
     <div className="rounded-2xl p-6 h-full" style={{ background: 'white', border: '1px solid rgba(7,16,31,0.07)', boxShadow: '0 1px 3px rgba(7,16,31,0.04), 0 6px 24px rgba(7,16,31,0.06)' }}>

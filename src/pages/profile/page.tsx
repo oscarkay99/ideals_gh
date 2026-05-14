@@ -9,14 +9,7 @@ import { isSupabaseConfigured, supabase } from '@/services/supabase';
 
 const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
-const activityLog = [
-  { id: 1, action: 'Signed in', detail: 'Chrome on Windows · Accra, Ghana', time: 'Today, 9:42 AM', icon: 'ri-login-box-line', color: '#0D1F4A' },
-  { id: 2, action: 'Created sale', detail: 'iPhone 15 Pro · GHS 12,500 · Kwame Asante', time: 'Today, 10:15 AM', icon: 'ri-shopping-bag-3-line', color: '#25D366' },
-  { id: 3, action: 'Updated inventory', detail: 'Samsung S24 Ultra — restocked 8 units', time: 'Today, 11:00 AM', icon: 'ri-archive-line', color: '#F5A623' },
-  { id: 4, action: 'Generated report', detail: 'Monthly Sales Summary · PDF', time: 'Yesterday, 4:30 PM', icon: 'ri-file-chart-line', color: '#07101F' },
-  { id: 5, action: 'Added customer', detail: 'Efua Boateng · +233 24 000 0006', time: 'Yesterday, 2:00 PM', icon: 'ri-user-add-line', color: '#E05A2B' },
-  { id: 6, action: 'Signed out', detail: 'Session ended', time: 'Yesterday, 7:00 PM', icon: 'ri-logout-box-line', color: '#94A3B8' },
-];
+const activityLog: never[] = [];
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -27,9 +20,9 @@ export default function ProfilePage() {
   const [saved, setSaved] = useState(false);
 
   const [name, setName] = useState(user?.name || '');
-  const [phone, setPhone] = useState('+233 24 000 0001');
+  const [phone, setPhone] = useState('');
   const [email] = useState(user?.email || '');
-  const [bio, setBio] = useState('System administrator at iDeals Tech Hub. Managing all operations and team performance.');
+  const [bio, setBio] = useState('');
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -275,7 +268,7 @@ export default function ProfilePage() {
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-slate-500 block mb-1">Member Since</label>
-                    <p className="text-sm font-semibold text-slate-800">Jan 1, 2026</p>
+                    <p className="text-sm font-semibold text-slate-800">—</p>
                   </div>
                 </div>
               </div>
@@ -422,26 +415,16 @@ export default function ProfilePage() {
               <div className="bg-white rounded-2xl border border-slate-100 p-5">
                 <h3 className="text-sm font-bold text-slate-800 mb-4">Active Sessions</h3>
                 <div className="space-y-3">
-                  {[
-                    { device: 'Chrome on Windows', location: 'Accra, Ghana', time: 'Now', current: true, icon: 'ri-computer-line' },
-                    { device: 'Safari on iPhone 15', location: 'Accra, Ghana', time: 'Yesterday, 6:15 PM', current: false, icon: 'ri-smartphone-line' },
-                    { device: 'Chrome on MacBook', location: 'Kumasi, Ghana', time: 'Apr 20, 2026', current: false, icon: 'ri-macbook-line' },
-                  ].map((session, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#0D1F4A15' }}>
-                        <i className={`${session.icon} text-sm`} style={{ color: '#0D1F4A' }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold text-slate-800">{session.device}</p>
-                        <p className="text-[10px] text-slate-400">{session.location} · {session.time}</p>
-                      </div>
-                      {session.current ? (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold whitespace-nowrap">Current</span>
-                      ) : (
-                        <button className="text-[10px] text-red-400 hover:text-red-600 cursor-pointer whitespace-nowrap">Revoke</button>
-                      )}
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#0D1F4A15' }}>
+                      <i className="ri-computer-line text-sm" style={{ color: '#0D1F4A' }} />
                     </div>
-                  ))}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-slate-800">Current session</p>
+                      <p className="text-[10px] text-slate-400">Active now</p>
+                    </div>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-600 font-semibold whitespace-nowrap">Current</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -455,7 +438,12 @@ export default function ProfilePage() {
                 <span className="text-xs text-slate-400">Last 7 days</span>
               </div>
               <div className="divide-y divide-slate-100">
-                {activityLog.map(item => (
+                {activityLog.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <i className="ri-history-line text-2xl text-slate-200 mb-2" />
+                    <p className="text-xs text-slate-400">No activity yet</p>
+                  </div>
+                ) : activityLog.map((item: { id: number; action: string; detail: string; time: string; icon: string; color: string }) => (
                   <div key={item.id} className="flex items-start gap-4 p-4 hover:bg-slate-50/50 transition-colors">
                     <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${item.color}15` }}>
                       <i className={`${item.icon} text-sm`} style={{ color: item.color }} />

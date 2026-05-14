@@ -15,16 +15,7 @@ const methodIcons: Record<string, string> = {
   Card: 'ri-bank-card-line',
 };
 
-const itemsByProduct: Record<string, Array<{ name: string; qty: number; price: string }>> = {
-  'iPhone 15 Pro Max': [{ name: 'iPhone 15 Pro Max 256GB', qty: 1, price: 'GHS 7,800' }, { name: 'Apple Care+', qty: 1, price: 'GHS 400' }],
-  'Samsung Galaxy S24': [{ name: 'Samsung Galaxy S24 128GB', qty: 1, price: 'GHS 3,900' }, { name: 'Screen Protector', qty: 1, price: 'GHS 180' }, { name: 'Cover Case', qty: 1, price: 'GHS 120' }],
-  'MacBook Air M2': [{ name: 'MacBook Air M2 8GB/256GB', qty: 1, price: 'GHS 11,800' }, { name: 'USB-C Hub', qty: 1, price: 'GHS 600' }],
-  'AirPods Pro 2': [{ name: 'AirPods Pro (2nd Gen)', qty: 1, price: 'GHS 1,600' }],
-  'iPad Pro 12.9"': [{ name: 'iPad Pro 12.9" M2 WiFi', qty: 1, price: 'GHS 3,200' }, { name: 'Apple Pencil 2', qty: 1, price: 'GHS 300' }],
-  'Samsung Galaxy S24 Ultra': [{ name: 'Samsung S24 Ultra 256GB', qty: 1, price: 'GHS 6,400' }, { name: 'S Pen Case', qty: 1, price: 'GHS 280' }, { name: 'Screen Protector', qty: 1, price: 'GHS 120' }],
-  'Apple Watch Series 9': [{ name: 'Apple Watch Series 9 GPS', qty: 1, price: 'GHS 2,000' }, { name: 'Extra Band', qty: 1, price: 'GHS 200' }],
-  'MacBook Pro 14"': [{ name: 'MacBook Pro 14" M3 16GB', qty: 1, price: 'GHS 9,200' }, { name: 'USB-C Hub', qty: 1, price: 'GHS 600' }],
-};
+const itemsByProduct: Record<string, Array<{ name: string; qty: number; price: string }>> = {};
 
 export default function TransactionTable() {
   const { transactions, verify } = useTransactions();

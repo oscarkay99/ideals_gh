@@ -95,9 +95,9 @@ export default function AnalyticsPage() {
                 <i className="ri-sparkling-2-fill text-white text-base" />
               </div>
               <div className="flex-1">
-                <p className="text-white font-bold text-sm mb-1">AI Performance Summary — April 2026</p>
+                <p className="text-white font-bold text-sm mb-1">AI Performance Summary</p>
                 <p className="text-white/60 text-xs leading-relaxed">
-                  Revenue is up <span className="text-emerald-400 font-semibold">18.6%</span> over 6 months, beating target in 4 of 6 months. iPhone 15 Pro Max and MacBook Air M2 drive <span className="text-emerald-400 font-semibold">57% of total revenue</span>. WhatsApp remains your top lead channel at 46%. 36 at-risk customers represent a <span className="text-amber-400 font-semibold">GHS 12,000+ recovery opportunity</span>. Repair revenue grew 119% — consider hiring a second technician.
+                  No data yet. Start recording sales, leads, and repairs to unlock AI-powered performance insights tailored to your store.
                 </p>
               </div>
               <button className="flex items-center gap-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap flex-shrink-0">

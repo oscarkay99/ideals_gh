@@ -8,7 +8,7 @@ interface Props {
 
 export default function AddRepairModal({ onSave, onClose }: Props) {
   const [form, setForm] = useState({
-    customer: '', device: '', issue: '', technician: 'Ama O.',
+    customer: '', device: '', issue: '', technician: '',
     cost: 'TBD', eta: '', warranty: false,
   });
   const [saving, setSaving] = useState(false);

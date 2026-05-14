@@ -5,35 +5,7 @@ interface GeneratorCanvasProps {
   selectedTemplate: string | null;
 }
 
-const sampleOutputs: Record<string, string> = {
-  t1: `Hi Kwame! 👋 Just checking in — we still have that iPhone 15 Pro Max you were eyeing. It's one of our last 3 units and it's been moving fast this week.
-
-We'd love to hold one for you. Just say the word and we'll reserve it right away. You can pay via MoMo or come in to see it first — no pressure at all.
-
-Let us know! 🙏`,
-  t4: `🔥 FLASH DEAL ALERT — GadgetFlow Accra
-
-MacBook Air M2 | 8GB RAM | 256GB SSD
-✅ Brand New, Sealed
-✅ 12-Month Apple Warranty
-✅ MoMo Accepted
-
-Was: GHS 13,800
-NOW: GHS 12,400 (Save GHS 1,400!)
-
-Only 5 units available. First come, first served.
-
-📲 Reply "MACBOOK" to reserve yours now
-📍 Pickup available in Accra
-🚚 Same-day delivery in Greater Accra`,
-  t9: `Experience the pinnacle of mobile photography and performance with the iPhone 15 Pro Max. Crafted from aerospace-grade titanium — the strongest material ever used in an iPhone — this device is as beautiful as it is powerful.
-
-The revolutionary A17 Pro chip delivers console-quality gaming, pro-level video editing, and AI-powered photography. The 48MP main camera with second-generation sensor-shift OIS captures stunning detail in any light.
-
-With USB-C connectivity, a customizable Action Button, and the largest battery ever in a Pro iPhone, the 15 Pro Max is built for those who demand the absolute best.
-
-✅ 100% Authentic | ✅ 12-Month Warranty | ✅ MoMo Accepted`,
-};
+const sampleOutputs: Record<string, string> = {};
 
 export default function GeneratorCanvas({ selectedTemplate }: GeneratorCanvasProps) {
   const [prompt, setPrompt] = useState('');

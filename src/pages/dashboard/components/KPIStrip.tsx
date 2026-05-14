@@ -26,7 +26,7 @@ export default function KPIStrip() {
         </div>
         <div className="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
           <span className="text-xs text-slate-400">Total Revenue</span>
-          <span className="text-sm font-bold text-slate-900">GHS 84,320</span>
+          <span className="text-sm font-bold text-slate-900">GHS 0</span>
         </div>
       </div>
 
@@ -60,7 +60,7 @@ export default function KPIStrip() {
           <div className="w-4 h-4 flex items-center justify-center text-amber-500">
             <i className="ri-smartphone-line text-xs" />
           </div>
-          <span className="text-xs text-slate-500">MoMo dominates at 57% — keep MoMo QR visible in store</span>
+          <span className="text-xs text-slate-500">No payment data yet</span>
         </div>
       </div>
     </div>
