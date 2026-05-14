@@ -53,7 +53,7 @@ function parseAiQuery(query: string, products: PosProduct[]): PosProduct[] {
     if (typeKeyword && !types[typeKeyword].includes(p.type)) return false;
     const cleaned = q.replace(/under\s+\d+|over\s+\d+|between\s+\d+\s+and\s+\d+/g, '').trim();
     const words = cleaned.split(/\s+/).filter(w => w.length > 2 && !brands.includes(w) && !Object.keys(types).includes(w));
-    if (words.length > 0 && !words.some(w => p.name.toLowerCase().includes(w) || p.sku.toLowerCase().includes(w))) return false;
+    if (words.length > 0 && !words.some(w => p.name.toLowerCase().includes(w))) return false;
     return true;
   });
 }
@@ -141,7 +141,7 @@ export default function POSPage() {
     const matchCat = category === 'All' || p.category === category;
     if (!matchCat) return false;
     if (!query) return true;
-    return p.name.toLowerCase().includes(query.toLowerCase()) || p.sku.toLowerCase().includes(query.toLowerCase());
+    return p.name.toLowerCase().includes(query.toLowerCase());
   });
 
   const [aiFiltered, setAiFiltered] = useState<PosProduct[]>(posProducts);
@@ -351,7 +351,7 @@ export default function POSPage() {
                   ref={searchInputRef}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
-                  placeholder={aiMode ? 'Try: "Samsung under 5000" or "Apple phone"…' : 'Search by name or SKU…'}
+                  placeholder={aiMode ? 'Try: "Samsung under 5000" or "Apple phone"…' : 'Search by name…'}
                   className="w-full bg-slate-50 rounded-xl pl-9 pr-9 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none focus:ring-2 focus:ring-indigo-200"
                   autoFocus
                 />
@@ -419,7 +419,6 @@ export default function POSPage() {
                           <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 mb-2">
                             <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{p.brand}</p>
                             <p className="text-[11px] font-semibold text-slate-800 leading-tight mt-1 line-clamp-2">{p.name}</p>
-                            <p className="text-[10px] text-slate-500 mt-1">{p.sku}</p>
                           </div>
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-bold text-slate-900">{formatGHS(p.price)}</p>
@@ -553,7 +552,6 @@ export default function POSPage() {
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-slate-800 leading-tight truncate">{item.product.name}</p>
                             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                              <span className="text-[10px] text-slate-500">{item.product.sku}</span>
                               <span className="text-[10px] text-slate-500">{formatGHS(item.product.price)}</span>
                               <span className={`text-[10px] font-bold ${marginColor(effectiveMargin)}`}>{effectiveMargin}% margin</span>
                             </div>
@@ -592,7 +590,6 @@ export default function POSPage() {
                     <button key={p.id} onClick={() => addToCart(p)} className="flex-shrink-0 bg-white rounded-xl p-2.5 flex flex-col gap-1.5 w-36 border border-indigo-100 hover:border-indigo-300 transition-all cursor-pointer text-left">
                       <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-400">{p.category}</p>
                       <p className="text-[10px] font-semibold text-slate-700 line-clamp-2 leading-tight">{p.name}</p>
-                      <p className="text-[10px] text-slate-500">{p.sku}</p>
                       <p className="text-[10px] font-bold text-[#0D1F4A]">{formatGHS(p.price)}</p>
                     </button>
                   ))}

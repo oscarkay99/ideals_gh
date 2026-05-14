@@ -187,7 +187,6 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
                           <p className="text-xs font-bold text-slate-800">{item.product.name}</p>
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                          <div><span className="text-slate-400">SKU</span><p className="font-semibold">{item.product.sku}</p></div>
                           {item.imeiEntered && <div><span className="text-slate-400">IMEI</span><p className="font-semibold font-mono">{item.imeiEntered}</p></div>}
                           <div><span className="text-slate-400">Duration</span><p className="font-semibold text-emerald-600">{wMonths} months</p></div>
                           <div><span className="text-slate-400">Expires</span><p className="font-semibold">{expiry}</p></div>

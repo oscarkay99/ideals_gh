@@ -59,7 +59,7 @@ export default function RepairAnalytics() {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h3 className="text-sm font-bold text-slate-800">Stock Health</h3>
-            <p className="text-xs text-slate-400 mt-0.5">0 SKUs tracked</p>
+            <p className="text-xs text-slate-400 mt-0.5">0 products tracked</p>
           </div>
           <button className="text-xs text-emerald-600 hover:text-emerald-700 cursor-pointer font-medium">View inventory</button>
         </div>
@@ -76,7 +76,7 @@ export default function RepairAnalytics() {
             <div key={s.label} className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full flex-shrink-0 ${s.color}`} />
               <span className="text-xs text-slate-600 flex-1">{s.label}</span>
-              <span className="text-xs font-bold text-slate-800">{s.value} SKUs</span>
+              <span className="text-xs font-bold text-slate-800">{s.value}</span>
               <span className="text-xs text-slate-400 w-8 text-right">{s.pct}%</span>
             </div>
           ))}

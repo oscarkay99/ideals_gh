@@ -1,7 +1,6 @@
 export interface PosProduct {
   id: string;
   name: string;
-  sku: string;
   price: number;
   cost: number;
   stock: number;
