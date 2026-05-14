@@ -169,6 +169,8 @@ export async function recordSaleTransaction(params: {
   }>;
   paymentMethod: string;
   customerId?: string | null;
+  customerName?: string | null;
+  customerPhone?: string | null;
   cashierId?: string;
 }) {
   if (!isSupabaseConfigured) return;
@@ -193,6 +195,8 @@ export async function recordSaleTransaction(params: {
       profit: +((effectivePrice - item.unitCost) * item.quantity).toFixed(2),
       payment_method: params.paymentMethod,
       customer_id: params.customerId ?? null,
+      customer_name: params.customerName ?? null,
+      customer_phone: params.customerPhone ?? null,
       cashier_id: params.cashierId ?? null,
     };
   });

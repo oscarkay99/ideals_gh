@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 import type { Customer } from '@/types/customer';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,7 +44,19 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
 
 export async function createCustomer(customer: Omit<Customer, 'id'>): Promise<Customer> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
-  const { data, error } = await supabase.from('customers').insert(toRow(customer)).select().single();
-  if (error) throw new Error(error.message);
-  return mapCustomer(data);
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'create',
+      entityType: 'customers',
+      summary: `Create customer ${customer.name}`,
+      metadata: { module: 'customers' },
+      getEntityId: (created) => created.id,
+    },
+    async () => {
+      const { data, error } = await supabase.from('customers').insert(toRow(customer)).select().single();
+      if (error) throw new Error(error.message);
+      return mapCustomer(data);
+    },
+  );
 }

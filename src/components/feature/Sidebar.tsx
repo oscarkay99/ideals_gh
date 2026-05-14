@@ -243,9 +243,7 @@ export default function Sidebar({ onWidthChange }: SidebarProps) {
             {!collapsed && (
               <div className="flex-1 min-w-0 text-left">
                 <p className="text-white text-[12px] font-semibold truncate leading-tight">{user.name}</p>
-                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                  {user.role ? roleLabels[user.role] : ''}
-                </p>
+                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{user.email}</p>
               </div>
             )}
             {!collapsed && <i className="ri-arrow-right-s-line text-sm flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }} />}

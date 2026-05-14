@@ -14,11 +14,11 @@ export interface SystemUser {
 }
 
 export const rolePermissions: Record<UserRole, string[]> = {
-  admin: ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio', 'Users'],
-  sales_manager: ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Marketing', 'Reports', 'Loyalty', 'Calendar', 'Team'],
-  sales_rep: ['Dashboard', 'POS', 'Inventory', 'Leads', 'Sales', 'Customers', 'Calendar'],
-  technician: ['Dashboard', 'Repairs', 'Warranty', 'Inventory', 'Customers', 'Calendar'],
-  inventory_manager: ['Dashboard', 'Inventory', 'Suppliers', 'Delivery', 'Reports', 'Analytics'],
+  admin: ['Dashboard', 'Analytics', 'Audit Logs', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio', 'Users'],
+  sales_manager: ['Dashboard', 'Analytics', 'Audit Logs', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Marketing', 'Reports', 'Loyalty', 'Calendar', 'Team'],
+  sales_rep: ['Dashboard', 'Audit Logs', 'POS', 'Inventory', 'Leads', 'Sales', 'Customers', 'Calendar'],
+  technician: ['Dashboard', 'Audit Logs', 'Repairs', 'Warranty', 'Inventory', 'Customers', 'Calendar'],
+  inventory_manager: ['Dashboard', 'Analytics', 'Audit Logs', 'Inventory', 'Suppliers', 'Delivery', 'Reports'],
 };
 
 export const roleLabels: Record<UserRole, string> = {

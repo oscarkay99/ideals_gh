@@ -1,4 +1,5 @@
 export * from './supabase';
+export * from './audit';
 export * from './products';
 export * from './customers';
 export * from './leads';

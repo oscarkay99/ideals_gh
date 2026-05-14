@@ -32,6 +32,7 @@ import WarrantyPage from "../pages/warranty/page";
 import ReportsPage from "../pages/reports/page";
 import ProfilePage from "../pages/profile/page";
 import AccessDeniedPage from "../pages/AccessDenied";
+import AuditLogsPage from "../pages/audit-logs/page";
 
 const routes: RouteObject[] = [
   { path: "/signin", element: <SignInPage /> },
@@ -67,6 +68,7 @@ const routes: RouteObject[] = [
       { path: "/suppliers", element: <AuthGuard requiredModule="Suppliers"><SuppliersPage /></AuthGuard> },
       { path: "/warranty", element: <AuthGuard requiredModule="Warranty"><WarrantyPage /></AuthGuard> },
       { path: "/reports", element: <AuthGuard requiredModule="Reports"><ReportsPage /></AuthGuard> },
+      { path: "/audit-logs", element: <AuthGuard requiredModule="Audit Logs"><AuditLogsPage /></AuthGuard> },
       { path: "/profile", element: <AuthGuard><ProfilePage /></AuthGuard> },
     ],
   },

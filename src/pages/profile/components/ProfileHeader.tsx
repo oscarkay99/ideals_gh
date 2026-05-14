@@ -54,37 +54,18 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-slate-100 p-4">
-        <p className="text-xs font-bold text-slate-700 mb-3">Quick Actions</p>
-        <div className="space-y-1">
-          {[
-            { label: 'Go to Dashboard', icon: 'ri-dashboard-3-line', path: '/' },
-            { label: 'User Management', icon: 'ri-user-settings-line', path: '/users' },
-            { label: 'System Settings', icon: 'ri-settings-4-line', path: '/settings' },
-          ].map(item => (
-            <button
-              key={item.path}
-              onClick={() => onNavigate(item.path)}
-              className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
-            >
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#0D1F4A15' }}>
-                <i className={`${item.icon} text-xs`} style={{ color: '#0D1F4A' }} />
-              </div>
-              <span className="text-xs font-medium text-slate-700">{item.label}</span>
-              <i className="ri-arrow-right-s-line text-slate-300 ml-auto" />
-            </button>
-          ))}
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer text-left"
-          >
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-50">
-              <i className="ri-logout-box-line text-xs text-red-400" />
-            </div>
-            <span className="text-xs font-medium text-red-500">Sign Out</span>
-          </button>
+      <button
+        onClick={onLogout}
+        className="w-full flex items-center gap-3 p-4 rounded-2xl border border-red-100 bg-white hover:bg-red-50 transition-colors cursor-pointer text-left"
+      >
+        <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-red-50">
+          <i className="ri-logout-box-line text-sm text-red-400" />
         </div>
-      </div>
+        <div>
+          <p className="text-sm font-semibold text-red-500">Sign Out</p>
+          <p className="text-xs text-slate-400">End this session</p>
+        </div>
+      </button>
     </div>
   );
 }

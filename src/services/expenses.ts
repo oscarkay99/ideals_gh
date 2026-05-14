@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 
 export interface Expense {
   id: string;
@@ -20,7 +21,19 @@ export async function getExpenses(): Promise<Expense[]> {
 
 export async function createExpense(expense: Omit<Expense, 'id'>): Promise<Expense> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
-  const { data, error } = await supabase.from('expenses').insert(expense).select().single();
-  if (error) throw new Error(error.message);
-  return data;
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'create',
+      entityType: 'expenses',
+      summary: `Create expense ${expense.description}`,
+      metadata: { module: 'expenses', category: expense.category, amount: expense.amount },
+      getEntityId: (created) => created.id,
+    },
+    async () => {
+      const { data, error } = await supabase.from('expenses').insert(expense).select().single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  );
 }

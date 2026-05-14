@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 import type { Transaction, VerificationQueueItem, TransactionStatus } from '@/types/payment';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,7 +16,9 @@ function groupBySession(rows: any[]): Transaction[] {
   }
   return Array.from(sessions.values()).map((s) => ({
     id: s.session_id ?? s.id,
-    customer: s.customer_id ?? '—',
+    customer: s.customer_name ?? (s.customer_id ? `ID:${String(s.customer_id).slice(0, 8)}` : 'Walk-in'),
+    customerPhone: s.customer_phone ?? null,
+    customerId: s.customer_id ?? null,
     amount: `GHS ${Number(s.totalRevenue).toLocaleString()}`,
     method: s.payment_method ?? 'Cash',
     status: 'verified' as TransactionStatus,
@@ -41,9 +44,21 @@ export async function getVerificationQueue(): Promise<VerificationQueueItem[]> {
 
 export async function verifyTransaction(id: string, status: TransactionStatus): Promise<void> {
   if (!isSupabaseConfigured) return;
-  const { error } = await supabase
-    .from('pos_transactions')
-    .update({ status })
-    .eq('session_id', id);
-  if (error) throw new Error(error.message);
+  await runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'verify',
+      entityType: 'pos_transactions',
+      entityId: id,
+      summary: `Verify transaction ${id} as ${status}`,
+      metadata: { module: 'payments', status },
+    },
+    async () => {
+      const { error } = await supabase
+        .from('pos_transactions')
+        .update({ status })
+        .eq('session_id', id);
+      if (error) throw new Error(error.message);
+    },
+  );
 }

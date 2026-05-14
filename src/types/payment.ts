@@ -5,6 +5,8 @@ export type TransactionStatus = 'verified' | 'pending' | 'needs_review' | 'faile
 export interface Transaction {
   id: string;
   customer: string;
+  customerPhone: string | null;
+  customerId: string | null;
   amount: string;
   method: PaymentMethod;
   status: TransactionStatus;

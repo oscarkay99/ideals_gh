@@ -36,34 +36,65 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
   const receiptRef = useRef<HTMLDivElement>(null);
   const txn = receiptNumber();
   const now = new Date();
-  const dateStr = now.toLocaleDateString('en-GH', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const dateStr = now.toLocaleDateString('en-GH', { day: 'numeric', month: 'long', year: 'numeric' });
   const timeStr = now.toLocaleTimeString('en-GH', { hour: '2-digit', minute: '2-digit' });
+  const isPaid = plan.toLowerCase().includes('cash') || paymentMethod.toLowerCase() !== 'installment';
 
-  const imeiItems = cart.filter(i => i.product.imei && i.imeiEntered);
   const warrantyItems = cart.filter(i => warrantyMonths(i.product.type) >= 6);
+  const subtotal = cart.reduce((sum, item) => sum + (item.product.price * item.qty * (1 - item.discount / 100)), 0);
 
   function handlePrint() {
     const content = receiptRef.current;
     if (!content) return;
-    const win = window.open('', '_blank', 'width=480,height=700');
+    const win = window.open('', '_blank', 'width=780,height=900');
     if (!win) return;
     win.document.write(`
-      <html><head><title>Receipt ${txn}</title>
+      <html><head><title>${isPaid ? 'Receipt' : 'Invoice'} ${txn}</title>
       <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'SF Mono', 'Courier New', monospace; font-size: 12px; color: #0f172a; padding: 24px; max-width: 380px; margin: 0 auto; }
-        h1 { font-size: 16px; text-align: center; margin-bottom: 2px; }
-        .center { text-align: center; }
-        .row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #e2e8f0; }
-        .row:last-child { border-bottom: none; }
-        .bold { font-weight: 700; }
-        .divider { border-top: 2px dashed #334155; margin: 8px 0; }
-        .section { margin: 10px 0; }
-        .label { color: #64748b; }
-        .warranty-box { border: 1px solid #0D1F4A; border-radius: 6px; padding: 8px; margin-top: 10px; }
-        .warranty-title { color: #0D1F4A; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .footer { margin-top: 16px; text-align: center; color: #64748b; font-size: 10px; }
-        @media print { body { padding: 8px; } }
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1e1e1e; background:#fff; padding:32px; max-width:740px; margin:0 auto; }
+        .rcp-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+        .rcp-company-name { font-size:15px; font-weight:700; color:#002d55; margin-bottom:4px; }
+        .rcp-company-address { font-size:11px; color:#5f7184; line-height:1.6; }
+        .rcp-title-block { text-align:right; }
+        .rcp-paid-stamp { display:inline-block; border:3px solid #16a34a; color:#16a34a; font-size:13px; font-weight:800; padding:4px 12px; border-radius:4px; transform:rotate(-8deg); margin-bottom:8px; letter-spacing:.08em; }
+        .rcp-title { font-size:26px; font-weight:800; color:#1e1e1e; }
+        .rcp-number { font-size:12px; color:#5f7184; margin-top:3px; }
+        hr { border:none; border-top:1px solid #e0e0e0; margin:18px 0; }
+        .rcp-middle { display:flex; justify-content:space-between; gap:24px; margin-bottom:24px; }
+        .rcp-field-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#5f7184; margin-bottom:5px; }
+        .rcp-client-name { font-size:14px; font-weight:700; color:#1e1e1e; }
+        .rcp-client-detail { font-size:12px; color:#5f7184; margin-top:2px; }
+        .rcp-meta-table { min-width:260px; border:1px solid #e0e0e0; border-radius:6px; overflow:hidden; }
+        .rcp-meta-row { display:flex; justify-content:space-between; padding:8px 14px; border-bottom:1px solid #e0e0e0; font-size:12px; }
+        .rcp-meta-row:last-child { border-bottom:none; }
+        .rcp-meta-label { color:#5f7184; }
+        .rcp-meta-value { font-weight:600; color:#1e1e1e; }
+        .rcp-balance-row { background:#eff6ff; }
+        .rcp-balance-label { font-weight:700; color:#1e1e1e; }
+        .rcp-balance-value { font-weight:800; color:#002d55; }
+        table { width:100%; border-collapse:collapse; margin-bottom:20px; }
+        thead tr { background:#333; color:#fff; }
+        thead th { padding:10px 12px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+        tbody tr { border-bottom:1px solid #f0f0f0; }
+        tbody tr:nth-child(even) { background:#fafafa; }
+        tbody td { padding:10px 12px; font-size:12px; color:#1e1e1e; }
+        .rcp-totals { display:flex; justify-content:flex-end; margin-bottom:20px; }
+        .rcp-totals table { width:280px; }
+        .rcp-totals td { padding:6px 12px; font-size:12px; }
+        .rcp-totals .rcp-tot-label { color:#5f7184; }
+        .rcp-totals .rcp-tot-val { text-align:right; font-weight:600; }
+        .rcp-tot-total td { font-size:15px; font-weight:800; border-top:2px solid #e0e0e0; padding-top:10px; }
+        .rcp-note-block { margin-top:16px; padding:12px; background:#f8fafc; border-radius:6px; }
+        .rcp-note-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#5f7184; margin-bottom:5px; }
+        .rcp-note-text { font-size:11px; color:#444; line-height:1.6; }
+        .warranty-section { margin-top:16px; }
+        .warranty-item { border:1px solid #002d5520; border-radius:6px; padding:10px 14px; margin-bottom:8px; }
+        .warranty-title { font-size:11px; font-weight:700; color:#002d55; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+        .warranty-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:11px; }
+        .warranty-key { color:#5f7184; }
+        .footer { margin-top:24px; text-align:center; font-size:11px; color:#5f7184; border-top:1px solid #e0e0e0; padding-top:14px; }
+        @media print { body { padding:16px; } }
       </style>
       </head><body>
       ${content.innerHTML}
@@ -75,10 +106,10 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onNewSale}>
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[92vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
 
-        {/* Header */}
+        {/* Header bar */}
         <div className="flex items-center justify-between p-5 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-emerald-100 flex items-center justify-center">
@@ -89,162 +120,201 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
               <p className="text-[10px] text-slate-400">{txn}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-semibold hover:bg-slate-200 cursor-pointer"
-            >
-              <i className="ri-printer-line" />Print
-            </button>
-          </div>
         </div>
 
-        {/* Scrollable receipt body */}
-        <div className="flex-1 overflow-y-auto p-5">
-          <div ref={receiptRef} className="space-y-4 font-mono text-xs text-slate-700">
+        <div className="grid grid-cols-1 xl:grid-cols-[1.35fr_0.65fr]">
 
-            {/* Shop header */}
-            <div className="text-center space-y-0.5">
-              <p className="text-base font-bold text-[#0D1F4A]">iDeals Tech Hub</p>
-              <p className="text-[10px] text-slate-500">Accra, Ghana · Tel: +233 XX XXX XXXX</p>
-              <p className="text-[10px] text-slate-500">{dateStr} · {timeStr}</p>
-              <p className="text-[10px] font-semibold text-slate-700">Receipt: {txn}</p>
-            </div>
+          {/* Receipt preview */}
+          <div className="p-6 bg-[#f0f4f8] max-h-[calc(92vh-81px)] overflow-y-auto">
+            <div ref={receiptRef} className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
 
-            <div className="border-t-2 border-dashed border-slate-300" />
-
-            {/* Customer */}
-            {customer && (
-              <div className="space-y-1">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Customer</p>
-                <div className="flex justify-between"><span className="label">Name</span><span className="font-semibold">{customer.name}</span></div>
-                <div className="flex justify-between"><span className="label">Phone</span><span>{customer.phone}</span></div>
-                <div className="flex justify-between"><span className="label">Loyalty pts earned</span><span className="text-amber-600 font-semibold">+{Math.round(total * 0.01)} pts</span></div>
-              </div>
-            )}
-
-            {customer && <div className="border-t border-dashed border-slate-200" />}
-
-            {/* Items */}
-            <div className="space-y-1.5">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Items</p>
-              {cart.map(item => {
-                const lineTotal = item.product.price * item.qty * (1 - item.discount / 100);
-                return (
-                  <div key={item.product.id} className="space-y-0.5">
-                    <div className="flex justify-between">
-                      <span className="font-semibold flex-1 pr-2 leading-tight">{item.product.name}</span>
-                      <span className="font-bold">{formatGHS(lineTotal)}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-400">
-                      <span>{formatGHS(item.product.price)} × {item.qty}{item.discount > 0 ? ` (−${item.discount}%)` : ''}</span>
-                    </div>
-                    {item.imeiEntered && (
-                      <p className="text-[10px] text-slate-400">IMEI: {item.imeiEntered}</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="border-t border-dashed border-slate-200" />
-
-            {/* Totals */}
-            <div className="space-y-1">
-              {tradeIn && (
-                <div className="flex justify-between text-emerald-600">
-                  <span>Trade-in: {tradeIn.device}</span>
-                  <span>–{formatGHS(tradeIn.value)}</span>
-                </div>
-              )}
-              <div className="flex justify-between font-bold text-slate-900 text-sm pt-0.5">
-                <span>TOTAL</span>
-                <span>{formatGHS(total)}</span>
-              </div>
-              <div className="flex justify-between text-slate-500">
-                <span>Payment</span><span>{paymentMethod}</span>
-              </div>
-              <div className="flex justify-between text-slate-500">
-                <span>Plan</span><span>{plan}</span>
-              </div>
-            </div>
-
-            {/* Warranty certificates */}
-            {warrantyItems.length > 0 && (
-              <>
-                <div className="border-t-2 border-dashed border-slate-300" />
-                <div className="space-y-3">
-                  <p className="text-[10px] font-bold text-[#0D1F4A] uppercase tracking-wider">
-                    <i className="ri-shield-check-line mr-1" />Warranty Certificates
+              {/* Top: company info + title block */}
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-5">
+                <div>
+                  <p className="text-[15px] font-bold mb-1" style={{ color: '#002d55' }}>iDeals Tech Hub</p>
+                  <p className="text-[11px] leading-relaxed" style={{ color: '#5f7184' }}>
+                    Accra, Ghana<br />
+                    ideals@idealsgh.com · idealsgh.com
                   </p>
-                  {warrantyItems.map(item => {
-                    const wMonths = warrantyMonths(item.product.type);
-                    const expiry = warrantyExpiry(wMonths);
-                    return (
-                      <div key={item.product.id} className="border border-[#0D1F4A] rounded-xl p-3 space-y-1.5">
-                        <div className="flex items-center gap-2">
-                          <i className="ri-shield-star-line text-[#0D1F4A]" />
-                          <p className="text-xs font-bold text-slate-800">{item.product.name}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
-                          {item.imeiEntered && <div><span className="text-slate-400">IMEI</span><p className="font-semibold font-mono">{item.imeiEntered}</p></div>}
-                          <div><span className="text-slate-400">Duration</span><p className="font-semibold text-emerald-600">{wMonths} months</p></div>
-                          <div><span className="text-slate-400">Expires</span><p className="font-semibold">{expiry}</p></div>
-                          <div><span className="text-slate-400">Receipt</span><p className="font-semibold">{txn}</p></div>
-                          {customer && <div><span className="text-slate-400">Customer</span><p className="font-semibold">{customer.name}</p></div>}
-                        </div>
-                        <p className="text-[9px] text-slate-400 leading-relaxed">
-                          Covers manufacturing defects. Physical damage, liquid damage, and software issues are excluded. Present this receipt for all warranty claims.
-                        </p>
-                      </div>
-                    );
-                  })}
                 </div>
-              </>
-            )}
+                <div className="sm:text-right">
+                  {isPaid && (
+                    <div className="inline-block border-2 border-green-600 text-green-600 text-[11px] font-black px-3 py-1 rounded mb-2 tracking-widest uppercase" style={{ transform: 'rotate(-8deg)' }}>
+                      PAID
+                    </div>
+                  )}
+                  <p className="text-[26px] font-black text-slate-900 leading-none">{isPaid ? 'RECEIPT' : 'INVOICE'}</p>
+                  <p className="text-[11px] mt-1" style={{ color: '#5f7184' }}># {txn}</p>
+                </div>
+              </div>
 
-            {/* IMEI log for non-warranty items */}
-            {imeiItems.filter(i => warrantyMonths(i.product.type) < 6).length > 0 && (
-              <>
-                <div className="border-t border-dashed border-slate-200" />
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">IMEI Log</p>
-                  {imeiItems.filter(i => warrantyMonths(i.product.type) < 6).map(item => (
-                    <div key={item.product.id} className="flex justify-between">
-                      <span className="text-slate-500 truncate pr-2">{item.product.name}</span>
-                      <span className="font-mono font-semibold">{item.imeiEntered}</span>
+              <hr className="border-slate-200 mb-5" />
+
+              {/* Middle: Bill To + Meta table */}
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-6 mb-6">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: '#5f7184' }}>Bill To</p>
+                  <p className="text-[14px] font-bold text-slate-900">{customer?.name || 'Walk-in Customer'}</p>
+                  {customer?.phone && <p className="text-[12px] mt-1" style={{ color: '#5f7184' }}>{customer.phone}</p>}
+                  {customer?.email && <p className="text-[12px]" style={{ color: '#5f7184' }}>{customer.email}</p>}
+                </div>
+                <div className="border border-slate-200 rounded-lg overflow-hidden min-w-[260px]">
+                  {[
+                    { label: 'Date', value: `${dateStr} · ${timeStr}` },
+                    { label: 'Payment Method', value: paymentMethod },
+                    { label: 'Plan', value: plan },
+                    { label: 'Reference', value: txn },
+                  ].map(row => (
+                    <div key={row.label} className="flex justify-between px-3.5 py-2 border-b border-slate-100 last:border-0 text-[12px]">
+                      <span style={{ color: '#5f7184' }}>{row.label}</span>
+                      <span className="font-semibold text-slate-800">{row.value}</span>
                     </div>
                   ))}
+                  <div className="flex justify-between px-3.5 py-2.5 text-[12px]" style={{ background: '#eff6ff' }}>
+                    <span className="font-bold text-slate-800">Total Paid</span>
+                    <span className="font-black" style={{ color: '#002d55' }}>{formatGHS(total)}</span>
+                  </div>
                 </div>
-              </>
-            )}
+              </div>
 
-            <div className="border-t-2 border-dashed border-slate-300" />
+              {/* Items table */}
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full min-w-[520px] border-collapse">
+                  <thead>
+                    <tr style={{ background: '#333' }}>
+                      {['Item', 'Qty', 'Unit Price', 'Amount'].map(h => (
+                        <th key={h} className="px-3 py-2.5 text-left text-[11px] font-bold uppercase tracking-wider text-white">{h}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cart.map((item, idx) => {
+                      const lineTotal = item.product.price * item.qty * (1 - item.discount / 100);
+                      return (
+                        <tr key={item.product.id} style={{ background: idx % 2 === 0 ? '#fff' : '#fafafa' }} className="border-b border-slate-100">
+                          <td className="px-3 py-3">
+                            <p className="text-[13px] font-semibold text-slate-800">{item.product.name}</p>
+                            {item.imeiEntered && <p className="text-[10px] mt-0.5" style={{ color: '#5f7184' }}>IMEI: {item.imeiEntered}</p>}
+                            {item.discount > 0 && <p className="text-[10px] text-amber-600 mt-0.5">{item.discount}% discount applied</p>}
+                          </td>
+                          <td className="px-3 py-3 text-[12px] text-slate-600">{item.qty}</td>
+                          <td className="px-3 py-3 text-[12px] text-slate-600">{formatGHS(item.product.price)}</td>
+                          <td className="px-3 py-3 text-[13px] font-bold text-slate-800">{formatGHS(lineTotal)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Footer */}
-            <div className="text-center space-y-1 text-[10px] text-slate-400">
-              <p>Thank you for shopping at iDeals Tech Hub!</p>
-              <p>Returns accepted within 7 days with receipt.</p>
-              <p>www.idealstechhub.com</p>
+              {/* Totals */}
+              <div className="flex justify-end mb-6">
+                <table className="w-[280px] border-collapse text-[12px]">
+                  <tbody>
+                    <tr>
+                      <td className="px-3 py-1.5" style={{ color: '#5f7184' }}>Subtotal</td>
+                      <td className="px-3 py-1.5 text-right font-semibold text-slate-800">{formatGHS(subtotal)}</td>
+                    </tr>
+                    {tradeIn && (
+                      <tr>
+                        <td className="px-3 py-1.5 text-green-700">Trade-in Credit</td>
+                        <td className="px-3 py-1.5 text-right font-semibold text-green-700">-{formatGHS(tradeIn.value)}</td>
+                      </tr>
+                    )}
+                    <tr className="border-t-2 border-slate-200">
+                      <td className="px-3 pt-3 pb-1.5 text-[15px] font-bold text-slate-900">Total</td>
+                      <td className="px-3 pt-3 pb-1.5 text-right text-[15px] font-black" style={{ color: '#002d55' }}>{formatGHS(total)}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Notes */}
+              <div className="rounded-lg p-4 mb-6" style={{ background: '#f8fafc' }}>
+                <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: '#5f7184' }}>Notes</p>
+                <p className="text-[11px] leading-relaxed" style={{ color: '#444' }}>
+                  Returns accepted within 7 days with this receipt. Warranty applies to eligible items listed below.
+                  {customer && ` · Loyalty points earned: +${Math.round(total * 0.01)} pts`}
+                </p>
+              </div>
+
+              {/* Warranty certificates */}
+              {warrantyItems.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: '#5f7184' }}>Warranty Certificates</p>
+                  <div className="space-y-2">
+                    {warrantyItems.map(item => {
+                      const wm = warrantyMonths(item.product.type);
+                      return (
+                        <div key={item.product.id} className="border rounded-lg p-4" style={{ borderColor: '#002d5520' }}>
+                          <div className="flex items-center gap-2 mb-3">
+                            <i className="ri-shield-star-line text-sm" style={{ color: '#002d55' }} />
+                            <p className="text-[13px] font-bold text-slate-800">{item.product.name}</p>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px]">
+                            {item.imeiEntered && (
+                              <div><span className="block mb-0.5" style={{ color: '#5f7184' }}>IMEI</span><p className="font-semibold font-mono text-slate-800">{item.imeiEntered}</p></div>
+                            )}
+                            <div><span className="block mb-0.5" style={{ color: '#5f7184' }}>Duration</span><p className="font-semibold text-green-700">{wm} months</p></div>
+                            <div><span className="block mb-0.5" style={{ color: '#5f7184' }}>Expires</span><p className="font-semibold text-slate-800">{warrantyExpiry(wm)}</p></div>
+                            <div><span className="block mb-0.5" style={{ color: '#5f7184' }}>Receipt</span><p className="font-semibold text-slate-800">{txn}</p></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer */}
+              <div className="border-t border-slate-200 pt-4 text-center">
+                <p className="text-[11px]" style={{ color: '#5f7184' }}>Thank you for shopping at iDeals Tech Hub</p>
+                <p className="text-[11px] mt-0.5" style={{ color: '#5f7184' }}>ideals@idealsgh.com · idealsgh.com</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="p-5 border-t border-slate-100 flex gap-3">
-          <button
-            onClick={handlePrint}
-            className="flex-1 py-3 rounded-2xl border border-slate-200 text-slate-600 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-slate-50 cursor-pointer"
-          >
-            <i className="ri-printer-line" />Print Receipt
-          </button>
-          <button
-            onClick={onNewSale}
-            className="flex-1 py-3 rounded-2xl text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #0D1F4A 0%, #1a53a8 100%)' }}
-          >
-            <i className="ri-add-line" />New Sale
-          </button>
+          {/* Right sidebar */}
+          <div className="p-6 border-l border-slate-100 bg-white max-h-[calc(92vh-81px)] overflow-y-auto space-y-4">
+            <div className="rounded-2xl border border-slate-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">Status</div>
+              <div className="p-4">
+                <span className={`inline-flex px-3 py-1.5 rounded-full text-xs font-semibold border ${isPaid ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-amber-50 text-amber-700 border-amber-100'}`}>
+                  {isPaid ? 'Paid' : 'Recorded'}
+                </span>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">Actions</div>
+              <div className="p-4 space-y-2">
+                <button
+                  onClick={handlePrint}
+                  className="w-full py-3 rounded-xl border border-slate-200 text-slate-700 text-sm font-semibold flex items-center justify-center gap-2 hover:bg-slate-50 cursor-pointer"
+                >
+                  <i className="ri-printer-line" />Print / Save PDF
+                </button>
+                <button
+                  onClick={onNewSale}
+                  className="w-full py-3 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2 cursor-pointer hover:opacity-90"
+                  style={{ background: 'linear-gradient(135deg, #002d55 0%, #1552A8 100%)' }}
+                >
+                  <i className="ri-add-line" />New Sale
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">Details</div>
+              <div className="p-4 space-y-3 text-sm">
+                <div className="flex items-center justify-between"><span className="text-slate-500">Customer</span><span className="font-semibold text-slate-800">{customer?.name || 'Walk-in'}</span></div>
+                <div className="flex items-center justify-between"><span className="text-slate-500">Items</span><span className="font-semibold text-slate-800">{cart.length}</span></div>
+                <div className="flex items-center justify-between"><span className="text-slate-500">Payment</span><span className="font-semibold text-slate-800">{paymentMethod}</span></div>
+                <div className="flex items-center justify-between"><span className="text-slate-500">Plan</span><span className="font-semibold text-slate-800">{plan}</span></div>
+                {tradeIn && <div className="flex items-center justify-between text-emerald-700"><span>Trade-in</span><span className="font-semibold">-{formatGHS(tradeIn.value)}</span></div>}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

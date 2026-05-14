@@ -223,29 +223,6 @@ export default function CalendarPage() {
             </div>
           )}
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-2xl p-4 border border-slate-100">
-            <h3 className="text-sm font-bold text-slate-800 mb-3">Quick Actions</h3>
-            <div className="space-y-2">
-              {[
-                { label: 'New Repair Booking', icon: 'ri-tools-line', color: '#E05A2B' },
-                { label: 'Schedule Consultation', icon: 'ri-user-voice-line', color: '#0D1F4A' },
-                { label: 'Book Trade-In', icon: 'ri-exchange-line', color: '#F5A623' },
-                { label: 'Staff Meeting', icon: 'ri-team-line', color: '#07101F' },
-              ].map((action) => (
-                <button
-                  key={action.label}
-                  onClick={() => setShowAddEvent(true)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-all cursor-pointer text-left"
-                >
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${action.color}15` }}>
-                    <i className={`${action.icon} text-sm`} style={{ color: action.color }} />
-                  </div>
-                  <span className="text-xs font-semibold text-slate-700">{action.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
 

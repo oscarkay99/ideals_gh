@@ -181,6 +181,9 @@ export default function SalesPage() {
       {showQuote && (
         <QuoteModal
           cartItems={cartItems}
+          customerName={cartItems.length > 0 ? 'Walk-in Customer' : ''}
+          deliveryType={delivery}
+          paymentMethod={payment}
           subtotal={subtotal}
           deliveryFee={deliveryFee}
           total={total}

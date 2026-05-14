@@ -41,6 +41,26 @@ export default function InventoryPage() {
 
   const product = selected ? products.find((p) => p.id === selected) : null;
 
+  const handleEditProduct = (item: typeof products[number]) => {
+    setEditingProduct(item);
+    setSelected(null);
+  };
+
+  const handleRestockProduct = async (item: typeof products[number]) => {
+    const now = new Date();
+    const lastRestocked = now.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+
+    await update(item.id, {
+      ...item,
+      stock: item.stock + 1,
+      lastRestocked,
+    });
+  };
+
   const totalValue = products.reduce((sum, p) => {
     const n = parseFloat(p.price.replace(/[^0-9.]/g, ''));
     return sum + (isNaN(n) ? 0 : n * p.stock);
@@ -178,7 +198,7 @@ export default function InventoryPage() {
                         <button onClick={() => setSelected(p.id)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
                           <i className="ri-eye-line text-sm" />
                         </button>
-                        <button onClick={() => setEditingProduct(p)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
+                        <button onClick={() => handleEditProduct(p)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
                           <i className="ri-edit-line text-sm" />
                         </button>
                       </div>
@@ -191,7 +211,14 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {product && <ProductDetail product={product} onClose={() => setSelected(null)} />}
+      {product && (
+        <ProductDetail
+          product={product}
+          onClose={() => setSelected(null)}
+          onEdit={() => handleEditProduct(product)}
+          onRestock={() => handleRestockProduct(product)}
+        />
+      )}
       {showAdd && <AddProductModal onSave={add} onClose={() => setShowAdd(false)} />}
       {editingProduct && (
         <AddProductModal

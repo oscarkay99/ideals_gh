@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 
 export interface InventoryRecord {
   id: string;
@@ -24,20 +25,56 @@ export async function fetchInventory(): Promise<InventoryRecord[]> {
 
 export async function addInventoryItem(item: Omit<InventoryRecord, 'id'>): Promise<InventoryRecord> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
-  const { data, error } = await supabase.from('inventory').insert(item).select().single();
-  if (error) throw new Error(error.message);
-  return data;
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'create',
+      entityType: 'inventory',
+      summary: `Create inventory item ${item.name}`,
+      metadata: { module: 'inventory', category: item.category },
+      getEntityId: (created) => created.id,
+    },
+    async () => {
+      const { data, error } = await supabase.from('inventory').insert(item).select().single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  );
 }
 
 export async function setInventoryStock(id: string, stock: number): Promise<void> {
   if (!isSupabaseConfigured) return;
-  const { error } = await supabase.from('inventory').update({ stock }).eq('id', id);
-  if (error) throw new Error(error.message);
+  await runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'update_stock',
+      entityType: 'inventory',
+      entityId: id,
+      summary: `Set inventory stock for ${id} to ${stock}`,
+      metadata: { module: 'inventory', stock },
+    },
+    async () => {
+      const { error } = await supabase.from('inventory').update({ stock }).eq('id', id);
+      if (error) throw new Error(error.message);
+    },
+  );
 }
 
 export async function updateInventoryItem(id: string, item: Omit<InventoryRecord, 'id'>): Promise<InventoryRecord> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
-  const { data, error } = await supabase.from('inventory').update(item).eq('id', id).select().single();
-  if (error) throw new Error(error.message);
-  return data;
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'update',
+      entityType: 'inventory',
+      entityId: id,
+      summary: `Update inventory item ${id}`,
+      metadata: { module: 'inventory', category: item.category, stock: item.stock },
+    },
+    async () => {
+      const { data, error } = await supabase.from('inventory').update(item).eq('id', id).select().single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  );
 }

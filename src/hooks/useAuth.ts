@@ -1,5 +1,6 @@
 import { useEffect, useSyncExternalStore } from 'react';
 import { isSupabaseConfigured, supabase } from '@/services/supabase';
+import { logAuditEvent } from '@/services/audit';
 
 export type UserRole = 'admin' | 'sales_manager' | 'sales_rep' | 'technician' | 'inventory_manager';
 
@@ -232,26 +233,70 @@ export function useAuth() {
       localStorage.setItem(MOCK_SESSION_KEY, '1');
       writeStoredUser(authUser);
       setAuthState({ user: authUser, initializing: false });
+      await logAuditEvent({
+        layer: 'auth',
+        action: 'login',
+        entityType: 'auth',
+        entityId: authUser.id,
+        status: 'info',
+        summary: `Mock login for ${authUser.email}`,
+        metadata: { authMode: 'mock' },
+      });
       return { success: true };
     }
 
     if (isSupabaseConfigured) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) return { success: false, error: 'Invalid email or password' };
+      if (error) {
+        await logAuditEvent({
+          layer: 'auth',
+          action: 'login',
+          entityType: 'auth',
+          status: 'failure',
+          summary: `Failed login attempt for ${email}`,
+          metadata: { authMode: 'supabase', email, error: error.message },
+        });
+        return { success: false, error: 'Invalid email or password' };
+      }
       await syncSupabaseSession();
+      await logAuditEvent({
+        layer: 'auth',
+        action: 'login',
+        entityType: 'auth',
+        status: 'success',
+        summary: `Login for ${email}`,
+        metadata: { authMode: 'supabase', email },
+      });
       return { success: true };
     }
 
+    await logAuditEvent({
+      layer: 'auth',
+      action: 'login',
+      entityType: 'auth',
+      status: 'failure',
+      summary: `Failed login attempt for ${email}`,
+      metadata: { authMode: 'unconfigured', email },
+    });
     return { success: false, error: 'Invalid email or password' };
   };
 
   const logout = async () => {
+    const currentUser = state.user;
     localStorage.removeItem(MOCK_SESSION_KEY);
     if (isSupabaseConfigured) {
       await supabase.auth.signOut();
     }
     writeStoredUser(null);
     setAuthState({ user: null, initializing: false });
+    await logAuditEvent({
+      layer: 'auth',
+      action: 'logout',
+      entityType: 'auth',
+      entityId: currentUser?.id,
+      status: 'info',
+      summary: currentUser ? `Logout for ${currentUser.email}` : 'Logout',
+    });
   };
 
   const resetPassword = async (email: string): Promise<AuthResult> => {

@@ -1,24 +1,13 @@
-interface InventoryProduct {
-  id: string;
-  name: string;
-  category: string;
-  color?: string;
-  condition: string;
-  price: string;
-  stock: number;
-  imei: string;
-  location: string;
-  supplier: string;
-  lastRestocked: string;
-  fastMover: boolean;
-}
+import type { InventoryProduct } from '@/hooks/useInventory';
 
 interface Props {
   product: InventoryProduct;
   onClose: () => void;
+  onEdit: () => void;
+  onRestock: () => void;
 }
 
-export default function ProductDetail({ product, onClose }: Props) {
+export default function ProductDetail({ product, onClose, onEdit, onRestock }: Props) {
   return (
     <div className="fixed inset-0 bg-black/30 z-50" onClick={onClose}>
       <div className="absolute right-0 top-0 bottom-0 w-[400px] bg-white shadow-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -64,7 +53,7 @@ export default function ProductDetail({ product, onClose }: Props) {
             </div>
             <div className="flex items-center justify-between py-2 border-b border-slate-50">
               <span className="text-xs text-slate-500">Last Restocked</span>
-              <span className="text-xs font-medium text-slate-800">{product.lastRestocked}</span>
+              <span className="text-xs font-medium text-slate-800">{product.lastRestocked || 'Not recorded'}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-slate-50">
               <span className="text-xs text-slate-500">Fast Mover</span>
@@ -73,10 +62,18 @@ export default function ProductDetail({ product, onClose }: Props) {
           </div>
 
           <div className="flex gap-2">
-            <button className="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap">
+            <button
+              type="button"
+              onClick={onEdit}
+              className="flex-1 py-2.5 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer whitespace-nowrap"
+            >
               Edit Product
             </button>
-            <button className="flex-1 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap">
+            <button
+              type="button"
+              onClick={onRestock}
+              className="flex-1 py-2.5 border border-slate-200 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-50 transition-all cursor-pointer whitespace-nowrap"
+            >
               Restock
             </button>
           </div>

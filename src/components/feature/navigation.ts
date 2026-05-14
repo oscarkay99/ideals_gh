@@ -66,6 +66,7 @@ export const navGroups: NavGroup[] = [
       { label: 'Authentication', icon: 'ri-shield-check-line', path: '/authentication', module: 'Authentication' },
       { label: 'Team', icon: 'ri-team-line', path: '/team', module: 'Team' },
       { label: 'Users', icon: 'ri-user-settings-line', path: '/users', module: 'Users' },
+      { label: 'Audit Logs', icon: 'ri-file-list-3-line', path: '/audit-logs', module: 'Audit Logs' },
       { label: 'Settings', icon: 'ri-settings-4-line', path: '/settings', module: 'Settings' },
     ],
   },
@@ -74,4 +75,3 @@ export const navGroups: NavGroup[] = [
 export const publicItems: NavItem[] = [
   { label: 'Storefront', icon: 'ri-store-2-line', path: '/store', group: 'Public' },
 ];
-

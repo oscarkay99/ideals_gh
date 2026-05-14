@@ -184,12 +184,18 @@ export default function TransactionTable() {
               style={{ background: 'rgba(7,16,31,0.03)', border: '1px solid rgba(7,16,31,0.06)' }}
             >
               <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: 'rgba(7,16,31,0.4)' }}>Details</p>
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[10px] mb-0.5" style={{ color: 'rgba(7,16,31,0.38)' }}>Customer</p>
+                  <p className="text-[12px] font-bold" style={{ color: '#07101F' }}>{selected.customer}</p>
+                  {selected.customerPhone && (
+                    <p className="text-[10px] mt-0.5" style={{ color: 'rgba(7,16,31,0.45)' }}>{selected.customerPhone}</p>
+                  )}
+                </div>
                 {[
-                  { label: 'Customer',  value: selected.customer },
-                  { label: 'Method',    value: selected.method },
-                  { label: 'Date',      value: selected.date },
-                  { label: 'Payment',   value: sc.label },
+                  { label: 'Method',  value: selected.method },
+                  { label: 'Date',    value: selected.date },
+                  { label: 'Status',  value: sc.label },
                 ].map(({ label, value }) => (
                   <div key={label}>
                     <p className="text-[10px] mb-0.5" style={{ color: 'rgba(7,16,31,0.38)' }}>{label}</p>

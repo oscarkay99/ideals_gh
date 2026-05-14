@@ -5,6 +5,7 @@ export type AppModule =
   | 'Dashboard'
   | 'Analytics'
   | 'AI Studio'
+  | 'Audit Logs'
   | 'POS'
   | 'Inventory'
   | 'Leads'

@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 
 export interface POItem {
   name: string;
@@ -43,32 +44,44 @@ export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
 
 export async function createPurchaseOrder(po: Omit<PurchaseOrder, 'id'>): Promise<PurchaseOrder> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
-  const { data, error } = await supabase
-    .from('purchase_orders')
-    .insert({
-      supplier: po.supplier,
-      items: po.items,
-      total_value: po.totalValue,
-      status: po.status,
-      ordered_date: po.orderedDate,
-      expected_date: po.expectedDate,
-      delivered_date: po.deliveredDate,
-      payment_terms: po.paymentTerms,
-      notes: po.notes,
-    })
-    .select()
-    .single();
-  if (error) throw new Error(error.message);
-  return {
-    id: data.id,
-    supplier: data.supplier,
-    items: data.items ?? [],
-    totalValue: data.total_value,
-    status: data.status,
-    orderedDate: data.ordered_date,
-    expectedDate: data.expected_date,
-    deliveredDate: data.delivered_date,
-    paymentTerms: data.payment_terms ?? '',
-    notes: data.notes,
-  };
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'create',
+      entityType: 'purchase_orders',
+      summary: `Create purchase order for ${po.supplier}`,
+      metadata: { module: 'purchase_orders', status: po.status, itemCount: po.items.length },
+      getEntityId: (created) => created.id,
+    },
+    async () => {
+      const { data, error } = await supabase
+        .from('purchase_orders')
+        .insert({
+          supplier: po.supplier,
+          items: po.items,
+          total_value: po.totalValue,
+          status: po.status,
+          ordered_date: po.orderedDate,
+          expected_date: po.expectedDate,
+          delivered_date: po.deliveredDate,
+          payment_terms: po.paymentTerms,
+          notes: po.notes,
+        })
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return {
+        id: data.id,
+        supplier: data.supplier,
+        items: data.items ?? [],
+        totalValue: data.total_value,
+        status: data.status,
+        orderedDate: data.ordered_date,
+        expectedDate: data.expected_date,
+        deliveredDate: data.delivered_date,
+        paymentTerms: data.payment_terms ?? '',
+        notes: data.notes,
+      };
+    },
+  );
 }

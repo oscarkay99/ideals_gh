@@ -310,6 +310,8 @@ export default function POSPage() {
       })),
       paymentMethod: methodLabel,
       customerId: customer?.id ?? null,
+      customerName: customer?.name ?? null,
+      customerPhone: customer?.phone ?? null,
       cashierId: user?.id,
     });
   }

@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 import { featuredProducts, productDetail } from '@/mocks/products';
 import type { Product, ProductDetail } from '@/types/product';
 
@@ -18,13 +19,37 @@ export async function getProductById(id: string): Promise<ProductDetail | null> 
 
 export async function updateStock(id: string, quantity: number): Promise<void> {
   if (!isSupabaseConfigured) return;
-  const { error } = await supabase.from('inventory').update({ stock: quantity }).eq('id', id);
-  if (error) throw new Error(error.message);
+  await runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'update_stock',
+      entityType: 'inventory',
+      entityId: id,
+      summary: `Update storefront stock for ${id} to ${quantity}`,
+      metadata: { module: 'products', quantity },
+    },
+    async () => {
+      const { error } = await supabase.from('inventory').update({ stock: quantity }).eq('id', id);
+      if (error) throw new Error(error.message);
+    },
+  );
 }
 
 export async function createProduct(product: Omit<Product, 'id'>): Promise<Product> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
-  const { data, error } = await supabase.from('inventory').insert(product).select().single();
-  if (error) throw new Error(error.message);
-  return data;
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'create',
+      entityType: 'inventory',
+      summary: `Create product ${product.name}`,
+      metadata: { module: 'products', category: product.category },
+      getEntityId: (created) => created.id,
+    },
+    async () => {
+      const { data, error } = await supabase.from('inventory').insert(product).select().single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  );
 }

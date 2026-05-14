@@ -1,21 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { roleLabels, roleColors, rolePermissions } from '@/mocks/users';
-import type { UserRole } from '@/hooks/useAuth';
-import { canAccessModule } from '@/utils/access';
 import { isSupabaseConfigured, supabase } from '@/services/supabase';
+import { getAuditLogs, type AuditLogRecord } from '@/services/audit';
 
-const allModulePermissions = ['Dashboard', 'Analytics', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
-
-const activityLog: never[] = [];
+const allModulePermissions = ['Dashboard', 'Analytics', 'Audit Logs', 'POS', 'Inventory', 'Leads', 'Sales', 'Payments', 'Customers', 'Repairs', 'Warranty', 'WhatsApp', 'Instagram', 'TikTok', 'Marketing', 'Price Intel', 'Trade-In', 'Delivery', 'Wallet', 'Expenses', 'Suppliers', 'Reports', 'Loyalty', 'Calendar', 'Team', 'Settings', 'Authentication', 'AI Studio'];
 
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'activity'>('profile');
+  const [auditLogs, setAuditLogs] = useState<AuditLogRecord[]>([]);
+  const [auditLoading, setAuditLoading] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -34,14 +33,16 @@ export default function ProfilePage() {
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
+  useEffect(() => {
+    if (activeTab === 'activity') {
+      setAuditLoading(true);
+      getAuditLogs(100).then(logs => { setAuditLogs(logs); setAuditLoading(false); }).catch(() => setAuditLoading(false));
+    }
+  }, [activeTab]);
+
   const roleColor = user?.role ? roleColors[user.role] : '#0D1F4A';
   const roleLabel = user?.role ? roleLabels[user.role] : 'User';
   const userPermissions = user?.role ? rolePermissions[user.role] : [];
-  const quickActions = [
-    { label: 'Go to Dashboard', icon: 'ri-dashboard-3-line', path: '/', module: 'Dashboard' as const },
-    { label: 'User Management', icon: 'ri-user-settings-line', path: '/users', module: 'Users' as const },
-    { label: 'System Settings', icon: 'ri-settings-4-line', path: '/settings', module: 'Settings' as const },
-  ].filter((item) => canAccessModule(user?.role, item.module));
 
   const handleSaveProfile = async () => {
     if (isSupabaseConfigured && user?.id) {
@@ -154,34 +155,18 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="bg-white rounded-2xl border border-slate-100 p-4">
-            <p className="text-xs font-bold text-slate-700 mb-3">Quick Actions</p>
-            <div className="space-y-1">
-              {quickActions.map(item => (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors cursor-pointer text-left"
-                >
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#0D1F4A15' }}>
-                    <i className={`${item.icon} text-xs`} style={{ color: '#0D1F4A' }} />
-                  </div>
-                  <span className="text-xs font-medium text-slate-700">{item.label}</span>
-                  <i className="ri-arrow-right-s-line text-slate-300 ml-auto" />
-                </button>
-              ))}
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-red-50 transition-colors cursor-pointer text-left"
-              >
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-50">
-                  <i className="ri-logout-box-line text-xs text-red-400" />
-                </div>
-                <span className="text-xs font-medium text-red-500">Sign Out</span>
-              </button>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 p-4 rounded-2xl border border-red-100 bg-white hover:bg-red-50 transition-colors cursor-pointer text-left"
+          >
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-red-50">
+              <i className="ri-logout-box-line text-sm text-red-400" />
             </div>
-          </div>
+            <div>
+              <p className="text-sm font-semibold text-red-500">Sign Out</p>
+              <p className="text-xs text-slate-400">End this session on this device</p>
+            </div>
+          </button>
         </div>
 
         {/* Right — Tabs */}
@@ -434,27 +419,49 @@ export default function ProfilePage() {
           {activeTab === 'activity' && (
             <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
               <div className="p-5 border-b border-slate-100 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-800">Recent Activity</h3>
-                <span className="text-xs text-slate-400">Last 7 days</span>
+                <h3 className="text-sm font-bold text-slate-800">System Activity Log</h3>
+                <span className="text-xs text-slate-400">All roles · Last 100 events</span>
               </div>
               <div className="divide-y divide-slate-100">
-                {activityLog.length === 0 ? (
+                {auditLoading ? (
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <i className="ri-loader-4-line text-2xl text-slate-300 mb-2 animate-spin" />
+                    <p className="text-xs text-slate-400">Loading activity…</p>
+                  </div>
+                ) : auditLogs.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-10 text-center">
                     <i className="ri-history-line text-2xl text-slate-200 mb-2" />
-                    <p className="text-xs text-slate-400">No activity yet</p>
+                    <p className="text-xs text-slate-400">No activity recorded yet</p>
                   </div>
-                ) : activityLog.map((item: { id: number; action: string; detail: string; time: string; icon: string; color: string }) => (
-                  <div key={item.id} className="flex items-start gap-4 p-4 hover:bg-slate-50/50 transition-colors">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${item.color}15` }}>
-                      <i className={`${item.icon} text-sm`} style={{ color: item.color }} />
+                ) : auditLogs.map(log => {
+                  const isSuccess = log.status === 'success';
+                  const isFailure = log.status === 'failure';
+                  const iconColor = isFailure ? '#E05A2B' : isSuccess ? '#0D1F4A' : '#F5A623';
+                  const icon = log.action === 'create' ? 'ri-add-circle-line' : log.action === 'update' ? 'ri-edit-line' : log.action === 'delete' ? 'ri-delete-bin-line' : log.action === 'verify' ? 'ri-checkbox-circle-line' : 'ri-history-line';
+                  const ts = new Date(log.createdAt);
+                  const timeLabel = ts.toLocaleString('en-GH', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                  return (
+                    <div key={log.id} className="flex items-start gap-4 p-4 hover:bg-slate-50/50 transition-colors">
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${iconColor}15` }}>
+                        <i className={`${icon} text-sm`} style={{ color: iconColor }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="text-sm font-semibold text-slate-800">{log.summary ?? `${log.action} · ${log.entityType ?? '—'}`}</p>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${isFailure ? 'bg-red-50 text-red-500' : isSuccess ? 'bg-green-50 text-green-600' : 'bg-amber-50 text-amber-600'}`}>
+                            {log.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {log.actorName ?? log.actorEmail ?? 'System'}
+                          {log.entityType && ` · ${log.entityType}`}
+                          {log.requestPath && ` · ${log.requestPath}`}
+                        </p>
+                      </div>
+                      <p className="text-[10px] text-slate-400 flex-shrink-0 whitespace-nowrap">{timeLabel}</p>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-800">{item.action}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{item.detail}</p>
-                    </div>
-                    <p className="text-[10px] text-slate-400 flex-shrink-0 whitespace-nowrap">{item.time}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase';
+import { runAuditedMutation } from './audit';
 
 export interface StoreSettings {
   business_name: string;
@@ -19,8 +20,20 @@ export async function getStoreSettings(): Promise<StoreSettings | null> {
 
 export async function saveStoreSettings(settings: StoreSettings): Promise<void> {
   if (!isSupabaseConfigured) return;
-  const { error } = await supabase
-    .from('settings')
-    .upsert({ id: SETTINGS_ID, ...settings }, { onConflict: 'id' });
-  if (error) throw new Error(error.message);
+  await runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'upsert',
+      entityType: 'settings',
+      entityId: SETTINGS_ID,
+      summary: 'Update store settings',
+      metadata: { module: 'settings', businessName: settings.business_name },
+    },
+    async () => {
+      const { error } = await supabase
+        .from('settings')
+        .upsert({ id: SETTINGS_ID, ...settings }, { onConflict: 'id' });
+      if (error) throw new Error(error.message);
+    },
+  );
 }

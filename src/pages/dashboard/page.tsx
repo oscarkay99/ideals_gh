@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/feature/AdminLayout';
 import StatCard from './components/StatCard';
 import RevenueChart from './components/RevenueChart';
@@ -10,17 +9,8 @@ import TopProducts from './components/TopProducts';
 import KPIStrip from './components/KPIStrip';
 import { dashboardStats } from '@/mocks/dashboard';
 
-const quickActions = [
-  { label: 'Create Quote', icon: 'ri-file-add-line', style: { background: '#0D1F4A' }, path: '/sales' },
-  { label: 'Add Inventory', icon: 'ri-add-box-line', style: { background: '#07101F' }, path: '/inventory' },
-  { label: 'Log Payment', icon: 'ri-bank-card-line', style: { background: '#F5A623' }, path: '/payments' },
-  { label: 'New Lead', icon: 'ri-user-add-line', style: { background: '#1552A8' }, path: '/leads' },
-  { label: 'AI Studio', icon: 'ri-sparkling-2-line', style: { background: '#0E3D8A' }, path: '/ai-studio' },
-  { label: 'Analytics', icon: 'ri-bar-chart-2-line', style: { background: 'rgba(7,16,31,0.08)', color: '#0D1F4A' }, path: '/analytics' },
-];
 
 export default function DashboardPage() {
-  const navigate = useNavigate();
   const dateSubtitle = useMemo(() => {
     return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date()) + ' · Accra, Ghana';
   }, []);
@@ -77,29 +67,6 @@ export default function DashboardPage() {
       {/* KPI Strip */}
       <div className="mb-5">
         <KPIStrip />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-white rounded-2xl p-5 border border-slate-100 mb-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-slate-800">Quick Actions</h3>
-          <span className="text-xs text-slate-400">Jump to any section</span>
-        </div>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-          {quickActions.map((action) => (
-            <button
-              key={action.label}
-              onClick={() => navigate(action.path)}
-              className="flex flex-col items-center gap-2 px-3 py-4 rounded-2xl text-xs font-semibold transition-all cursor-pointer whitespace-nowrap text-white hover:opacity-90"
-              style={action.style}
-            >
-              <div className="w-6 h-6 flex items-center justify-center">
-                <i className={`${action.icon} text-lg`} />
-              </div>
-              {action.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Bottom Grid */}
