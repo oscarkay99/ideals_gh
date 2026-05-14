@@ -60,7 +60,7 @@ export default function CustomerSegments() {
             <i className="ri-lightbulb-line text-xs" />
           </div>
           <p className="text-[11px] text-amber-700 leading-relaxed">
-            <strong>Opportunity:</strong> 36 at-risk customers haven't purchased in 60+ days. A targeted WhatsApp campaign could recover GHS 12,000+ in revenue.
+            <strong>Tip:</strong> Add customers and track purchases to unlock AI-powered retention insights here.
           </p>
         </div>
       </div>

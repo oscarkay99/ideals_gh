@@ -20,7 +20,13 @@ export default function TopProductsTable() {
             </tr>
           </thead>
           <tbody>
-            {topSellingProducts.map((p, i) => (
+            {topSellingProducts.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-4 py-10 text-center text-xs text-slate-400">
+                  No sales data yet — products will appear here once you record sales.
+                </td>
+              </tr>
+            ) : topSellingProducts.map((p, i) => (
               <tr key={p.name} className={`border-b border-slate-50 hover:bg-slate-50/60 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/20'}`}>
                 <td className="px-4 py-3 text-xs font-bold text-slate-300">#{i + 1}</td>
                 <td className="px-4 py-3 text-xs font-semibold text-slate-800 whitespace-nowrap">{p.name}</td>

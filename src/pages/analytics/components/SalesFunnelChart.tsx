@@ -1,7 +1,7 @@
 import { salesFunnel } from '@/mocks/analytics';
 
 export default function SalesFunnelChart() {
-  const max = salesFunnel[0].value;
+  const max = Math.max(salesFunnel[0].value, 1);
 
   return (
     <div className="bg-white rounded-2xl p-6 border border-slate-100">
@@ -11,7 +11,7 @@ export default function SalesFunnelChart() {
           <p className="text-xs text-slate-400 mt-0.5">Lead-to-close pipeline — this month</p>
         </div>
         <div className="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full">
-          27.9% close rate
+          0% close rate
         </div>
       </div>
 
@@ -47,12 +47,12 @@ export default function SalesFunnelChart() {
       <div className="mt-5 pt-4 border-t border-slate-50 grid grid-cols-2 gap-3">
         <div className="bg-slate-50 rounded-xl p-3">
           <p className="text-[10px] text-slate-400 uppercase tracking-wider">Biggest Drop-off</p>
-          <p className="text-sm font-bold text-slate-800 mt-0.5">Quoted → Negotiating</p>
-          <p className="text-[11px] text-red-400 font-medium">-35% conversion</p>
+          <p className="text-sm font-bold text-slate-800 mt-0.5">—</p>
+          <p className="text-[11px] text-slate-400 font-medium">No data yet</p>
         </div>
         <div className="bg-emerald-50 rounded-xl p-3">
           <p className="text-[10px] text-slate-400 uppercase tracking-wider">AI Suggestion</p>
-          <p className="text-xs text-emerald-700 mt-0.5 leading-relaxed">Follow up within 2h of sending quotes to improve close rate by ~12%</p>
+          <p className="text-xs text-emerald-700 mt-0.5 leading-relaxed">Add leads and track them to unlock AI funnel insights</p>
         </div>
       </div>
     </div>
