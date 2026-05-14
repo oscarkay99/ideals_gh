@@ -27,3 +27,13 @@ export interface PosCustomer {
 export const posProducts: PosProduct[] = [];
 
 export const posCustomers: PosCustomer[] = [];
+
+export const posRecentSales: never[] = [];
+
+export const upsellRules: never[] = [];
+
+export const installmentPlans: never[] = [];
+
+export const tradeInConditions: never[] = [];
+
+export const tradeInDevices: never[] = [];
