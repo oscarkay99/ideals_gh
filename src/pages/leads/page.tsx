@@ -22,6 +22,7 @@ const sourceIcons: Record<string, string> = {
 
 export default function LeadsPage() {
   const { leads, add, move } = useLeads();
+  const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -58,7 +59,13 @@ export default function LeadsPage() {
           <div className="w-4 h-4 flex items-center justify-center text-slate-400">
             <i className="ri-search-line text-sm" />
           </div>
-          <input type="text" placeholder="Search leads..." className="bg-transparent text-sm text-slate-600 outline-none w-full" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search leads..."
+            className="bg-transparent text-sm text-slate-600 outline-none w-full"
+          />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {['all', 'WhatsApp', 'Instagram', 'Walk-in', 'Referral'].map((f) => (
@@ -86,7 +93,13 @@ export default function LeadsPage() {
       {/* Kanban */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {columns.map((col) => {
-          const colLeads = leads.filter((l) => l.status === col && (filter === 'all' || l.source === filter));
+          const q = search.trim().toLowerCase();
+          const colLeads = leads.filter((l) => {
+            const matchStatus = l.status === col;
+            const matchSource = filter === 'all' || l.source === filter;
+            const matchSearch = !q || l.name.toLowerCase().includes(q) || l.phone.includes(q) || l.product.toLowerCase().includes(q);
+            return matchStatus && matchSource && matchSearch;
+          });
           const cfg = statusConfig[col];
           return (
             <div key={col} className="flex flex-col">
@@ -103,6 +116,11 @@ export default function LeadsPage() {
                 </button>
               </div>
               <div className={`flex-1 border-x border-b ${cfg.border} rounded-b-2xl p-3 space-y-3 min-h-[300px]`}>
+                {colLeads.length === 0 && (
+                  <div className="h-full flex items-center justify-center py-8">
+                    <p className="text-[11px] text-slate-300">No leads</p>
+                  </div>
+                )}
                 {colLeads.map((l) => (
                   <div
                     key={l.id}

@@ -122,6 +122,14 @@ export default function InventoryPage() {
               </tr>
             </thead>
             <tbody>
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-16 text-center text-sm text-slate-400">
+                    <i className="ri-archive-line text-3xl block mb-2 text-slate-200" />
+                    No products yet. Add your first product to get started.
+                  </td>
+                </tr>
+              )}
               {filtered.map((p, i) => {
                 const cond = conditionConfig[p.condition] || conditionConfig['New'];
                 return (

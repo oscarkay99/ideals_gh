@@ -14,11 +14,17 @@ const segmentConfig: Record<string, { label: string; color: string }> = {
 
 export default function CustomersPage() {
   const { customers, add } = useCustomers();
+  const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
-  const filtered = customers.filter((c) => filter === 'all' || c.segment === filter);
+  const q = search.trim().toLowerCase();
+  const filtered = customers.filter((c) => {
+    const matchSegment = filter === 'all' || c.segment === filter;
+    const matchSearch = !q || c.name.toLowerCase().includes(q) || c.phone.includes(q);
+    return matchSegment && matchSearch;
+  });
   const customer = selected ? customers.find((c) => c.id === selected) : null;
 
   return (
@@ -48,7 +54,13 @@ export default function CustomersPage() {
           <div className="w-4 h-4 flex items-center justify-center text-slate-400">
             <i className="ri-search-line text-sm" />
           </div>
-          <input type="text" placeholder="Search customers..." className="bg-transparent text-sm text-slate-600 outline-none w-full" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search customers..."
+            className="bg-transparent text-sm text-slate-600 outline-none w-full"
+          />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {['all', 'VIP', 'Repeat', 'New', 'At-Risk'].map((f) => (
@@ -75,6 +87,12 @@ export default function CustomersPage() {
 
       {/* Customer Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filtered.length === 0 && (
+          <div className="col-span-4 bg-white rounded-2xl border border-slate-100 py-16 text-center">
+            <i className="ri-group-line text-3xl text-slate-200 block mb-2" />
+            <p className="text-sm text-slate-400">No customers yet. They'll appear here after first purchases.</p>
+          </div>
+        )}
         {filtered.map((c) => {
           const seg = segmentConfig[c.segment];
           return (

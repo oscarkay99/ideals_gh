@@ -125,6 +125,14 @@ export default function SalesPage() {
                   </tr>
                 </thead>
                 <tbody>
+                  {sales.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-16 text-center text-sm text-slate-400">
+                        <i className="ri-shopping-bag-3-line text-3xl block mb-2 text-slate-200" />
+                        No sales yet. Use the POS to record your first sale.
+                      </td>
+                    </tr>
+                  )}
                   {sales.map((s, i) => (
                     <tr key={s.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/20'}`}>
                       <td className="px-4 py-3 text-xs font-mono text-slate-500">{s.id}</td>

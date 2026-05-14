@@ -15,11 +15,17 @@ const statusConfig: Record<string, { label: string; color: string; dot: string; 
 
 export default function RepairsPage() {
   const { repairs, add, updateStatus, addNote } = useRepairs();
+  const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
-  const filtered = repairs.filter((r) => filter === 'all' || r.status === filter);
+  const q = search.trim().toLowerCase();
+  const filtered = repairs.filter((r) => {
+    const matchStatus = filter === 'all' || r.status === filter;
+    const matchSearch = !q || r.device.toLowerCase().includes(q) || r.customer.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || r.issue.toLowerCase().includes(q);
+    return matchStatus && matchSearch;
+  });
   const repair = selected ? repairs.find((r) => r.id === selected) : null;
 
   return (
@@ -49,7 +55,13 @@ export default function RepairsPage() {
           <div className="w-4 h-4 flex items-center justify-center text-slate-400">
             <i className="ri-search-line text-sm" />
           </div>
-          <input type="text" placeholder="Search repairs..." className="bg-transparent text-sm text-slate-600 outline-none w-full" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search repairs..."
+            className="bg-transparent text-sm text-slate-600 outline-none w-full"
+          />
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {['all', 'received', 'diagnosed', 'parts_pending', 'in_progress', 'ready'].map((f) => (
@@ -76,6 +88,12 @@ export default function RepairsPage() {
 
       {/* Repair Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filtered.length === 0 && (
+          <div className="col-span-3 bg-white rounded-2xl border border-slate-100 py-16 text-center">
+            <i className="ri-tools-line text-3xl text-slate-200 block mb-2" />
+            <p className="text-sm text-slate-400">No repairs yet. Create your first repair job.</p>
+          </div>
+        )}
         {filtered.map((r) => {
           const st = statusConfig[r.status];
           return (
