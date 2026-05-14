@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { suppliers, purchaseOrders, supplierStats } from '@/mocks/suppliers';
+import { suppliers, supplierStats } from '@/mocks/suppliers';
 import PurchaseOrderDetail from './components/PurchaseOrderDetail';
 import NewPOModal from './components/NewPOModal';
+import { usePurchaseOrders } from '@/hooks/usePurchaseOrders';
 
 const tabs = ['Purchase Orders', 'Suppliers'];
 
@@ -14,6 +15,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
 };
 
 export default function SuppliersPage() {
+  const { orders: purchaseOrders, add: addPO } = usePurchaseOrders();
   const [activeTab, setActiveTab] = useState('Purchase Orders');
   const [selectedPO, setSelectedPO] = useState<string | null>(null);
   const [showNewPO, setShowNewPO] = useState(false);
@@ -160,7 +162,7 @@ export default function SuppliersPage() {
         </div>
       )}
 
-      {showNewPO && <NewPOModal suppliers={suppliers} onClose={() => setShowNewPO(false)} />}
+      {showNewPO && <NewPOModal suppliers={suppliers} onSave={addPO} onClose={() => setShowNewPO(false)} />}
     </AdminLayout>
   );
 }

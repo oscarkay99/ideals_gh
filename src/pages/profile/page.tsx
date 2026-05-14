@@ -50,7 +50,10 @@ export default function ProfilePage() {
     { label: 'System Settings', icon: 'ri-settings-4-line', path: '/settings', module: 'Settings' as const },
   ].filter((item) => canAccessModule(user?.role, item.module));
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
+    if (isSupabaseConfigured && user?.id) {
+      await supabase.from('profiles').update({ name, phone }).eq('id', user.id);
+    }
     setSaved(true);
     setEditMode(false);
     setTimeout(() => setSaved(false), 3000);

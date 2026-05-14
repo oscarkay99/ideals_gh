@@ -7,6 +7,7 @@ const tabs = ['Members', 'Tiers', 'Rewards', 'Analytics'];
 
 export default function LoyaltyPage() {
   const [activeTab, setActiveTab] = useState('Members');
+  const [memberSearch, setMemberSearch] = useState('');
   const [showRedeem, setShowRedeem] = useState(false);
   const [selectedReward, setSelectedReward] = useState('');
 
@@ -69,11 +70,17 @@ export default function LoyaltyPage() {
           <div className="p-4 border-b border-slate-100 flex items-center justify-between">
             <h3 className="text-sm font-bold text-slate-800">All Members</h3>
             <div className="flex items-center gap-2">
-              <input type="text" placeholder="Search members..." className="px-3 py-2 rounded-lg bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200" />
+              <input
+                type="text"
+                value={memberSearch}
+                onChange={(e) => setMemberSearch(e.target.value)}
+                placeholder="Search members..."
+                className="px-3 py-2 rounded-lg bg-slate-50 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              />
             </div>
           </div>
           <div className="divide-y divide-slate-100">
-            {loyaltyCustomers.map((customer) => (
+            {loyaltyCustomers.filter((c) => !memberSearch.trim() || c.name.toLowerCase().includes(memberSearch.toLowerCase())).map((customer) => (
               <div key={customer.id} className="p-4 flex items-center gap-4 hover:bg-slate-50/50 transition-colors">
                 <img loading="lazy" decoding="async" src={customer.avatar} alt={customer.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
                 <div className="flex-1 min-w-0">

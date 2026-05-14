@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { expenseCategories, monthlyExpenses, recentTransactions, expenseStats } from '@/mocks/expenses';
+import { expenseCategories, monthlyExpenses, expenseStats } from '@/mocks/expenses';
 import AddExpenseModal from './components/AddExpenseModal';
+import { useExpenses } from '@/hooks/useExpenses';
 
 const tabs = ['Overview', 'Transactions', 'Budgets'];
 
 export default function ExpensesPage() {
+  const { expenses, add: addExpense } = useExpenses();
   const [activeTab, setActiveTab] = useState('Overview');
   const [showAddExpense, setShowAddExpense] = useState(false);
 
@@ -156,7 +158,7 @@ export default function ExpensesPage() {
             <h3 className="text-sm font-bold text-slate-800">Recent Transactions</h3>
           </div>
           <div className="divide-y divide-slate-100">
-            {recentTransactions.map((tx) => (
+            {expenses.map((tx) => (
               <div key={tx.id} className="p-4 flex items-center gap-4 hover:bg-slate-50/50 transition-colors">
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: tx.type === 'expense' ? '#E05A2B15' : '#25D36615' }}>
                   <i className={`${tx.type === 'expense' ? 'ri-arrow-down-line' : 'ri-arrow-up-line'} text-lg`} style={{ color: tx.type === 'expense' ? '#E05A2B' : '#25D366' }} />
@@ -213,7 +215,13 @@ export default function ExpensesPage() {
         </div>
       )}
 
-      {showAddExpense && <AddExpenseModal categories={expenseCategories} onClose={() => setShowAddExpense(false)} />}
+      {showAddExpense && (
+        <AddExpenseModal
+          categories={expenseCategories}
+          onSave={addExpense}
+          onClose={() => setShowAddExpense(false)}
+        />
+      )}
     </AdminLayout>
   );
 }

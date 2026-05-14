@@ -5,7 +5,7 @@ import WalletCustomerDetail from './components/WalletCustomerDetail';
 import TopUpModal from './components/TopUpModal';
 
 export default function WalletPage() {
-  const [selectedCustomer, setSelectedCustomer] = useState(walletCustomers[0]);
+  const [selectedCustomer, setSelectedCustomer] = useState(walletCustomers[0] ?? null);
   const [topupModal, setTopupModal] = useState(false);
   const [topupAmount, setTopupAmount] = useState('');
 
@@ -72,7 +72,7 @@ export default function WalletPage() {
               <button
                 key={customer.id}
                 onClick={() => setSelectedCustomer(customer)}
-                className={`w-full bg-white rounded-2xl border p-4 text-left hover:border-emerald-300 transition-all cursor-pointer ${selectedCustomer.id === customer.id ? 'border-emerald-400' : 'border-slate-100'}`}
+                className={`w-full bg-white rounded-2xl border p-4 text-left hover:border-emerald-300 transition-all cursor-pointer ${selectedCustomer?.id === customer.id ? 'border-emerald-400' : 'border-slate-100'}`}
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-full ${customer.avatarColor} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
@@ -95,10 +95,19 @@ export default function WalletPage() {
         </div>
 
         {/* Customer Detail */}
-        <WalletCustomerDetail customer={selectedCustomer} onTopUp={() => setTopupModal(true)} />
+        {selectedCustomer ? (
+          <WalletCustomerDetail customer={selectedCustomer} onTopUp={() => setTopupModal(true)} />
+        ) : (
+          <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-100 flex items-center justify-center py-24">
+            <div className="text-center">
+              <i className="ri-wallet-3-line text-3xl text-slate-200 block mb-2" />
+              <p className="text-sm text-slate-400">No wallet holders yet.</p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {topupModal && (
+      {topupModal && selectedCustomer && (
         <TopUpModal
           customer={selectedCustomer}
           topupAmount={topupAmount}

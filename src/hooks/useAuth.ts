@@ -171,17 +171,22 @@ async function syncSupabaseSession() {
     return;
   }
 
-  const { data, error } = await supabase.auth.getSession();
+  try {
+    const { data, error } = await supabase.auth.getSession();
 
-  if (error || !data.session?.user) {
-    writeStoredUser(null);
-    setAuthState({ user: null, initializing: false });
-    return;
+    if (error || !data.session?.user) {
+      writeStoredUser(null);
+      setAuthState({ user: null, initializing: false });
+      return;
+    }
+
+    const resolvedUser = await resolveSupabaseUser(data.session.user);
+    writeStoredUser(resolvedUser);
+    setAuthState({ user: resolvedUser, initializing: false });
+  } catch {
+    // Network failure or invalid key — don't leave the app stuck on initializing
+    setAuthState({ initializing: false });
   }
-
-  const resolvedUser = await resolveSupabaseUser(data.session.user);
-  writeStoredUser(resolvedUser);
-  setAuthState({ user: resolvedUser, initializing: false });
 }
 
 function ensureSupabaseAuth() {

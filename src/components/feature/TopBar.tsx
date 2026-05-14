@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useDarkMode } from '@/hooks/useDarkMode';
 import { roleLabels } from '@/mocks/users';
 import { inventoryProducts } from '@/mocks/inventory';
 
@@ -33,6 +34,7 @@ export default function TopBar({
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { isDark, toggle: toggleDark } = useDarkMode();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -226,6 +228,18 @@ export default function TopBar({
             </div>
           )}
         </div>
+
+        {/* Dark mode toggle */}
+        <button
+          onClick={toggleDark}
+          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="w-8 h-8 flex items-center justify-center rounded-xl transition-colors cursor-pointer"
+          style={{ color: 'var(--text-ink-40)' }}
+          onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(7,16,31,0.06)'; }}
+          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = ''; }}
+        >
+          <i className={isDark ? 'ri-sun-line text-base' : 'ri-moon-line text-base'} />
+        </button>
 
         {/* Divider */}
         <div className="w-px h-6 mx-1" style={{ background: 'rgba(7,16,31,0.1)' }} />

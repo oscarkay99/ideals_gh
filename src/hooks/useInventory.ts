@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getProducts, updateStock } from '@/services/products';
+import { getProducts, updateStock, createProduct } from '@/services/products';
 import { inventoryProducts as mockData } from '@/mocks/inventory';
 
 export interface InventoryProduct {
@@ -28,10 +28,16 @@ export function useInventory() {
       .finally(() => setLoading(false));
   }, []);
 
-  const add = (p: Omit<InventoryProduct, 'id'>) => {
-    const local = { ...p, id: `P${Date.now()}` } as InventoryProduct;
-    setProducts(prev => [local, ...prev]);
-    return local;
+  const add = async (p: Omit<InventoryProduct, 'id'>) => {
+    try {
+      const created = await createProduct(p as never);
+      setProducts(prev => [created as unknown as InventoryProduct, ...prev]);
+      return created as unknown as InventoryProduct;
+    } catch {
+      const local = { ...p, id: `P${Date.now()}` } as InventoryProduct;
+      setProducts(prev => [local, ...prev]);
+      return local;
+    }
   };
 
   const adjustStock = async (id: string, qty: number) => {

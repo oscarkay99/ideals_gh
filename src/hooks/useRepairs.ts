@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getRepairs, createRepair, updateRepairStatus } from '@/services/repairs';
+import { getRepairs, createRepair, updateRepairStatus, updateRepairNotes } from '@/services/repairs';
 import { repairs as mockData } from '@/mocks/repairs';
 import type { Repair, RepairStatus } from '@/types/repair';
 
@@ -32,7 +32,12 @@ export function useRepairs() {
   };
 
   const addNote = (id: string, note: string) => {
-    setRepairs(prev => prev.map(r => r.id === id ? { ...r, notes: [...(r.notes ?? []), note] } : r));
+    setRepairs(prev => {
+      const updated = prev.map(r => r.id === id ? { ...r, notes: [...(r.notes ?? []), note] } : r);
+      const repair = updated.find(r => r.id === id);
+      if (repair) { updateRepairNotes(id, repair.notes ?? []).catch(() => {}); }
+      return updated;
+    });
   };
 
   return { repairs, loading, add, updateStatus, addNote };

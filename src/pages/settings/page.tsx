@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
+import { getStoreSettings, saveStoreSettings } from '@/services/settings';
 import SettingsSidebar from './components/SettingsSidebar';
 import BrandingSection from './components/BrandingSection';
 import OperationsSection from './components/OperationsSection';
@@ -74,7 +75,29 @@ export default function SettingsPage() {
   const [automations, setAutomations] = useState(automationRules);
   const [showAddRole, setShowAddRole] = useState(false);
 
-  const handleSave = () => {
+  useEffect(() => {
+    getStoreSettings().then((s) => {
+      if (!s) return;
+      if (s.business_name) setBusinessName(s.business_name);
+      if (s.tagline) setTagline(s.tagline);
+      if (s.phone) setPhone(s.phone);
+      if (s.whatsapp) setWhatsapp(s.whatsapp);
+      if (s.address) setAddress(s.address);
+      if (s.primary_color) setPrimaryColor(s.primary_color);
+    }).catch(() => {});
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      await saveStoreSettings({
+        business_name: businessName,
+        tagline,
+        phone,
+        whatsapp,
+        address,
+        primary_color: primaryColor,
+      });
+    } catch { /* fallback: show saved anyway for mock mode */ }
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };

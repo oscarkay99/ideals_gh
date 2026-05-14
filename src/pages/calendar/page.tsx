@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { calendarEvents, calendarStats } from '@/mocks/calendar';
+import { calendarStats } from '@/mocks/calendar';
 import AddEventModal from './components/AddEventModal';
+import { useCalendarEvents } from '@/hooks/useCalendarEvents';
 
 const typeLabels: Record<string, string> = {
   repair: 'Repair',
@@ -26,12 +27,14 @@ const currentWeekDates = ['21', '22', '23', '24', '25', '26', '27'];
 const currentDayIndex = 2; // Wednesday (23rd)
 
 export default function CalendarPage() {
+  const { events, add: addEvent } = useCalendarEvents();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [filterType, setFilterType] = useState('all');
 
-  const filteredEvents = filterType === 'all' ? calendarEvents : calendarEvents.filter(e => e.type === filterType);
-  const todayEvents = calendarEvents.filter(e => e.date === '2026-04-23');
+  const today = new Date().toISOString().split('T')[0];
+  const filteredEvents = filterType === 'all' ? events : events.filter(e => e.type === filterType);
+  const todayEvents = events.filter(e => e.date === today);
 
   return (
     <AdminLayout title="Booking Calendar" subtitle="Repair appointments · Consultations · Staff schedule">
@@ -161,7 +164,7 @@ export default function CalendarPage() {
           {selectedEvent && (
             <div className="bg-white rounded-2xl p-4 border border-slate-100">
               {(() => {
-                const event = calendarEvents.find(e => e.id === selectedEvent);
+                const event = events.find(e => e.id === selectedEvent);
                 if (!event) return null;
                 return (
                   <>
@@ -241,7 +244,7 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {showAddEvent && <AddEventModal onClose={() => setShowAddEvent(false)} />}
+      {showAddEvent && <AddEventModal onSave={addEvent} onClose={() => setShowAddEvent(false)} />}
     </AdminLayout>
   );
 }

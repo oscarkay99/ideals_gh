@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '@/components/feature/AdminLayout';
 import StatCard from './components/StatCard';
@@ -20,9 +21,12 @@ const quickActions = [
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const dateSubtitle = useMemo(() => {
+    return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date()) + ' · Accra, Ghana';
+  }, []);
 
   return (
-    <AdminLayout title="Dashboard" subtitle="Thursday, April 23, 2026 · Accra, Ghana">
+    <AdminLayout title="Dashboard" subtitle={dateSubtitle}>
       {/* Hero welcome strip */}
       <div className="rounded-2xl p-5 mb-5 flex items-center justify-between overflow-hidden relative" style={{ background: 'linear-gradient(135deg, #07101F 0%, #0D1F4A 50%, #1552A8 100%)' }}>
         <div className="absolute right-0 top-0 bottom-0 w-64 bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
