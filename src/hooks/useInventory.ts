@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchInventory, addInventoryItem, setInventoryStock } from '@/services/inventory';
+import { fetchInventory, addInventoryItem, setInventoryStock, updateInventoryItem } from '@/services/inventory';
 
 export interface InventoryProduct {
   id: string;
@@ -49,5 +49,18 @@ export function useInventory() {
     try { await setInventoryStock(id, qty); } catch { /* optimistic */ }
   };
 
-  return { products, loading, add, adjustStock };
+  const update = async (id: string, p: Omit<InventoryProduct, 'id'>) => {
+    const updated = { ...p, id } as InventoryProduct;
+    setProducts(prev => prev.map(x => x.id === id ? updated : x));
+    try {
+      await updateInventoryItem(id, {
+        name: p.name, category: p.category, color: p.color,
+        condition: p.condition, price: p.price, stock: p.stock,
+        location: p.location, supplier: p.supplier, imei: p.imei,
+      });
+    } catch { /* optimistic */ }
+    return updated;
+  };
+
+  return { products, loading, add, update, adjustStock };
 }

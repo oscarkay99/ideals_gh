@@ -34,3 +34,10 @@ export async function setInventoryStock(id: string, stock: number): Promise<void
   const { error } = await supabase.from('inventory').update({ stock }).eq('id', id);
   if (error) throw new Error(error.message);
 }
+
+export async function updateInventoryItem(id: string, item: Omit<InventoryRecord, 'id'>): Promise<InventoryRecord> {
+  if (!isSupabaseConfigured) throw new Error('Supabase not configured');
+  const { data, error } = await supabase.from('inventory').update(item).eq('id', id).select().single();
+  if (error) throw new Error(error.message);
+  return data;
+}

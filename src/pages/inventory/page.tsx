@@ -13,12 +13,13 @@ const conditionConfig: Record<string, { label: string; color: string; dot: strin
 };
 
 export default function InventoryPage() {
-  const { products, add } = useInventory();
+  const { products, add, update } = useInventory();
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<typeof products[0] | null>(null);
 
   useEffect(() => {
     const incomingSearch = searchParams.get('search') || '';
@@ -177,7 +178,7 @@ export default function InventoryPage() {
                         <button onClick={() => setSelected(p.id)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
                           <i className="ri-eye-line text-sm" />
                         </button>
-                        <button className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
+                        <button onClick={() => setEditingProduct(p)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-all">
                           <i className="ri-edit-line text-sm" />
                         </button>
                       </div>
@@ -192,6 +193,13 @@ export default function InventoryPage() {
 
       {product && <ProductDetail product={product} onClose={() => setSelected(null)} />}
       {showAdd && <AddProductModal onSave={add} onClose={() => setShowAdd(false)} />}
+      {editingProduct && (
+        <AddProductModal
+          editProduct={editingProduct}
+          onSave={(data) => update(editingProduct.id, data)}
+          onClose={() => setEditingProduct(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

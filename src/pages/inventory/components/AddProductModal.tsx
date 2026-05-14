@@ -2,17 +2,27 @@ import { useState } from 'react';
 import type { InventoryProduct } from '@/hooks/useInventory';
 
 interface Props {
-  onSave: (p: Omit<InventoryProduct, 'id'>) => InventoryProduct;
+  onSave: (p: Omit<InventoryProduct, 'id'>) => unknown;
   onClose: () => void;
+  editProduct?: InventoryProduct | null;
 }
 
 const categories = ['Phones', 'Laptops', 'Tablets', 'Accessories', 'Wearables'];
 const conditions = ['New', 'Used - Excellent', 'Used - Good', 'Refurbished'];
 
-export default function AddProductModal({ onSave, onClose }: Props) {
+export default function AddProductModal({ onSave, onClose, editProduct }: Props) {
+  const isEditing = !!editProduct;
+
   const [form, setForm] = useState({
-    name: '', category: 'Phones', color: '', condition: 'New',
-    price: '', stock: 1, imei: '', location: '', supplier: '',
+    name: editProduct?.name ?? '',
+    category: editProduct?.category ?? 'Phones',
+    color: editProduct?.color ?? '',
+    condition: editProduct?.condition ?? 'New',
+    price: editProduct?.price ?? '',
+    stock: editProduct?.stock ?? 1,
+    imei: editProduct?.imei ?? '',
+    location: editProduct?.location ?? '',
+    supplier: editProduct?.supplier ?? '',
   });
 
   const set = (k: string, v: unknown) => setForm(p => ({ ...p, [k]: v }));
@@ -28,7 +38,7 @@ export default function AddProductModal({ onSave, onClose }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(7,16,31,0.5)', backdropFilter: 'blur(4px)' }}>
       <div className="w-full max-w-md rounded-2xl overflow-hidden" style={{ background: 'white', boxShadow: '0 24px 80px rgba(7,16,31,0.2)' }}>
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid rgba(7,16,31,0.07)' }}>
-          <h3 className="text-[14px] font-bold" style={{ color: '#07101F' }}>Add Product</h3>
+          <h3 className="text-[14px] font-bold" style={{ color: '#07101F' }}>{isEditing ? 'Edit Product' : 'Add Product'}</h3>
           <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg cursor-pointer" style={{ background: 'rgba(7,16,31,0.06)' }}>
             <i className="ri-close-line text-sm" style={{ color: 'rgba(7,16,31,0.5)' }} />
           </button>
@@ -113,7 +123,7 @@ export default function AddProductModal({ onSave, onClose }: Props) {
             <button type="submit"
               className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white cursor-pointer"
               style={{ background: '#0D1F4A' }}>
-              Add Product
+              {isEditing ? 'Save Changes' : 'Add Product'}
             </button>
           </div>
         </form>
