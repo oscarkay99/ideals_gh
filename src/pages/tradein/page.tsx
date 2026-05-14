@@ -33,11 +33,7 @@ export default function TradeInPage() {
 
   const tradeValue = calculateValue();
 
-  const upgradeOptions = [
-    { name: 'iPhone 15 Pro Max 256GB', price: 8200, img: 'https://readdy.ai/api/search-image?query=iPhone%2015%20Pro%20Max%20Natural%20Titanium%20product%20shot%20on%20clean%20white%20background%20professional%20studio%20photography%20minimalist&width=80&height=80&seq=ti1&orientation=squarish' },
-    { name: 'Samsung Galaxy S24 Ultra', price: 9400, img: 'https://readdy.ai/api/search-image?query=Samsung%20Galaxy%20S24%20Ultra%20Titanium%20Black%20product%20shot%20clean%20white%20background%20professional%20studio%20photography&width=80&height=80&seq=ti2&orientation=squarish' },
-    { name: 'Google Pixel 9 Pro', price: 7200, img: 'https://readdy.ai/api/search-image?query=Google%20Pixel%209%20Pro%20smartphone%20product%20shot%20clean%20white%20background%20professional%20studio%20photography&width=80&height=80&seq=ti3&orientation=squarish' },
-  ];
+  const upgradeOptions: never[] = [];
 
   return (
     <AdminLayout title="Trade-In Calculator" subtitle="Estimate device value and manage trade-in pipeline">
@@ -231,42 +227,29 @@ export default function TradeInPage() {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-xs text-slate-500">Trade-ins processed</span>
-                <span className="text-xs font-bold text-slate-800">34</span>
+                <span className="text-xs font-bold text-slate-800">0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-slate-500">Total value paid out</span>
-                <span className="text-xs font-bold text-slate-800">GHS 68,400</span>
+                <span className="text-xs font-bold text-slate-800">GHS 0</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-slate-500">Converted to upgrades</span>
-                <span className="text-xs font-bold" style={{ color: '#0D1F4A' }}>28 (82%)</span>
+                <span className="text-xs font-bold" style={{ color: '#0D1F4A' }}>0 (0%)</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-xs text-slate-500">Avg trade-in value</span>
-                <span className="text-xs font-bold text-slate-800">GHS 2,012</span>
+                <span className="text-xs font-bold text-slate-800">GHS 0</span>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 p-5">
             <h4 className="text-sm font-bold text-slate-800 mb-3">Top Trade-In Devices</h4>
-            {[
-              { device: 'iPhone 13 Pro', count: 8, value: 2600 },
-              { device: 'Samsung S22', count: 6, value: 1600 },
-              { device: 'iPhone 12', count: 5, value: 1200 },
-              { device: 'Pixel 7 Pro', count: 4, value: 1400 },
-            ].map((d, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400 w-4">{i + 1}</span>
-                  <span className="text-xs font-medium text-slate-700">{d.device}</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs text-slate-400">{d.count}x · </span>
-                  <span className="text-xs font-semibold text-slate-700">GHS {d.value.toLocaleString()}</span>
-                </div>
-              </div>
-            ))}
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <i className="ri-exchange-line text-2xl text-slate-200 mb-2" />
+              <p className="text-xs text-slate-400">No trade-ins yet</p>
+            </div>
           </div>
         </div>
       </div>
