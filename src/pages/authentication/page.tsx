@@ -9,7 +9,7 @@ type Tab = 'certificates' | 'imei' | 'generate';
 
 export default function AuthenticationPage() {
   const [tab, setTab] = useState<Tab>('certificates');
-  const [selectedCert, setSelectedCert] = useState(authCertificates[0]);
+  const [selectedCert, setSelectedCert] = useState(authCertificates[0] ?? null);
   const [certDetailOpen, setCertDetailOpen] = useState(false);
 
   return (
@@ -17,10 +17,10 @@ export default function AuthenticationPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         {[
-          { label: 'Certificates Issued', value: '891', icon: 'ri-shield-check-line', iconColor: '#0D1F4A', bg: 'rgba(7,16,31,0.06)' },
-          { label: 'IMEI Checks Today', value: '47', icon: 'ri-scan-line', iconColor: '#0E3D8A', bg: '#E8F0FB' },
-          { label: 'Clean Devices', value: '98.7%', icon: 'ri-checkbox-circle-line', iconColor: '#F5A623', bg: '#FEF3C7' },
-          { label: 'Flagged Devices', value: '11', icon: 'ri-alert-line', iconColor: '#E05A2B', bg: '#FEE2E2' },
+          { label: 'Certificates Issued', value: '0', icon: 'ri-shield-check-line', iconColor: '#0D1F4A', bg: 'rgba(7,16,31,0.06)' },
+          { label: 'IMEI Checks Today', value: '0', icon: 'ri-scan-line', iconColor: '#0E3D8A', bg: '#E8F0FB' },
+          { label: 'Clean Devices', value: '0%', icon: 'ri-checkbox-circle-line', iconColor: '#F5A623', bg: '#FEF3C7' },
+          { label: 'Flagged Devices', value: '0', icon: 'ri-alert-line', iconColor: '#E05A2B', bg: '#FEE2E2' },
         ].map(s => (
           <div key={s.label} className="rounded-2xl p-4 border border-white" style={{ background: s.bg }}>
             <div className="flex items-center gap-2 mb-2">
@@ -52,12 +52,18 @@ export default function AuthenticationPage() {
       {tab === 'certificates' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 space-y-3">
-            {authCertificates.map(cert => (
+            {authCertificates.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-slate-100 p-10 flex flex-col items-center text-center">
+                <i className="ri-shield-check-line text-3xl text-slate-200 mb-3" />
+                <p className="text-sm font-semibold text-slate-600 mb-1">No certificates yet</p>
+                <p className="text-xs text-slate-400">Generate your first certificate to verify a device's authenticity.</p>
+              </div>
+            ) : authCertificates.map(cert => (
               <button
                 key={cert.id}
                 onClick={() => { setSelectedCert(cert); setCertDetailOpen(true); }}
                 className={`w-full bg-white rounded-2xl border p-4 text-left transition-all cursor-pointer`}
-                style={{ borderColor: selectedCert.id === cert.id ? '#0D1F4A' : '#f1f5f9' }}
+                style={{ borderColor: selectedCert?.id === cert.id ? '#0D1F4A' : '#f1f5f9' }}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -97,7 +103,7 @@ export default function AuthenticationPage() {
           </div>
 
           {/* Certificate Preview */}
-          <CertificatePreview cert={selectedCert} />
+          {selectedCert && <CertificatePreview cert={selectedCert} />}
         </div>
       )}
 

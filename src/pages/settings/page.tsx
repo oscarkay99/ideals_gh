@@ -33,22 +33,22 @@ const messageTemplates = [
 ];
 
 const teamRoles = [
-  { id: 'r1', name: 'Admin', members: 1, permissions: ['All access', 'Settings', 'Financial reports', 'Team management', 'Delete records'] },
-  { id: 'r2', name: 'Sales Manager', members: 1, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view', 'Reports view', 'Team view'] },
-  { id: 'r3', name: 'Sales Rep', members: 2, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view'] },
-  { id: 'r4', name: 'Technician', members: 1, permissions: ['Repairs', 'Inventory view', 'Customers view'] },
-  { id: 'r5', name: 'Inventory Manager', members: 1, permissions: ['Inventory', 'Purchase Orders', 'Suppliers', 'Reports view'] },
+  { id: 'r1', name: 'Admin', members: 0, permissions: ['All access', 'Settings', 'Financial reports', 'Team management', 'Delete records'] },
+  { id: 'r2', name: 'Sales Manager', members: 0, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view', 'Reports view', 'Team view'] },
+  { id: 'r3', name: 'Sales Rep', members: 0, permissions: ['Sales', 'Leads', 'Customers', 'Inventory view'] },
+  { id: 'r4', name: 'Technician', members: 0, permissions: ['Repairs', 'Inventory view', 'Customers view'] },
+  { id: 'r5', name: 'Inventory Manager', members: 0, permissions: ['Inventory', 'Purchase Orders', 'Suppliers', 'Reports view'] },
 ];
 
 const automationRules = [
-  { id: 'ar1', name: 'Lead Follow-up Reminder', trigger: 'Lead not contacted in 48 hours', action: 'Send push notification to assigned rep', status: true, runs: 234 },
-  { id: 'ar2', name: 'Low Stock Alert', trigger: 'Product stock drops below threshold', action: 'Notify inventory manager + create restock task', status: true, runs: 89 },
-  { id: 'ar3', name: 'Payment Overdue', trigger: 'Payment due date passed by 3 days', action: 'Send WhatsApp reminder to customer', status: true, runs: 45 },
-  { id: 'ar4', name: 'Repair Status Update', trigger: 'Repair status changes to Ready', action: 'Send SMS to customer automatically', status: true, runs: 156 },
-  { id: 'ar5', name: 'Birthday Greeting', trigger: 'Customer birthday (8:00 AM)', action: 'Send birthday SMS with 10% discount code', status: false, runs: 67 },
-  { id: 'ar6', name: 'Warranty Expiry Warning', trigger: '30 days before warranty expires', action: 'Send WhatsApp message with renewal offer', status: true, runs: 34 },
-  { id: 'ar7', name: 'New Lead Assignment', trigger: 'New lead created from any channel', action: 'Auto-assign to least-busy sales rep', status: true, runs: 312 },
-  { id: 'ar8', name: 'Quote Expiry Reminder', trigger: 'Quote expires in 24 hours', action: 'Send WhatsApp reminder to customer', status: false, runs: 28 },
+  { id: 'ar1', name: 'Lead Follow-up Reminder', trigger: 'Lead not contacted in 48 hours', action: 'Send push notification to assigned rep', status: false, runs: 0 },
+  { id: 'ar2', name: 'Low Stock Alert', trigger: 'Product stock drops below threshold', action: 'Notify inventory manager + create restock task', status: false, runs: 0 },
+  { id: 'ar3', name: 'Payment Overdue', trigger: 'Payment due date passed by 3 days', action: 'Send WhatsApp reminder to customer', status: false, runs: 0 },
+  { id: 'ar4', name: 'Repair Status Update', trigger: 'Repair status changes to Ready', action: 'Send SMS to customer automatically', status: false, runs: 0 },
+  { id: 'ar5', name: 'Birthday Greeting', trigger: 'Customer birthday (8:00 AM)', action: 'Send birthday SMS with 10% discount code', status: false, runs: 0 },
+  { id: 'ar6', name: 'Warranty Expiry Warning', trigger: '30 days before warranty expires', action: 'Send WhatsApp message with renewal offer', status: false, runs: 0 },
+  { id: 'ar7', name: 'New Lead Assignment', trigger: 'New lead created from any channel', action: 'Auto-assign to least-busy sales rep', status: false, runs: 0 },
+  { id: 'ar8', name: 'Quote Expiry Reminder', trigger: 'Quote expires in 24 hours', action: 'Send WhatsApp reminder to customer', status: false, runs: 0 },
 ];
 
 const integrations = [
@@ -74,6 +74,7 @@ export default function SettingsPage() {
   const [editingTemplate, setEditingTemplate] = useState<string | null>(null);
   const [automations, setAutomations] = useState(automationRules);
   const [showAddRole, setShowAddRole] = useState(false);
+  const [editingRole, setEditingRole] = useState<{ id: string; name: string; permissions: string[] } | null>(null);
 
   useEffect(() => {
     getStoreSettings().then((s) => {
@@ -134,7 +135,11 @@ export default function SettingsPage() {
           )}
 
           {activeSection === 'team' && (
-            <TeamRolesSection roles={teamRoles} onAddRole={() => setShowAddRole(true)} />
+            <TeamRolesSection
+              roles={teamRoles}
+              onAddRole={() => { setEditingRole(null); setShowAddRole(true); }}
+              onEditRole={(role) => { setEditingRole(role); setShowAddRole(true); }}
+            />
           )}
 
           {activeSection === 'automation' && (
@@ -160,7 +165,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <AddRoleModal open={showAddRole} onClose={() => setShowAddRole(false)} />
+      <AddRoleModal open={showAddRole} onClose={() => { setShowAddRole(false); setEditingRole(null); }} editRole={editingRole} />
     </AdminLayout>
   );
 }

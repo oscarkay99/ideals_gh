@@ -8,9 +8,10 @@ interface TeamRole {
 interface TeamRolesSectionProps {
   roles: TeamRole[];
   onAddRole: () => void;
+  onEditRole: (role: TeamRole) => void;
 }
 
-export default function TeamRolesSection({ roles, onAddRole }: TeamRolesSectionProps) {
+export default function TeamRolesSection({ roles, onAddRole, onEditRole }: TeamRolesSectionProps) {
   return (
     <div className="space-y-4">
       <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
@@ -40,7 +41,7 @@ export default function TeamRolesSection({ roles, onAddRole }: TeamRolesSectionP
                   ))}
                 </div>
               </div>
-              <button className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer flex-shrink-0">
+              <button onClick={() => onEditRole(role)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 cursor-pointer flex-shrink-0">
                 <i className="ri-edit-line text-slate-400 text-sm" />
               </button>
             </div>
