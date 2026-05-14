@@ -13,24 +13,17 @@ const reportTypes = [
   { id: 'loyalty', name: 'Loyalty Report', icon: 'ri-vip-crown-line', color: '#F5A623', desc: 'Points issued, redeemed, tier distribution' },
 ];
 
-const prebuiltReports = [
-  { id: 'pr1', name: 'Monthly Sales Summary', type: 'Sales', period: 'April 2026', generated: 'Apr 22, 2026', size: '2.4 MB', format: 'PDF' },
-  { id: 'pr2', name: 'Q1 2026 P&L Statement', type: 'Finance', period: 'Jan–Mar 2026', generated: 'Apr 1, 2026', size: '1.8 MB', format: 'Excel' },
-  { id: 'pr3', name: 'Inventory Audit Report', type: 'Inventory', period: 'April 2026', generated: 'Apr 20, 2026', size: '3.1 MB', format: 'PDF' },
-  { id: 'pr4', name: 'Team Performance Q1', type: 'Team', period: 'Jan–Mar 2026', generated: 'Apr 1, 2026', size: '1.2 MB', format: 'PDF' },
-  { id: 'pr5', name: 'Customer Retention Analysis', type: 'Customers', period: 'Q1 2026', generated: 'Apr 5, 2026', size: '2.0 MB', format: 'Excel' },
-  { id: 'pr6', name: 'WhatsApp Campaign ROI', type: 'Marketing', period: 'March 2026', generated: 'Apr 2, 2026', size: '0.9 MB', format: 'PDF' },
-];
+const prebuiltReports: never[] = [];
 
 const kpiData = [
-  { label: 'Total Revenue (Apr)', value: 'GHS 84,320', change: '+12.4%', up: true, color: '#0D1F4A' },
-  { label: 'Total Orders', value: '109', change: '+8.2%', up: true, color: '#07101F' },
-  { label: 'Avg Order Value', value: 'GHS 773', change: '+3.8%', up: true, color: '#F5A623' },
-  { label: 'Gross Profit', value: 'GHS 9,430', change: '+24.1%', up: true, color: '#25D366' },
-  { label: 'Profit Margin', value: '11.2%', change: '+1.8pp', up: true, color: '#1552A8' },
-  { label: 'New Customers', value: '34', change: '+18.5%', up: true, color: '#E05A2B' },
-  { label: 'Repair Revenue', value: 'GHS 12,400', change: '+6.3%', up: true, color: '#0E3D8A' },
-  { label: 'Leads Converted', value: '23', change: '-4.2%', up: false, color: '#F5A623' },
+  { label: 'Total Revenue', value: 'GHS 0', change: '0%', up: true, color: '#0D1F4A' },
+  { label: 'Total Orders', value: '0', change: '0%', up: true, color: '#07101F' },
+  { label: 'Avg Order Value', value: 'GHS 0', change: '0%', up: true, color: '#F5A623' },
+  { label: 'Gross Profit', value: 'GHS 0', change: '0%', up: true, color: '#25D366' },
+  { label: 'Profit Margin', value: '0%', change: '0%', up: true, color: '#1552A8' },
+  { label: 'New Customers', value: '0', change: '0%', up: true, color: '#E05A2B' },
+  { label: 'Repair Revenue', value: 'GHS 0', change: '0%', up: true, color: '#0E3D8A' },
+  { label: 'Leads Converted', value: '0', change: '0%', up: true, color: '#F5A623' },
 ];
 
 export default function ReportsPage() {
@@ -83,7 +76,7 @@ export default function ReportsPage() {
         <div className="space-y-5">
           {/* All KPIs */}
           <div className="bg-white rounded-2xl border border-slate-100 p-5">
-            <h3 className="text-sm font-bold text-slate-800 mb-4">April 2026 — Key Metrics</h3>
+            <h3 className="text-sm font-bold text-slate-800 mb-4">Key Metrics</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {kpiData.map(kpi => (
                 <div key={kpi.label} className="p-3 rounded-xl" style={{ background: `${kpi.color}08` }}>
