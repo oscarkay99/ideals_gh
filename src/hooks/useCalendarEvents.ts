@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCalendarEvents, createCalendarEvent } from '@/services/events';
+import { getCalendarEvents, createCalendarEvent, updateCalendarEvent } from '@/services/events';
 import type { CalendarEvent } from '@/services/events';
 
 export function useCalendarEvents() {
@@ -25,5 +25,10 @@ export function useCalendarEvents() {
     }
   };
 
-  return { events, loading, add };
+  const update = (id: string, patch: Partial<Omit<CalendarEvent, 'id'>>) => {
+    setEvents(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
+    updateCalendarEvent(id, patch).catch(() => {});
+  };
+
+  return { events, loading, add, update };
 }

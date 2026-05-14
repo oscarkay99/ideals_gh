@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { calendarStats } from '@/mocks/calendar';
 import AddEventModal from './components/AddEventModal';
 import { useCalendarEvents } from '@/hooks/useCalendarEvents';
 
@@ -27,7 +26,7 @@ const currentWeekDates = ['21', '22', '23', '24', '25', '26', '27'];
 const currentDayIndex = 2; // Wednesday (23rd)
 
 export default function CalendarPage() {
-  const { events, add: addEvent } = useCalendarEvents();
+  const { events, add: addEvent, update: updateEvent } = useCalendarEvents();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [filterType, setFilterType] = useState('all');
@@ -36,17 +35,19 @@ export default function CalendarPage() {
   const filteredEvents = filterType === 'all' ? events : events.filter(e => e.type === filterType);
   const todayEvents = events.filter(e => e.date === today);
 
+  const stats = [
+    { label: "Today's Appts", value: String(todayEvents.length), icon: 'ri-calendar-check-line', color: '#0D1F4A' },
+    { label: 'This Week', value: String(events.length), icon: 'ri-calendar-2-line', color: '#07101F' },
+    { label: 'Pending Confirm', value: String(events.filter(e => e.status === 'pending').length), icon: 'ri-time-line', color: '#F5A623' },
+    { label: 'Repair Queue', value: String(events.filter(e => e.type === 'repair').length), icon: 'ri-tools-line', color: '#E05A2B' },
+    { label: 'Completed', value: String(todayEvents.filter(e => e.status === 'completed').length), icon: 'ri-check-double-line', color: '#25D366' },
+  ];
+
   return (
     <AdminLayout title="Booking Calendar" subtitle="Repair appointments · Consultations · Staff schedule">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
-        {[
-          { label: "Today's Appts", value: `${calendarStats.todayAppointments}`, icon: 'ri-calendar-check-line', color: '#0D1F4A' },
-          { label: 'This Week', value: `${calendarStats.weekAppointments}`, icon: 'ri-calendar-2-line', color: '#07101F' },
-          { label: 'Pending Confirm', value: `${calendarStats.pendingConfirmations}`, icon: 'ri-time-line', color: '#F5A623' },
-          { label: 'Repair Queue', value: `${calendarStats.repairQueue}`, icon: 'ri-tools-line', color: '#E05A2B' },
-          { label: 'Completed', value: `${calendarStats.completedToday}`, icon: 'ri-check-double-line', color: '#25D366' },
-        ].map((s) => (
+        {stats.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-4 border border-slate-100">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${s.color}15` }}>
@@ -204,10 +205,14 @@ export default function CalendarPage() {
                         <p className="text-xs text-slate-600">{event.notes}</p>
                       </div>
                       <div className="flex gap-2 pt-2">
-                        <button className="flex-1 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
+                        <button
+                          onClick={() => { updateEvent(event.id, { status: 'confirmed' }); setSelectedEvent(null); }}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#0D1F4A' }}>
                           Confirm
                         </button>
-                        <button className="flex-1 py-2 rounded-lg text-xs font-semibold border border-slate-200 text-slate-500 cursor-pointer whitespace-nowrap">
+                        <button
+                          onClick={() => { updateEvent(event.id, { status: 'rescheduled' }); setSelectedEvent(null); }}
+                          className="flex-1 py-2 rounded-lg text-xs font-semibold border border-slate-200 text-slate-500 cursor-pointer whitespace-nowrap">
                           Reschedule
                         </button>
                       </div>

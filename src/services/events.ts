@@ -27,3 +27,9 @@ export async function createCalendarEvent(event: Omit<CalendarEvent, 'id'>): Pro
   if (error) throw new Error(error.message);
   return data;
 }
+
+export async function updateCalendarEvent(id: string, patch: Partial<Omit<CalendarEvent, 'id'>>): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const { error } = await supabase.from('events').update(patch).eq('id', id);
+  if (error) throw new Error(error.message);
+}

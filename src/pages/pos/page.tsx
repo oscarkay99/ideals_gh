@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import {
-  posProducts, posCustomers, posRecentSales, upsellRules,
-  installmentPlans, tradeInConditions, tradeInDevices,
+  upsellRules, installmentPlans, tradeInConditions, tradeInDevices,
   type PosProduct, type PosCustomer,
 } from '@/mocks/pos';
 import {
@@ -11,6 +10,10 @@ import {
 } from '@/mocks/posIntelligence';
 import { recordSaleTransaction } from '@/hooks/useLearnedPatterns';
 import { useAuth } from '@/hooks/useAuth';
+import { useInventory, type InventoryProduct } from '@/hooks/useInventory';
+import { useCustomers } from '@/hooks/useCustomers';
+import { useSales } from '@/hooks/useSales';
+import type { Customer } from '@/types/customer';
 import AiReceiptModal from './components/AiReceiptModal';
 import IntelligencePanel from './components/IntelligencePanel';
 import AiChat from './components/AiChat';
@@ -74,7 +77,31 @@ function marginColor(pct: number) {
   return 'text-rose-500';
 }
 
-const CATEGORIES = ['All', 'Apple', 'Samsung', 'Xiaomi', 'Google', 'Tecno', 'Accessories'];
+const CATEGORIES = ['All', 'Phones', 'Laptops', 'Tablets', 'Accessories', 'Wearables'];
+
+const categoryToType: Record<string, PosProduct['type']> = {
+  Phones: 'phone', Laptops: 'laptop', Tablets: 'tablet',
+  Wearables: 'wearable', Accessories: 'accessory',
+};
+
+function mapToPosProduct(p: InventoryProduct): PosProduct {
+  const price = parseFloat(p.price.replace(/[^0-9.]/g, '')) || 0;
+  return {
+    id: p.id, name: p.name, price, cost: 0, stock: p.stock,
+    category: p.category, type: categoryToType[p.category] ?? 'accessory',
+    brand: p.name.split(' ')[0], imei: !!p.imei,
+  };
+}
+
+function mapToPosCustomer(c: Customer): PosCustomer {
+  const ltv = parseFloat(c.ltv.replace(/[^0-9.]/g, '')) || 0;
+  return {
+    id: c.id, name: c.name, phone: c.phone, email: c.email,
+    loyaltyPoints: c.orders * 10, totalSpent: ltv,
+    purchaseCount: c.orders, lastPurchase: c.lastOrder,
+    openRepairs: c.repairs, tags: [c.segment],
+  };
+}
 
 // ── Velocity badge ─────────────────────────────────────────────────────────────
 
@@ -132,27 +159,36 @@ export default function POSPage() {
   } | null>(null);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const { products: inventoryProducts, adjustStock } = useInventory();
+  const { customers: allCustomers } = useCustomers();
+  const { sales, add: saveSale } = useSales();
   const summary = getTodaySummary();
   const { user } = useAuth();
 
+  const posProductsList = inventoryProducts.map(mapToPosProduct);
+  const posCustomersList = allCustomers.map(mapToPosCustomer);
+  const today = new Date().toLocaleDateString('en-GH', { month: 'short', day: 'numeric', year: 'numeric' });
+  const todaySales = sales.filter(s => s.date === today);
+
   // ── Filtered products ────────────────────────────────────────────────────────
 
-  const simpleFiltered = posProducts.filter(p => {
+  const simpleFiltered = posProductsList.filter(p => {
     const matchCat = category === 'All' || p.category === category;
     if (!matchCat) return false;
     if (!query) return true;
     return p.name.toLowerCase().includes(query.toLowerCase());
   });
 
-  const [aiFiltered, setAiFiltered] = useState<PosProduct[]>(posProducts);
+  const [aiFiltered, setAiFiltered] = useState<PosProduct[]>([]);
 
   useEffect(() => {
     if (!aiMode) return;
-    if (!query.trim()) { setAiFiltered(posProducts); return; }
+    if (!query.trim()) { setAiFiltered(posProductsList); return; }
     setIsSearching(true);
-    const t = setTimeout(() => { setAiFiltered(parseAiQuery(query, posProducts)); setIsSearching(false); }, 400);
+    const t = setTimeout(() => { setAiFiltered(parseAiQuery(query, posProductsList)); setIsSearching(false); }, 400);
     return () => clearTimeout(t);
-  }, [query, aiMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, aiMode, posProductsList.length]);
 
   const displayedProducts = aiMode ? aiFiltered : simpleFiltered;
 
@@ -160,10 +196,11 @@ export default function POSPage() {
 
   useEffect(() => {
     if (!customerQuery.trim()) { setCustomerSuggestions([]); return; }
-    setCustomerSuggestions(posCustomers.filter(c =>
+    setCustomerSuggestions(posCustomersList.filter(c =>
       c.phone.includes(customerQuery) || c.name.toLowerCase().includes(customerQuery.toLowerCase()),
     ).slice(0, 4));
-  }, [customerQuery]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customerQuery, posCustomersList.length]);
 
   const customerCI = customer ? customerIntelligence.find(ci => ci.customerId === customer.id.replace('U', 'c').toLowerCase()) ?? null : null;
 
@@ -204,7 +241,8 @@ export default function POSPage() {
     const cartIds = cart.map(i => i.product.id);
     const suggested = new Set<string>();
     cart.forEach(item => (upsellRules[item.product.type] ?? []).forEach(id => { if (!cartIds.includes(id)) suggested.add(id); }));
-    setUpsells(posProducts.filter(p => suggested.has(p.id)).slice(0, 4));
+    setUpsells(posProductsList.filter(p => suggested.has(p.id)).slice(0, 4));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart]);
 
   // ── Cart actions ─────────────────────────────────────────────────────────────
@@ -239,22 +277,37 @@ export default function POSPage() {
     setCompletedSale({ cart, customer, total: totalWithPlan, tradeIn, method: methodLabel, plan: plan.label });
     setShowReceipt(true);
 
-    // Record to Supabase for ML pattern learning (fire-and-forget)
+    const payMethod = paymentMethod === 'momo' ? 'MoMo' : paymentMethod === 'card' ? 'Card' : 'Cash';
+
+    // Save to sales table
+    void saveSale({
+      customer: customer?.name ?? 'Walk-in',
+      items: cart.map(i => `${i.qty}x ${i.product.name}`).join(', '),
+      total: `GHS ${Math.round(totalWithPlan).toLocaleString()}`,
+      method: payMethod,
+      status: 'completed',
+      date: today,
+      delivery: 'Pickup',
+    });
+
+    // Deduct inventory stock
+    cart.forEach(item => {
+      adjustStock(item.product.id, Math.max(0, item.product.stock - item.qty));
+    });
+
+    // Record to pos_transactions for ML pattern learning
     const sessionId = crypto.randomUUID();
     void recordSaleTransaction({
       sessionId,
-      items: cart.map(item => {
-        const effectivePrice = item.product.price * (1 - item.discount / 100);
-        return {
-          productId: item.product.id,
-          productName: item.product.name,
-          category: item.product.category,
-          quantity: item.qty,
-          unitPrice: item.product.price,
-          unitCost: item.product.cost,
-          discountPct: item.discount,
-        };
-      }),
+      items: cart.map(item => ({
+        productId: item.product.id,
+        productName: item.product.name,
+        category: item.product.category,
+        quantity: item.qty,
+        unitPrice: item.product.price,
+        unitCost: item.product.cost,
+        discountPct: item.discount,
+      })),
       paymentMethod: methodLabel,
       customerId: customer?.id ?? null,
       cashierId: user?.id,
@@ -441,18 +494,19 @@ export default function POSPage() {
             {/* Recent sales */}
             <div className="bg-white rounded-2xl border border-slate-100 p-3">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Today's Sales</p>
-              <div className="flex gap-3 overflow-x-auto pb-1">
-                {posRecentSales.map(s => (
-                  <div key={s.id} className="flex-shrink-0 bg-slate-50 rounded-xl px-3 py-2 min-w-[160px]">
-                    <p className="text-xs font-semibold text-slate-800 truncate">{s.customer}</p>
-                    <p className="text-[10px] text-slate-500 truncate">{s.items}</p>
-                    <div className="flex items-center justify-between mt-1">
-                      <span className="text-xs font-bold text-[#0D1F4A]">{formatGHS(s.total)}</span>
-                      <span className="text-[9px] text-slate-400">{s.time}</span>
+              {todaySales.length === 0 ? (
+                <p className="text-[11px] text-slate-400 text-center py-3">No sales yet today</p>
+              ) : (
+                <div className="flex gap-3 overflow-x-auto pb-1">
+                  {todaySales.map(s => (
+                    <div key={s.id} className="flex-shrink-0 bg-slate-50 rounded-xl px-3 py-2 min-w-[160px]">
+                      <p className="text-xs font-semibold text-slate-800 truncate">{s.customer}</p>
+                      <p className="text-[10px] text-slate-500 truncate">{s.items}</p>
+                      <span className="text-xs font-bold text-[#0D1F4A]">{s.total}</span>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
