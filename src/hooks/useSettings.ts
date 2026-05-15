@@ -21,10 +21,15 @@ export function useSetting(key: string) {
     return () => { supabase.removeChannel(channel); };
   }, [key]);
 
-  const save = useCallback(async (newValue: string) => {
-    if (!isSupabaseConfigured) return;
+  const save = useCallback(async (newValue: string): Promise<boolean> => {
+    if (!isSupabaseConfigured) return false;
+    const { error } = await supabase.from('settings').upsert(
+      { key, value: newValue, updated_at: new Date().toISOString() },
+      { onConflict: 'key' }
+    );
+    if (error) { console.error('settings save failed:', error.message); return false; }
     setValue(newValue);
-    await supabase.from('settings').upsert({ key, value: newValue, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    return true;
   }, [key]);
 
   return { value, loading, save };

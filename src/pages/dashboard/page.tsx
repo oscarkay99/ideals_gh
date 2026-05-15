@@ -169,11 +169,12 @@ export default function DashboardPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sales, expenses, products, period, customStart, customEnd]);
 
-  function saveTarget(val: string) {
+  async function saveTarget(val: string) {
     const n = parseFloat(val.replace(/[^0-9.]/g, ''));
     if (!isNaN(n) && n > 0) {
-      setMonthlyTarget(n);
-      saveSetting(String(n));
+      const ok = await saveSetting(String(n));
+      if (ok) setMonthlyTarget(n);
+      else alert('Could not save target — please log out and back in, then try again.');
     }
     setEditingTarget(false);
   }
