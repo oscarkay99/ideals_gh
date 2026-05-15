@@ -8,8 +8,12 @@ interface UserFormModalProps {
   open: boolean;
   isEditing: boolean;
   editingUser: Partial<SystemUser> | null;
+  password: string;
+  onPasswordChange: (v: string) => void;
   onClose: () => void;
   onSave: () => void;
+  saving?: boolean;
+  saveError?: string | null;
   onRoleChange: (role: UserRole) => void;
   onTogglePermission: (perm: string) => void;
   onFieldChange: (field: keyof SystemUser, value: string) => void;
@@ -19,8 +23,12 @@ export default function UserFormModal({
   open,
   isEditing,
   editingUser,
+  password,
+  onPasswordChange,
   onClose,
   onSave,
+  saving,
+  saveError,
   onRoleChange,
   onTogglePermission,
   onFieldChange,
@@ -77,10 +85,12 @@ export default function UserFormModal({
               <label className="text-xs font-semibold text-slate-600 block mb-1.5">Temporary Password *</label>
               <input
                 type="text"
+                value={password}
+                onChange={e => onPasswordChange(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
                 placeholder="Set a temporary password"
               />
-              <p className="text-[10px] text-slate-400 mt-1">User will be prompted to change on first login</p>
+              <p className="text-[10px] text-slate-400 mt-1">Share this with the user so they can sign in</p>
             </div>
           )}
 
@@ -143,15 +153,20 @@ export default function UserFormModal({
             </div>
           </div>
 
+          {saveError && (
+            <p className="text-xs text-rose-500 text-center">{saveError}</p>
+          )}
           <div className="flex gap-3 pt-2">
-            <button onClick={onClose} className="flex-1 py-3 rounded-xl text-sm font-semibold border border-slate-200 text-slate-600 cursor-pointer whitespace-nowrap">
+            <button onClick={onClose} disabled={saving} className="flex-1 py-3 rounded-xl text-sm font-semibold border border-slate-200 text-slate-600 cursor-pointer whitespace-nowrap disabled:opacity-50">
               Cancel
             </button>
             <button
               onClick={onSave}
-              className="flex-1 py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap"
+              disabled={saving}
+              className="flex-1 py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap disabled:opacity-60 flex items-center justify-center gap-2"
               style={{ background: '#0D1F4A' }}
             >
+              {saving && <i className="ri-loader-4-line animate-spin text-xs" />}
               {isEditing ? 'Save Changes' : 'Create User'}
             </button>
           </div>
