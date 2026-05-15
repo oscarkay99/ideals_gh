@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useSetting } from '@/hooks/useSettings';
 import AdminLayout from '@/components/feature/AdminLayout';
 import StatCard from './components/StatCard';
 import RevenueChart from './components/RevenueChart';
@@ -93,12 +94,13 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<Period>('month');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
-  const [monthlyTarget, setMonthlyTarget] = useState<number>(() => {
-    const saved = localStorage.getItem('ideals_monthly_target');
-    return saved ? parseFloat(saved) : 0;
-  });
+  const { value: targetValue, save: saveSetting } = useSetting('monthly_profit_target');
+  const [monthlyTarget, setMonthlyTarget] = useState(0);
   const [editingTarget, setEditingTarget] = useState(false);
-  const [targetInput, setTargetInput] = useState('');
+
+  useEffect(() => {
+    setMonthlyTarget(targetValue ? parseFloat(targetValue) : 0);
+  }, [targetValue]);
 
   const dateSubtitle = useMemo(() =>
     new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date()) + ' · Accra, Ghana'
@@ -171,7 +173,7 @@ export default function DashboardPage() {
     const n = parseFloat(val.replace(/[^0-9.]/g, ''));
     if (!isNaN(n) && n > 0) {
       setMonthlyTarget(n);
-      localStorage.setItem('ideals_monthly_target', String(n));
+      saveSetting(String(n));
     }
     setEditingTarget(false);
   }
