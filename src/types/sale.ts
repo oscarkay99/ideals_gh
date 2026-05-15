@@ -11,6 +11,7 @@ export interface Sale {
   status: SaleStatus;
   date: string;
   delivery: DeliveryType;
+  cogs?: number;
 }
 
 export interface SaleStat {

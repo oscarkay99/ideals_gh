@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { CalendarEvent } from '@/services/events';
+import CustomerPicker from '@/components/shared/CustomerPicker';
 
 const typeLabels: Record<string, string> = {
   repair: 'Repair',
@@ -77,27 +78,24 @@ export default function AddEventModal({ onSave, onClose }: Props) {
               placeholder="e.g. iPhone Screen Repair"
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-slate-500 mb-1 block">Customer Name</label>
-              <input
-                type="text"
-                value={customer}
-                onChange={(e) => setCustomer(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                placeholder="Customer name"
-              />
-            </div>
-            <div>
-              <label className="text-xs text-slate-500 mb-1 block">Phone</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
-                placeholder="0244-XXX-XXX"
-              />
-            </div>
+          <CustomerPicker
+            value={customer}
+            phone={phone}
+            onChange={(name, p) => { setCustomer(name); setPhone(p); }}
+            required
+            label="Customer Name"
+            placeholder="Search existing or type new name…"
+            theme="light"
+          />
+          <div>
+            <label className="text-xs text-slate-500 mb-1 block">Phone</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              placeholder="0244-XXX-XXX"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>

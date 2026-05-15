@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { warranties, returns, warrantyStats } from '@/mocks/warranty';
 import WarrantyDetail from './components/WarrantyDetail';
@@ -31,6 +33,8 @@ export default function WarrantyPage() {
     const matchStatus = filterStatus === 'all' || w.status === filterStatus;
     return matchSearch && matchStatus;
   });
+  const { paginated: pagedWarranties, page: wPage, setPage: setWPage, totalPages: wTotalPages, total: wTotal, from: wFrom, to: wTo } = usePagination(filteredWarranties, 15, `${search}|${filterStatus}`);
+  const { paginated: pagedReturns, page: rPage, setPage: setRPage, totalPages: rTotalPages, total: rTotal, from: rFrom, to: rTo } = usePagination(returns, 15);
 
   const selected = warranties.find(w => w.id === selectedWarranty);
 
@@ -111,7 +115,7 @@ export default function WarrantyPage() {
 
             <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
               <div className="divide-y divide-slate-100">
-                {filteredWarranties.map(w => {
+                {pagedWarranties.map(w => {
                   const st = statusConfig[w.status];
                   return (
                     <button
@@ -140,6 +144,7 @@ export default function WarrantyPage() {
                   );
                 })}
               </div>
+              <Pagination page={wPage} totalPages={wTotalPages} total={wTotal} from={wFrom} to={wTo} onPageChange={setWPage} />
             </div>
           </div>
 
@@ -165,7 +170,7 @@ export default function WarrantyPage() {
       {activeTab === 'Returns & Refunds' && (
         <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
           <div className="divide-y divide-slate-100">
-            {returns.map(ret => {
+            {pagedReturns.map(ret => {
               const st = returnStatusConfig[ret.status];
               return (
                 <div key={ret.id} className="p-4 flex items-start gap-4 hover:bg-slate-50/50 transition-colors">
@@ -195,6 +200,7 @@ export default function WarrantyPage() {
               );
             })}
           </div>
+          <Pagination page={rPage} totalPages={rTotalPages} total={rTotal} from={rFrom} to={rTo} onPageChange={setRPage} />
         </div>
       )}
 

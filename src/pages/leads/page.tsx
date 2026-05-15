@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { leadStats } from '@/mocks/leads';
 import { useLeads } from '@/hooks/useLeads';
 import type { LeadStatus } from '@/types/lead';
 import LeadDetail from './components/LeadDetail';
@@ -29,6 +28,12 @@ export default function LeadsPage() {
   const [addStatus, setAddStatus] = useState<LeadStatus>('warm');
 
   const columns = ['hot', 'warm', 'cold'] as const;
+  const leadStats = [
+    { label: 'Total Leads',  value: leads.length,                                      icon: 'ri-user-star-line',    accent: 'bg-blue-500' },
+    { label: 'Hot Leads',    value: leads.filter(l => l.status === 'hot').length,       icon: 'ri-fire-line',         accent: 'bg-red-500' },
+    { label: 'Quote Ready',  value: leads.filter(l => l.quoteReady).length,             icon: 'ri-file-list-3-line',  accent: 'bg-emerald-500' },
+    { label: 'Warm Leads',   value: leads.filter(l => l.status === 'warm').length,      icon: 'ri-temp-hot-line',     accent: 'bg-amber-500' },
+  ];
 
   const lead = selected ? leads.find((l) => l.id === selected) : null;
 
@@ -43,7 +48,6 @@ export default function LeadsPage() {
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{s.label}</p>
                 <p className="text-2xl font-bold text-slate-800 mt-1">{s.value}</p>
-                <p className="text-xs text-emerald-600 font-medium mt-1">{s.change}</p>
               </div>
               <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
                 <i className={`${s.icon} text-lg`} />

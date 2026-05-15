@@ -8,6 +8,7 @@ export interface InventoryRecord {
   color?: string;
   condition: string;
   price: string;
+  cost_price?: number;
   stock: number;
   location: string;
   supplier: string;

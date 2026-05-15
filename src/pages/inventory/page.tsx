@@ -4,6 +4,8 @@ import { useInventory } from '@/hooks/useInventory';
 import ProductDetail from './components/ProductDetail';
 import AddProductModal from './components/AddProductModal';
 import { useSearchParams } from 'react-router-dom';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 
 const conditionConfig: Record<string, { label: string; color: string; dot: string }> = {
   'New': { label: 'New', color: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' },
@@ -38,6 +40,7 @@ export default function InventoryPage() {
     const matchFilter = filter === 'all' || p.condition === filter || (filter === 'low' && p.stock <= 2) || (filter === 'out' && p.stock === 0);
     return matchSearch && matchFilter;
   });
+  const { paginated, page, setPage, totalPages, total, from, to } = usePagination(filtered, 20, `${search}|${filter}`);
 
   const product = selected ? products.find((p) => p.id === selected) : null;
 
@@ -161,7 +164,7 @@ export default function InventoryPage() {
                   </td>
                 </tr>
               )}
-              {filtered.map((p, i) => {
+              {paginated.map((p, i) => {
                 const cond = conditionConfig[p.condition] || conditionConfig['New'];
                 return (
                   <tr key={p.id} className={`border-b border-slate-50 hover:bg-slate-50 transition-colors ${i % 2 === 0 ? '' : 'bg-slate-50/20'}`}>
@@ -209,6 +212,7 @@ export default function InventoryPage() {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
       </div>
 
       {product && (

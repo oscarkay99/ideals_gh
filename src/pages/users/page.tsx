@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 import { systemUsers, rolePermissions } from '@/mocks/users';
 import type { SystemUser } from '@/mocks/users';
 import type { UserRole } from '@/hooks/useAuth';
@@ -34,6 +36,7 @@ export default function UsersPage() {
     const matchRole = filterRole === 'all' || u.role === filterRole;
     return matchSearch && matchRole;
   });
+  const { paginated, page, setPage, totalPages, total, from, to } = usePagination(filtered, 15, `${search}|${filterRole}`);
 
   const selected = users.find(u => u.id === selectedUser);
 
@@ -107,7 +110,7 @@ export default function UsersPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <UserTable
-          filtered={filtered}
+          filtered={paginated}
           selectedUser={selectedUser}
           onSelect={handleSelect}
           onEdit={openEditModal}
@@ -126,6 +129,7 @@ export default function UsersPage() {
           onToggleStatus={toggleStatus}
         />
       </div>
+      <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
 
       <UserFormModal
         open={showModal}

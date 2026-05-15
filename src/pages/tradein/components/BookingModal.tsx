@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import CustomerPicker from '@/components/shared/CustomerPicker';
+
 interface Props {
   selectedModel: string;
   tradeValue: number;
@@ -5,6 +8,10 @@ interface Props {
 }
 
 export default function BookingModal({ selectedModel, tradeValue, onClose }: Props) {
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [datetime, setDatetime] = useState('');
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
@@ -15,17 +22,31 @@ export default function BookingModal({ selectedModel, tradeValue, onClose }: Pro
           </button>
         </div>
         <div className="space-y-4">
-          <div>
-            <label className="text-xs font-semibold text-slate-600 mb-1 block">Customer Name</label>
-            <input className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-400" placeholder="Full name" />
-          </div>
+          <CustomerPicker
+            value={customerName}
+            phone={phone}
+            onChange={(name, p) => { setCustomerName(name); setPhone(p); }}
+            label="Customer Name"
+            placeholder="Search existing or type new name…"
+            theme="light"
+          />
           <div>
             <label className="text-xs font-semibold text-slate-600 mb-1 block">Phone Number</label>
-            <input className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-400" placeholder="+233 XX XXX XXXX" />
+            <input
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-400"
+              placeholder="+233 XX XXX XXXX"
+            />
           </div>
           <div>
             <label className="text-xs font-semibold text-slate-600 mb-1 block">Preferred Date & Time</label>
-            <input type="datetime-local" className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-400" />
+            <input
+              type="datetime-local"
+              value={datetime}
+              onChange={e => setDatetime(e.target.value)}
+              className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-400"
+            />
           </div>
           <div className="bg-emerald-50 rounded-xl p-3">
             <p className="text-xs text-slate-600">Device: <strong>{selectedModel}</strong></p>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Repair } from '@/types/repair';
+import CustomerPicker from '@/components/shared/CustomerPicker';
 
 interface Props {
   onSave: (r: Omit<Repair, 'id'>) => Promise<unknown>;
@@ -44,13 +45,12 @@ export default function AddRepairModal({ onSave, onClose }: Props) {
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Customer *</label>
-              <input required value={form.customer} onChange={e => set('customer', e.target.value)}
-                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
-                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
-                placeholder="Customer name" />
-            </div>
+            <CustomerPicker
+              value={form.customer}
+              onChange={(name) => set('customer', name)}
+              required
+              label="Customer *"
+            />
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Device *</label>
               <input required value={form.device} onChange={e => set('device', e.target.value)}

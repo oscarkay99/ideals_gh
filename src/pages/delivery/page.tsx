@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { deliveryOrders, drivers, deliveryZones } from '@/mocks/delivery';
 import DeliveryDetail from './components/DeliveryDetail';
@@ -22,6 +24,7 @@ export default function DeliveryPage() {
   const [filter, setFilter] = useState<'all' | OrderStatus>('all');
 
   const filtered = filter === 'all' ? deliveryOrders : deliveryOrders.filter(o => o.status === filter);
+  const { paginated, page, setPage, totalPages, total, from, to } = usePagination(filtered, 15, filter);
 
   const stats = {
     total: deliveryOrders.length,
@@ -69,7 +72,7 @@ export default function DeliveryPage() {
           </div>
 
           <div className="space-y-2">
-            {filtered.map(order => {
+            {paginated.map(order => {
               const sc = statusConfig[order.status as OrderStatus];
               const pc = priorityConfig[order.priority];
               return (
@@ -104,6 +107,7 @@ export default function DeliveryPage() {
               );
             })}
           </div>
+          <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
         </div>
 
         {/* Map + Detail */}

@@ -19,6 +19,43 @@ export async function getExpenses(): Promise<Expense[]> {
   return data ?? [];
 }
 
+export async function updateExpense(id: string, updates: Partial<Omit<Expense, 'id'>>): Promise<Expense> {
+  if (!isSupabaseConfigured) throw new Error('Supabase not configured');
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'update',
+      entityType: 'expenses',
+      entityId: id,
+      summary: `Update expense ${id}`,
+      metadata: { module: 'expenses', ...updates },
+    },
+    async () => {
+      const { data, error } = await supabase.from('expenses').update(updates).eq('id', id).select().single();
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  );
+}
+
+export async function deleteExpense(id: string): Promise<void> {
+  if (!isSupabaseConfigured) throw new Error('Supabase not configured');
+  return runAuditedMutation(
+    {
+      layer: 'service',
+      action: 'delete',
+      entityType: 'expenses',
+      entityId: id,
+      summary: `Delete expense ${id}`,
+      metadata: { module: 'expenses' },
+    },
+    async () => {
+      const { error } = await supabase.from('expenses').delete().eq('id', id);
+      if (error) throw new Error(error.message);
+    },
+  );
+}
+
 export async function createExpense(expense: Omit<Expense, 'id'>): Promise<Expense> {
   if (!isSupabaseConfigured) throw new Error('Supabase not configured');
   return runAuditedMutation(

@@ -4,94 +4,99 @@ interface StatCardProps {
   label: string;
   value: string;
   change: string;
-  trend: 'up' | 'down';
+  trend: 'up' | 'down' | 'neutral';
   icon: string;
   accentColor?: string;
-  accent?: string;
   sub?: string;
+  sparkline?: number[];
 }
 
-export default function StatCard({ label, value, change, trend, icon, accentColor, sub }: StatCardProps) {
+function Sparkline({ data, color }: { data: number[]; color: string }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+  const W = 100; const H = 36;
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * W;
+    const y = H - 4 - ((v - min) / range) * (H - 8);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const areaBottom = `${((data.length - 1) / (data.length - 1)) * W},${H} 0,${H}`;
+  return (
+    <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="mt-3">
+      <defs>
+        <linearGradient id={`sg-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.18" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.01" />
+        </linearGradient>
+      </defs>
+      <polygon points={`${pts} ${areaBottom}`} fill={`url(#sg-${color.replace('#', '')})`} />
+      <polyline points={pts} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export default function StatCard({ label, value, change, trend, icon, accentColor, sub, sparkline }: StatCardProps) {
   const [hovered, setHovered] = useState(false);
   const color = accentColor || '#0D1F4A';
-
   const isPositive = trend === 'up';
+  const isNeutral  = trend === 'neutral';
 
   return (
     <div
-      className="relative rounded-2xl p-5 overflow-hidden cursor-default transition-all duration-300"
+      className="relative rounded-2xl p-5 overflow-hidden cursor-default transition-all duration-300 flex flex-col"
       style={{
         background: 'white',
         border: '1px solid rgba(7,16,31,0.07)',
         boxShadow: hovered
-          ? '0 4px 24px rgba(7,16,31,0.1), 0 1px 4px rgba(7,16,31,0.05), 0 0 0 1px rgba(255,255,255,0.9) inset'
-          : '0 1px 3px rgba(7,16,31,0.04), 0 6px 24px rgba(7,16,31,0.06), 0 0 0 1px rgba(255,255,255,0.9) inset',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+          ? '0 4px 24px rgba(7,16,31,0.1), 0 1px 4px rgba(7,16,31,0.05)'
+          : '0 1px 3px rgba(7,16,31,0.04), 0 6px 24px rgba(7,16,31,0.06)',
+        transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Top accent stripe */}
-      <div
-        className="absolute top-0 left-0 right-0 h-[2.5px] rounded-t-2xl transition-opacity duration-300"
-        style={{
-          background: `linear-gradient(90deg, ${color}, ${color}88)`,
-          opacity: hovered ? 1 : 0.6,
-        }}
-      />
+      <div className="absolute top-0 left-0 right-0 h-[2.5px] rounded-t-2xl"
+        style={{ background: `linear-gradient(90deg, ${color}, ${color}66)`, opacity: hovered ? 1 : 0.5 }} />
 
-      {/* Decorative corner orb */}
-      <div
-        className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full pointer-events-none transition-opacity duration-300"
-        style={{ background: color, opacity: hovered ? 0.06 : 0.04 }}
-      />
+      {/* Corner orb */}
+      <div className="absolute -bottom-6 -right-6 w-24 h-24 rounded-full pointer-events-none"
+        style={{ background: color, opacity: hovered ? 0.06 : 0.03 }} />
 
       <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
-          {/* Label */}
-          <p
-            className="text-[10px] font-bold uppercase tracking-[0.12em] mb-3"
-            style={{ color: 'rgba(10,31,74,0.38)' }}
-          >
+          <p className="text-[10px] font-bold uppercase tracking-[0.12em] mb-2.5" style={{ color: 'rgba(10,31,74,0.38)' }}>
             {label}
           </p>
-
-          {/* Value */}
-          <p
-            className="text-[28px] font-bold leading-none mb-1 figure"
-            style={{ color: '#07101F', letterSpacing: '-0.03em' }}
-          >
+          <p className="text-[26px] font-bold leading-none mb-1" style={{ color: '#07101F', letterSpacing: '-0.03em' }}>
             {value}
           </p>
-
-          {/* Sub label */}
           {sub && (
-            <p className="text-[11px] mb-3" style={{ color: 'rgba(10,31,74,0.38)' }}>{sub}</p>
+            <p className="text-[11px] mt-1" style={{ color: 'rgba(10,31,74,0.38)' }}>{sub}</p>
           )}
-
-          {/* Trend badge */}
-          <div
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold mt-2"
-            style={{
-              background: isPositive ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
-              color: isPositive ? '#059669' : '#DC2626',
-            }}
-          >
-            <i className={`${isPositive ? 'ri-arrow-up-line' : 'ri-arrow-down-line'} text-xs`} />
-            {change} vs last month
-          </div>
         </div>
+        <div className="w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0 ml-3"
+          style={{ background: `${color}18`, border: `1px solid ${color}22`, boxShadow: hovered ? `0 4px 12px ${color}22` : 'none' }}>
+          <i className={`${icon} text-lg`} style={{ color }} />
+        </div>
+      </div>
 
-        {/* Icon */}
-        <div
-          className="w-11 h-11 flex items-center justify-center rounded-2xl flex-shrink-0 ml-3 transition-all duration-300"
+      {/* Sparkline */}
+      {sparkline && sparkline.length >= 2 && (
+        <Sparkline data={sparkline} color={color} />
+      )}
+
+      {/* Change badge */}
+      <div className="mt-auto pt-3 flex items-center gap-1.5">
+        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
           style={{
-            background: `linear-gradient(135deg, ${color}1A, ${color}0D)`,
-            border: `1px solid ${color}1F`,
-            boxShadow: hovered ? `0 4px 16px ${color}25` : 'none',
-          }}
-        >
-          <i className={`${icon} text-xl`} style={{ color }} />
+            background: isNeutral ? 'rgba(100,116,139,0.1)' : isPositive ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)',
+            color:      isNeutral ? '#64748b' : isPositive ? '#059669' : '#DC2626',
+          }}>
+          {!isNeutral && <i className={`${isPositive ? 'ri-arrow-up-line' : 'ri-arrow-down-line'} text-[9px]`} />}
+          {change}
         </div>
       </div>
     </div>

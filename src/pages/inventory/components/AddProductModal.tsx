@@ -19,6 +19,7 @@ export default function AddProductModal({ onSave, onClose, editProduct }: Props)
     color: editProduct?.color ?? '',
     condition: editProduct?.condition ?? 'New',
     price: editProduct?.price ?? '',
+    costPrice: editProduct?.costPrice !== undefined ? String(editProduct.costPrice) : '',
     stock: editProduct?.stock ?? 1,
     imei: editProduct?.imei ?? '',
     location: editProduct?.location ?? '',
@@ -31,7 +32,8 @@ export default function AddProductModal({ onSave, onClose, editProduct }: Props)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.price) return;
-    onSave(form);
+    const costPriceNum = parseFloat(form.costPrice);
+    onSave({ ...form, costPrice: isNaN(costPriceNum) ? undefined : costPriceNum });
     onClose();
   };
 
@@ -79,31 +81,48 @@ export default function AddProductModal({ onSave, onClose, editProduct }: Props)
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Price *</label>
+              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Cost Price (GHS)</label>
+              <input type="number" min="0" step="0.01" value={form.costPrice} onChange={e => set('costPrice', e.target.value)}
+                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
+                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
+                placeholder="What you paid" />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Selling Price *</label>
               <input required value={form.price} onChange={e => set('price', e.target.value)}
                 className="w-full text-sm rounded-xl px-3 py-2 outline-none"
                 style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
                 placeholder="GHS 8,200" />
             </div>
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Stock Qty</label>
-              <input
-                type="number" min={0} value={stockInput}
-                onChange={e => {
-                  setStockInput(e.target.value);
-                  const n = parseInt(e.target.value, 10);
-                  if (!isNaN(n) && n >= 0) set('stock', n);
-                }}
-                onBlur={() => {
-                  const n = parseInt(stockInput, 10);
-                  const valid = !isNaN(n) && n >= 0 ? n : 0;
-                  setStockInput(String(valid));
-                  set('stock', valid);
-                }}
-                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
-                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
-              />
-            </div>
+          </div>
+          {form.costPrice && form.price && (() => {
+            const cost = parseFloat(form.costPrice);
+            const sell = parseFloat(form.price.replace(/[^0-9.]/g, ''));
+            const margin = sell > 0 && !isNaN(cost) ? Math.round(((sell - cost) / sell) * 100) : null;
+            return margin !== null ? (
+              <p className="text-[10px] mt-0.5" style={{ color: margin >= 20 ? '#25D366' : margin >= 10 ? '#F5A623' : '#E05A2B' }}>
+                Margin: {margin}% · Profit per unit: GHS {Math.round(sell - cost).toLocaleString()}
+              </p>
+            ) : null;
+          })()}
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Stock Qty</label>
+            <input
+              type="number" min={0} value={stockInput}
+              onChange={e => {
+                setStockInput(e.target.value);
+                const n = parseInt(e.target.value, 10);
+                if (!isNaN(n) && n >= 0) set('stock', n);
+              }}
+              onBlur={() => {
+                const n = parseInt(stockInput, 10);
+                const valid = !isNaN(n) && n >= 0 ? n : 0;
+                setStockInput(String(valid));
+                set('stock', valid);
+              }}
+              className="w-full text-sm rounded-xl px-3 py-2 outline-none"
+              style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
+            />
           </div>
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>IMEI / Serial Number</label>

@@ -222,34 +222,6 @@ export default function Sidebar({ onWidthChange }: SidebarProps) {
 
       {/* Bottom — user + actions */}
       <div className="flex-shrink-0 p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-        {/* User card */}
-        {user && (
-          <button
-            onClick={() => navigate('/profile')}
-            className={`w-full flex items-center rounded-2xl transition-all duration-200 cursor-pointer mb-2 ${collapsed ? 'justify-center p-2' : 'gap-2.5 p-2.5'}`}
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.09)',
-            }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.07)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)'; }}
-          >
-            <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-white text-[11px] font-bold flex-shrink-0 shadow-lg"
-              style={{ background: avatarGradient }}
-            >
-              {user.avatar}
-            </div>
-            {!collapsed && (
-              <div className="flex-1 min-w-0 text-left">
-                <p className="text-white text-[12px] font-semibold truncate leading-tight">{user.name}</p>
-                <p className="text-[10px] truncate leading-tight mt-0.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{user.email}</p>
-              </div>
-            )}
-            {!collapsed && <i className="ri-arrow-right-s-line text-sm flex-shrink-0" style={{ color: 'rgba(255,255,255,0.2)' }} />}
-          </button>
-        )}
-
         {/* Action row */}
         <div className={`flex ${collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1'}`}>
           <button

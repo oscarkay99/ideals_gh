@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { getAuditLogs, type AuditLogRecord } from '@/services/audit';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 
 const statusTone: Record<string, string> = {
   success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
@@ -95,7 +97,8 @@ export default function AuditLogsPage() {
     });
   }, [layerFilter, logs, search, sourceFilter, statusFilter]);
 
-  const selectedLog = filteredLogs.find((log) => log.id === selectedLogId) ?? filteredLogs[0] ?? null;
+  const { paginated: pagedLogs, page, setPage, totalPages, total, from, to } = usePagination(filteredLogs, 25, `${search}|${statusFilter}|${sourceFilter}|${layerFilter}`);
+  const selectedLog = pagedLogs.find((log) => log.id === selectedLogId) ?? pagedLogs[0] ?? null;
 
   const summaryStats = [
     { label: 'Total Events', value: String(logs.length), icon: 'ri-file-list-3-line', accent: 'bg-[#0D1F4A]' },
@@ -178,6 +181,7 @@ export default function AuditLogsPage() {
               Loading audit logs...
             </div>
           ) : error ? (
+
             <div className="px-5 py-16 text-center">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 bg-red-50 text-red-500">
                 <i className="ri-error-warning-line text-xl" />
@@ -185,14 +189,16 @@ export default function AuditLogsPage() {
               <p className="text-sm font-semibold text-slate-700 mb-1">Unable to load audit logs</p>
               <p className="text-xs text-slate-400">{error}</p>
             </div>
-          ) : filteredLogs.length === 0 ? (
-            <div className="px-5 py-16 text-center text-sm text-slate-400">
-              <i className="ri-inbox-archive-line text-3xl block mb-2 text-slate-200" />
-              No audit logs matched the current filters.
-            </div>
           ) : (
-            <div className="divide-y divide-slate-100 max-h-[760px] overflow-y-auto">
-              {filteredLogs.map((log) => {
+            <>
+            <div className="divide-y divide-slate-100">
+              {pagedLogs.length === 0 ? (
+                <div className="px-5 py-16 text-center text-sm text-slate-400">
+                  <i className="ri-inbox-archive-line text-3xl block mb-2 text-slate-200" />
+                  No audit logs matched the current filters.
+                </div>
+              ) : null}
+              {pagedLogs.map((log) => {
                 const active = selectedLog?.id === log.id;
 
                 return (
@@ -226,6 +232,8 @@ export default function AuditLogsPage() {
                 );
               })}
             </div>
+            <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
+            </>
           )}
         </div>
 

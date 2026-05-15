@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { repairStats } from '@/mocks/repairs';
 import { useRepairs } from '@/hooks/useRepairs';
 import RepairDetail from './components/RepairDetail';
 import AddRepairModal from './components/AddRepairModal';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 
 const statusConfig: Record<string, { label: string; color: string; dot: string; step: number }> = {
   received:     { label: 'Received',     color: 'bg-slate-100 text-slate-600',    dot: 'bg-slate-400', step: 1 },
@@ -20,12 +21,24 @@ export default function RepairsPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
+  const active    = repairs.filter(r => r.status !== 'completed' && r.status !== 'cancelled');
+  const ready     = repairs.filter(r => r.status === 'ready');
+  const pending   = repairs.filter(r => r.status === 'diagnosed' || r.status === 'parts_pending');
+  const revenue   = repairs.filter(r => r.status === 'completed').reduce((s, r) => s + (parseFloat(r.cost.replace(/[^0-9.]/g, '')) || 0), 0);
+  const repairStats = [
+    { label: 'Active Repairs',    value: active.length,     icon: 'ri-tools-line',         accent: 'bg-violet-500' },
+    { label: 'Ready for Pickup',  value: ready.length,      icon: 'ri-checkbox-circle-line',accent: 'bg-emerald-500' },
+    { label: 'Pending Approval',  value: pending.length,    icon: 'ri-time-line',           accent: 'bg-amber-500' },
+    { label: 'Total Repair Revenue', value: `GHS ${Math.round(revenue).toLocaleString()}`, icon: 'ri-money-dollar-circle-line', accent: 'bg-blue-500' },
+  ];
+
   const q = search.trim().toLowerCase();
   const filtered = repairs.filter((r) => {
     const matchStatus = filter === 'all' || r.status === filter;
     const matchSearch = !q || r.device.toLowerCase().includes(q) || r.customer.toLowerCase().includes(q) || r.id.toLowerCase().includes(q) || r.issue.toLowerCase().includes(q);
     return matchStatus && matchSearch;
   });
+  const { paginated, page, setPage, totalPages, total, from, to } = usePagination(filtered, 12, `${search}|${filter}`);
   const repair = selected ? repairs.find((r) => r.id === selected) : null;
 
   return (
@@ -39,7 +52,6 @@ export default function RepairsPage() {
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{s.label}</p>
                 <p className="text-2xl font-bold text-slate-800 mt-1">{s.value}</p>
-                <p className="text-xs text-emerald-600 font-medium mt-1">{s.change}</p>
               </div>
               <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
                 <i className={`${s.icon} text-lg`} />
@@ -94,7 +106,7 @@ export default function RepairsPage() {
             <p className="text-sm text-slate-400">No repairs yet. Create your first repair job.</p>
           </div>
         )}
-        {filtered.map((r) => {
+        {paginated.map((r) => {
           const st = statusConfig[r.status];
           return (
             <div
@@ -138,6 +150,8 @@ export default function RepairsPage() {
           );
         })}
       </div>
+
+      <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
 
       {repair && (
         <RepairDetail

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { customerStats } from '@/mocks/customers';
 import { useCustomers } from '@/hooks/useCustomers';
 import CustomerDetail from './components/CustomerDetail';
 import AddCustomerModal from './components/AddCustomerModal';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 
 const segmentConfig: Record<string, { label: string; color: string }> = {
   VIP: { label: 'VIP', color: 'bg-amber-100 text-amber-700' },
@@ -19,26 +20,35 @@ export default function CustomersPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
+  const parseLtv = (s: string) => parseFloat(s.replace(/[^0-9.]/g, '')) || 0;
+  const avgLtv = customers.length ? customers.reduce((sum, c) => sum + parseLtv(c.ltv), 0) / customers.length : 0;
+  const stats = [
+    { label: 'Total Customers', value: customers.length, icon: 'ri-group-line', accent: 'bg-blue-500' },
+    { label: 'VIP',             value: customers.filter(c => c.segment === 'VIP').length, icon: 'ri-vip-crown-line', accent: 'bg-amber-500' },
+    { label: 'At-Risk',         value: customers.filter(c => c.segment === 'At-Risk').length, icon: 'ri-alarm-warning-line', accent: 'bg-red-500' },
+    { label: 'Avg. LTV',        value: `GHS ${Math.round(avgLtv).toLocaleString()}`, icon: 'ri-line-chart-line', accent: 'bg-emerald-500' },
+  ];
+
   const q = search.trim().toLowerCase();
   const filtered = customers.filter((c) => {
     const matchSegment = filter === 'all' || c.segment === filter;
     const matchSearch = !q || c.name.toLowerCase().includes(q) || c.phone.includes(q);
     return matchSegment && matchSearch;
   });
+  const { paginated, page, setPage, totalPages, total, from, to } = usePagination(filtered, 12, `${search}|${filter}`);
   const customer = selected ? customers.find((c) => c.id === selected) : null;
 
   return (
     <AdminLayout title="Customers" subtitle="Profiles, segments, and lifetime value">
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        {customerStats.map((s) => (
+        {stats.map((s) => (
           <div key={s.label} className="bg-white rounded-2xl p-5 border border-slate-100 relative overflow-hidden">
             <div className={`absolute left-0 top-0 bottom-0 w-1 ${s.accent} rounded-l-2xl`} />
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">{s.label}</p>
                 <p className="text-2xl font-bold text-slate-800 mt-1">{s.value}</p>
-                <p className="text-xs text-emerald-600 font-medium mt-1">{s.change}</p>
               </div>
               <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400">
                 <i className={`${s.icon} text-lg`} />
@@ -93,7 +103,7 @@ export default function CustomersPage() {
             <p className="text-sm text-slate-400">No customers yet. They'll appear here after first purchases.</p>
           </div>
         )}
-        {filtered.map((c) => {
+        {paginated.map((c) => {
           const seg = segmentConfig[c.segment];
           return (
             <div
@@ -130,6 +140,7 @@ export default function CustomersPage() {
         })}
       </div>
 
+      <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
       {customer && <CustomerDetail customer={customer} onClose={() => setSelected(null)} />}
       {showAdd && <AddCustomerModal onSave={add} onClose={() => setShowAdd(false)} />}
     </AdminLayout>

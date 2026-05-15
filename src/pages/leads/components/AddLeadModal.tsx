@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Lead, LeadStatus, LeadSource } from '@/types/lead';
+import CustomerPicker from '@/components/shared/CustomerPicker';
 
 interface Props {
   defaultStatus?: LeadStatus;
@@ -43,23 +44,22 @@ export default function AddLeadModal({ defaultStatus = 'warm', onSave, onClose }
           </button>
         </div>
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          <CustomerPicker
+            value={form.name}
+            phone={form.phone}
+            onChange={(name, phone) => setForm(p => ({ ...p, name, phone }))}
+            required
+            label="Customer *"
+            placeholder="Search existing or type new name…"
+          />
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Name *</label>
-              <input required value={form.name} onChange={e => set('name', e.target.value)}
-                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
-                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
-                placeholder="Full name" />
-            </div>
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Phone *</label>
               <input required value={form.phone} onChange={e => set('phone', e.target.value)}
                 className="w-full text-sm rounded-xl px-3 py-2 outline-none"
                 style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
-                placeholder="+233 24 ..." />
+                placeholder="+233 24 …" />
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Source</label>
               <select value={form.source} onChange={e => set('source', e.target.value as LeadSource)}
@@ -68,6 +68,8 @@ export default function AddLeadModal({ defaultStatus = 'warm', onSave, onClose }
                 {sources.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Temperature</label>
               <select value={form.status} onChange={e => set('status', e.target.value as LeadStatus)}
@@ -75,6 +77,13 @@ export default function AddLeadModal({ defaultStatus = 'warm', onSave, onClose }
                 style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}>
                 {statuses.map(s => <option key={s} value={s} className="capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
               </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Assigned To</label>
+              <input value={form.assigned} onChange={e => set('assigned', e.target.value)}
+                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
+                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
+                placeholder="Kofi M." />
             </div>
           </div>
           <div>
@@ -84,21 +93,12 @@ export default function AddLeadModal({ defaultStatus = 'warm', onSave, onClose }
               style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
               placeholder="e.g. iPhone 15 Pro Max" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Budget</label>
-              <input value={form.budget} onChange={e => set('budget', e.target.value)}
-                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
-                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
-                placeholder="GHS 8,000–9,000" />
-            </div>
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Assigned To</label>
-              <input value={form.assigned} onChange={e => set('assigned', e.target.value)}
-                className="w-full text-sm rounded-xl px-3 py-2 outline-none"
-                style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
-                placeholder="Kofi M." />
-            </div>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Budget</label>
+            <input value={form.budget} onChange={e => set('budget', e.target.value)}
+              className="w-full text-sm rounded-xl px-3 py-2 outline-none"
+              style={{ border: '1px solid rgba(7,16,31,0.12)', background: 'rgba(7,16,31,0.02)', color: '#07101F' }}
+              placeholder="GHS 8,000–9,000" />
           </div>
           <div>
             <label className="text-[10px] font-bold uppercase tracking-wider mb-1 block" style={{ color: 'rgba(7,16,31,0.4)' }}>Notes</label>

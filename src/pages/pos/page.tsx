@@ -5,7 +5,7 @@ import {
   type PosProduct, type PosCustomer,
 } from '@/mocks/pos';
 import {
-  productMetrics, getTodaySummary, customerIntelligence,
+  productMetrics, customerIntelligence,
   detectAnomalies, type AnomalyAlert,
 } from '@/mocks/posIntelligence';
 import { recordSaleTransaction } from '@/hooks/useLearnedPatterns';
@@ -17,6 +17,7 @@ import type { Customer } from '@/types/customer';
 import AiReceiptModal from './components/AiReceiptModal';
 import IntelligencePanel from './components/IntelligencePanel';
 import AiChat from './components/AiChat';
+import AddCustomerModal from '@/pages/customers/components/AddCustomerModal';
 
 export interface CartItem {
   product: PosProduct;
@@ -87,7 +88,7 @@ const categoryToType: Record<string, PosProduct['type']> = {
 function mapToPosProduct(p: InventoryProduct): PosProduct {
   const price = parseFloat(p.price.replace(/[^0-9.]/g, '')) || 0;
   return {
-    id: p.id, name: p.name, price, cost: 0, stock: p.stock,
+    id: p.id, name: p.name, price, cost: p.costPrice ?? 0, stock: p.stock,
     category: p.category, type: categoryToType[p.category] ?? 'accessory',
     brand: p.name.split(' ')[0], imei: !!p.imei,
   };
@@ -152,6 +153,7 @@ export default function POSPage() {
   const [upsells, setUpsells] = useState<PosProduct[]>([]);
   const [anomalies, setAnomalies] = useState<AnomalyAlert[]>([]);
 
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [completedSale, setCompletedSale] = useState<{
     cart: CartItem[]; customer: PosCustomer | null; total: number;
@@ -160,15 +162,40 @@ export default function POSPage() {
 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { products: inventoryProducts, adjustStock } = useInventory();
-  const { customers: allCustomers } = useCustomers();
+  const { customers: allCustomers, add: addCustomer } = useCustomers();
   const { sales, add: saveSale } = useSales();
-  const summary = getTodaySummary();
   const { user } = useAuth();
 
   const posProductsList = inventoryProducts.map(mapToPosProduct);
   const posCustomersList = allCustomers.map(mapToPosCustomer);
   const today = new Date().toLocaleDateString('en-GH', { month: 'short', day: 'numeric', year: 'numeric' });
-  const todaySales = sales.filter(s => s.date === today);
+  const todaySales = sales.filter(s => s.date === today && s.status !== 'cancelled' && s.status !== 'refunded');
+
+  const parseGHS = (t: string) => parseFloat(t.replace(/[^0-9.]/g, '')) || 0;
+
+  function estimateCogs(itemsStr: string): number {
+    return itemsStr.split(',').reduce((sum, part) => {
+      const m = part.trim().match(/^(\d+)x\s+(.+)$/);
+      if (!m) return sum;
+      const qty = parseInt(m[1]);
+      const name = m[2].trim().toLowerCase();
+      const product = posProductsList.find(p => p.name.toLowerCase() === name);
+      return sum + (product ? product.cost * qty : 0);
+    }, 0);
+  }
+
+  const todayRevenue = todaySales.reduce((s, x) => s + parseGHS(x.total), 0);
+  const todayCogs    = todaySales.reduce((s, x) => s + (x.cogs ?? estimateCogs(x.items)), 0);
+  const todayProfit  = todayRevenue - todayCogs;
+  const todayAvgOrder = todaySales.length > 0 ? todayRevenue / todaySales.length : 0;
+
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = yesterdayDate.toLocaleDateString('en-GH', { month: 'short', day: 'numeric', year: 'numeric' });
+  const yesterdayRevenue = sales
+    .filter(s => s.date === yesterday && s.status !== 'cancelled' && s.status !== 'refunded')
+    .reduce((s, x) => s + parseGHS(x.total), 0);
+  const growthPct = yesterdayRevenue > 0 ? Math.round(((todayRevenue - yesterdayRevenue) / yesterdayRevenue) * 100) : 0;
 
   // ── Filtered products ────────────────────────────────────────────────────────
 
@@ -271,23 +298,30 @@ export default function POSPage() {
     setShowTradeIn(false);
   }
 
+  const hasCustomer = !!(customer || customerQuery.trim());
+
   function completeSale() {
-    if (cart.length === 0) return;
+    if (cart.length === 0 || !hasCustomer) return;
     const methodLabel = paymentMethod === 'momo' ? `MoMo (${momoNumber || '—'})` : paymentMethod === 'split' ? `Split (Cash: ${formatGHS(Number(splitCash))})` : paymentMethod === 'cash' ? 'Cash' : 'Card';
-    setCompletedSale({ cart, customer, total: totalWithPlan, tradeIn, method: methodLabel, plan: plan.label });
+    const saleCustomer: typeof customer = customer ?? (customerQuery.trim()
+      ? { id: '', name: customerQuery.trim(), phone: '', email: '', loyaltyPoints: 0, totalSpent: 0, purchaseCount: 0, lastPurchase: '', openRepairs: 0, tags: [] }
+      : null);
+    setCompletedSale({ cart, customer: saleCustomer, total: totalWithPlan, tradeIn, method: methodLabel, plan: plan.label });
     setShowReceipt(true);
 
     const payMethod = paymentMethod === 'momo' ? 'MoMo' : paymentMethod === 'card' ? 'Card' : 'Cash';
 
-    // Save to sales table
+    const saleCogs = cart.reduce((sum, i) => sum + i.product.cost * i.qty * (1 - i.discount / 100), 0);
+
     void saveSale({
-      customer: customer?.name ?? 'Walk-in',
+      customer: saleCustomer?.name ?? 'Walk-in',
       items: cart.map(i => `${i.qty}x ${i.product.name}`).join(', '),
       total: `GHS ${Math.round(totalWithPlan).toLocaleString()}`,
       method: payMethod,
       status: 'completed',
       date: today,
       delivery: 'Pickup',
+      cogs: saleCogs > 0 ? Math.round(saleCogs) : undefined,
     });
 
     // Deduct inventory stock
@@ -309,9 +343,9 @@ export default function POSPage() {
         discountPct: item.discount,
       })),
       paymentMethod: methodLabel,
-      customerId: customer?.id ?? null,
-      customerName: customer?.name ?? null,
-      customerPhone: customer?.phone ?? null,
+      customerId: saleCustomer?.id || null,
+      customerName: saleCustomer?.name ?? null,
+      customerPhone: saleCustomer?.phone || null,
       cashierId: user?.id,
     });
   }
@@ -336,9 +370,9 @@ export default function POSPage() {
       {/* ── Top stats bar ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {[
-          { label: "Today's Revenue", value: formatGHSShort(summary.revenue), sub: `${summary.growthPct >= 0 ? '+' : ''}${summary.growthPct}% vs yesterday`, icon: 'ri-money-dollar-circle-line', color: '#0D1F4A', positive: summary.growthPct >= 0 },
-          { label: 'Transactions', value: String(summary.transactions), sub: `${formatGHSShort(summary.avgOrder)} avg order`, icon: 'ri-receipt-line', color: '#10b981', positive: true },
-          { label: "Today's Profit", value: formatGHSShort(summary.profit), sub: `${Math.round((summary.profit / Math.max(summary.revenue, 1)) * 100)}% margin`, icon: 'ri-line-chart-line', color: '#f59e0b', positive: true },
+          { label: "Today's Revenue", value: formatGHSShort(todayRevenue), sub: `${growthPct >= 0 ? '+' : ''}${growthPct}% vs yesterday`, icon: 'ri-money-dollar-circle-line', color: '#0D1F4A', positive: growthPct >= 0 },
+          { label: 'Transactions', value: String(todaySales.length), sub: `${formatGHSShort(todayAvgOrder)} avg order`, icon: 'ri-receipt-line', color: '#10b981', positive: true },
+          { label: "Today's Profit", value: formatGHSShort(todayProfit), sub: `${Math.round((todayProfit / Math.max(todayRevenue, 1)) * 100)}% margin`, icon: 'ri-line-chart-line', color: '#f59e0b', positive: todayProfit >= 0 },
           { label: 'Reorder Alerts', value: String(productMetrics.filter(m => m.reorderAlert).length), sub: 'items need restocking', icon: 'ri-alarm-warning-line', color: productMetrics.some(m => m.reorderAlert) ? '#ef4444' : '#10b981', positive: !productMetrics.some(m => m.reorderAlert) },
         ].map(stat => (
           <div key={stat.label} className="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-3">
@@ -563,14 +597,25 @@ export default function POSPage() {
                 </div>
               ) : (
                 <div className="relative">
-                  <i className="ri-user-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
-                  <input
-                    value={customerQuery}
-                    onChange={e => setCustomerQuery(e.target.value)}
-                    placeholder="Search by name or phone…"
-                    className="w-full bg-slate-50 rounded-xl pl-9 pr-3 py-2 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#0D1F4A]/30"
-                  />
-                  {customerSuggestions.length > 0 && (
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <i className="ri-user-search-line absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+                      <input
+                        value={customerQuery}
+                        onChange={e => setCustomerQuery(e.target.value)}
+                        placeholder="Search by name or phone…"
+                        className="w-full bg-slate-50 rounded-xl pl-9 pr-3 py-2 text-sm placeholder-slate-400 outline-none focus:ring-2 focus:ring-[#0D1F4A]/30"
+                      />
+                    </div>
+                    <button
+                      onClick={() => setShowAddCustomer(true)}
+                      className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-xl bg-[#0D1F4A] text-white cursor-pointer hover:opacity-90"
+                      title="Add new customer"
+                    >
+                      <i className="ri-user-add-line text-sm" />
+                    </button>
+                  </div>
+                  {(customerSuggestions.length > 0 || customerQuery.trim().length > 1) && (
                     <div className="absolute z-10 top-full left-0 right-0 mt-1 bg-white rounded-xl border border-slate-200 shadow-lg overflow-hidden">
                       {customerSuggestions.map(c => (
                         <button key={c.id} onClick={() => { setCustomer(c); setCustomerQuery(''); setCustomerSuggestions([]); }} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-slate-50 cursor-pointer text-left">
@@ -581,6 +626,21 @@ export default function POSPage() {
                           </div>
                         </button>
                       ))}
+                      {customerSuggestions.length === 0 && customerQuery.trim().length > 1 && (
+                        <div className="px-3 py-2 text-[11px] text-slate-400">No match found</div>
+                      )}
+                      <button
+                        onClick={() => { setCustomerSuggestions([]); setShowAddCustomer(true); }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 border-t border-slate-100 hover:bg-slate-50 cursor-pointer text-left"
+                      >
+                        <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                          <i className="ri-user-add-line text-emerald-600 text-xs" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-emerald-700">Add new customer</p>
+                          {customerQuery.trim() && <p className="text-[10px] text-slate-400">"{customerQuery.trim()}"</p>}
+                        </div>
+                      </button>
                     </div>
                   )}
                 </div>
@@ -765,11 +825,17 @@ export default function POSPage() {
             )}
 
             {/* Complete sale */}
+            {cart.length > 0 && !hasCustomer && (
+              <p className="text-[11px] text-center text-amber-600 font-medium bg-amber-50 rounded-xl py-2 px-3">
+                <i className="ri-user-line mr-1" />
+                Add a customer name before completing the sale
+              </p>
+            )}
             <button
               onClick={completeSale}
-              disabled={cart.length === 0}
+              disabled={cart.length === 0 || !hasCustomer}
               className="w-full py-4 rounded-2xl text-white font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition-all hover:opacity-90 flex items-center justify-center gap-2"
-              style={{ background: cart.length === 0 ? '#94a3b8' : 'linear-gradient(135deg, #0D1F4A 0%, #1a53a8 100%)' }}
+              style={{ background: cart.length === 0 || !hasCustomer ? '#94a3b8' : 'linear-gradient(135deg, #0D1F4A 0%, #1a53a8 100%)' }}
             >
               <i className="ri-checkbox-circle-line text-lg" />
               Complete Sale · {formatGHS(totalWithPlan)}
@@ -788,6 +854,18 @@ export default function POSPage() {
           paymentMethod={completedSale.method}
           plan={completedSale.plan}
           onNewSale={newSale}
+        />
+      )}
+
+      {showAddCustomer && (
+        <AddCustomerModal
+          onClose={() => setShowAddCustomer(false)}
+          onSave={async (c) => {
+            const created = await addCustomer(c);
+            setCustomer(mapToPosCustomer(created));
+            setCustomerQuery('');
+            setShowAddCustomer(false);
+          }}
         />
       )}
 

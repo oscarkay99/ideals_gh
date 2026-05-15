@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { usePagination } from '@/hooks/usePagination';
+import Pagination from '@/components/shared/Pagination';
 import AdminLayout from '@/components/feature/AdminLayout';
 import { teamMembers, teamStats } from '@/mocks/team';
 import Leaderboard from './components/Leaderboard';
@@ -7,6 +9,7 @@ import MemberModal from './components/MemberModal';
 export default function TeamPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const member = selected ? teamMembers.find((m) => m.id === selected) : null;
+  const { paginated, page, setPage, totalPages, total, from, to } = usePagination(teamMembers, 9);
 
   return (
     <AdminLayout title="Team" subtitle="Performance, leaderboard, and coaching">
@@ -33,7 +36,7 @@ export default function TeamPage() {
 
       {/* All Team Members */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {teamMembers.map((m) => (
+        {paginated.map((m) => (
           <div
             key={m.id}
             onClick={() => setSelected(m.id)}
@@ -79,6 +82,7 @@ export default function TeamPage() {
         ))}
       </div>
 
+      <Pagination page={page} totalPages={totalPages} total={total} from={from} to={to} onPageChange={setPage} />
       {member && <MemberModal member={member} onClose={() => setSelected(null)} />}
     </AdminLayout>
   );

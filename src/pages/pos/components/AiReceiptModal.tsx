@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import type { CartItem, TradeIn } from '../page';
 import type { PosCustomer } from '@/mocks/pos';
+import idealsLogo from '@/assets/ideals-tech-hub-logo.png';
 
 interface Props {
   cart: CartItem[];
@@ -43,6 +44,46 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
   const warrantyItems = cart.filter(i => warrantyMonths(i.product.type) >= 6);
   const subtotal = cart.reduce((sum, item) => sum + (item.product.price * item.qty * (1 - item.discount / 100)), 0);
 
+  function buildReceiptText() {
+    const lines: string[] = [
+      `*iDeals Tech Hub — ${isPaid ? 'Receipt' : 'Invoice'} #${txn}*`,
+      '',
+      `Customer: ${customer?.name ?? 'Walk-in Customer'}`,
+      `Date: ${dateStr} · ${timeStr}`,
+      `Payment: ${paymentMethod}`,
+      '',
+      '*Items:*',
+      ...cart.map(item => {
+        const line = item.product.price * item.qty * (1 - item.discount / 100);
+        return `• ${item.product.name} (×${item.qty}) — ${formatGHS(line)}${item.discount > 0 ? ` [${item.discount}% off]` : ''}`;
+      }),
+      '',
+      `*Total: ${formatGHS(total)}*`,
+      '',
+      'Returns accepted within 7 days with this receipt.',
+      'Thank you for shopping with us!',
+      'ideals@idealsgh.com · idealsgh.com',
+    ];
+    return lines.join('\n');
+  }
+
+  function handleSendWhatsApp() {
+    const raw = customer?.phone ?? '';
+    const digits = raw.replace(/\D/g, '');
+    const phone = digits.startsWith('0') ? `233${digits.slice(1)}` : digits;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(buildReceiptText())}`;
+    window.open(url, '_blank');
+  }
+
+  function handleSendEmail() {
+    const email = customer?.email ?? '';
+    const subject = encodeURIComponent(`Your Receipt from iDeals Tech Hub — #${txn}`);
+    const body = encodeURIComponent(
+      buildReceiptText().replace(/\*/g, ''),
+    );
+    window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+  }
+
   function handlePrint() {
     const content = receiptRef.current;
     if (!content) return;
@@ -54,8 +95,11 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1e1e1e; background:#fff; padding:32px; max-width:740px; margin:0 auto; }
         .rcp-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
-        .rcp-company-name { font-size:15px; font-weight:700; color:#002d55; margin-bottom:4px; }
+        .rcp-logo { height:48px; width:auto; display:block; margin-bottom:4px; }
         .rcp-company-address { font-size:11px; color:#5f7184; line-height:1.6; }
+        .rcp-watermark { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:0; }
+        .rcp-watermark img { width:320px; opacity:0.04; filter:grayscale(100%); }
+        .rcp-content { position:relative; z-index:1; }
         .rcp-title-block { text-align:right; }
         .rcp-paid-stamp { display:inline-block; border:3px solid #16a34a; color:#16a34a; font-size:13px; font-weight:800; padding:4px 12px; border-radius:4px; transform:rotate(-8deg); margin-bottom:8px; letter-spacing:.08em; }
         .rcp-title { font-size:26px; font-weight:800; color:#1e1e1e; }
@@ -126,12 +170,20 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
 
           {/* Receipt preview */}
           <div className="p-6 bg-[#f0f4f8] max-h-[calc(92vh-81px)] overflow-y-auto">
-            <div ref={receiptRef} className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm">
+            <div ref={receiptRef} className="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm relative overflow-hidden">
 
-              {/* Top: company info + title block */}
+              {/* Watermark */}
+              <div className="pointer-events-none select-none absolute inset-0 flex items-center justify-center" style={{ zIndex: 0 }}>
+                <img src={idealsLogo} alt="" className="w-[340px] opacity-[0.04]" style={{ filter: 'grayscale(100%)' }} />
+              </div>
+
+              {/* All receipt content sits above the watermark */}
+              <div style={{ position: 'relative', zIndex: 1 }}>
+
+              {/* Top: company logo + title block */}
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-5">
                 <div>
-                  <p className="text-[15px] font-bold mb-1" style={{ color: '#002d55' }}>iDeals Tech Hub</p>
+                  <img src={idealsLogo} alt="iDeals Tech Hub" className="h-12 w-auto mb-1" />
                   <p className="text-[11px] leading-relaxed" style={{ color: '#5f7184' }}>
                     Accra, Ghana<br />
                     ideals@idealsgh.com · idealsgh.com
@@ -154,9 +206,23 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
               <div className="flex flex-col sm:flex-row sm:justify-between gap-6 mb-6">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: '#5f7184' }}>Bill To</p>
-                  <p className="text-[14px] font-bold text-slate-900">{customer?.name || 'Walk-in Customer'}</p>
-                  {customer?.phone && <p className="text-[12px] mt-1" style={{ color: '#5f7184' }}>{customer.phone}</p>}
-                  {customer?.email && <p className="text-[12px]" style={{ color: '#5f7184' }}>{customer.email}</p>}
+                  {customer ? (
+                    <>
+                      <p className="text-[14px] font-bold text-slate-900">{customer.name}</p>
+                      {customer.phone && <p className="text-[12px] mt-1" style={{ color: '#5f7184' }}>{customer.phone}</p>}
+                      {customer.email && <p className="text-[12px]" style={{ color: '#5f7184' }}>{customer.email}</p>}
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center">
+                        <i className="ri-user-line text-slate-400 text-sm" />
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-semibold text-slate-500">Walk-in Customer</p>
+                        <p className="text-[10px] text-slate-400">No account attached</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="border border-slate-200 rounded-lg overflow-hidden min-w-[260px]">
                   {[
@@ -271,6 +337,8 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
                 <p className="text-[11px]" style={{ color: '#5f7184' }}>Thank you for shopping at iDeals Tech Hub</p>
                 <p className="text-[11px] mt-0.5" style={{ color: '#5f7184' }}>ideals@idealsgh.com · idealsgh.com</p>
               </div>
+
+              </div>{/* end z-index wrapper */}
             </div>
           </div>
 
@@ -300,6 +368,46 @@ export default function AiReceiptModal({ cart, customer, total, tradeIn, payment
                   style={{ background: 'linear-gradient(135deg, #002d55 0%, #1552A8 100%)' }}
                 >
                   <i className="ri-add-line" />New Sale
+                </button>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-100 overflow-hidden">
+              <div className="px-4 py-3 border-b border-slate-100 text-xs font-bold uppercase tracking-wider text-slate-500">Send Receipt</div>
+              <div className="p-4 space-y-2">
+                {!customer && (
+                  <p className="text-[11px] text-slate-400 mb-2 flex items-center gap-1.5">
+                    <i className="ri-information-line" />
+                    Attach a customer to enable delivery
+                  </p>
+                )}
+                <button
+                  onClick={handleSendWhatsApp}
+                  disabled={!customer?.phone}
+                  className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  style={{
+                    background: customer?.phone ? '#25D366' : 'rgba(7,16,31,0.06)',
+                    color: customer?.phone ? 'white' : 'rgba(7,16,31,0.3)',
+                    cursor: customer?.phone ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  <i className="ri-whatsapp-line" />
+                  Send via WhatsApp
+                  {customer?.phone && <span className="text-[11px] opacity-80">· {customer.phone}</span>}
+                </button>
+                <button
+                  onClick={handleSendEmail}
+                  disabled={!customer?.email}
+                  className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all"
+                  style={{
+                    background: customer?.email ? '#0D1F4A' : 'rgba(7,16,31,0.06)',
+                    color: customer?.email ? 'white' : 'rgba(7,16,31,0.3)',
+                    cursor: customer?.email ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  <i className="ri-mail-send-line" />
+                  Send via Email
+                  {customer?.email && <span className="text-[11px] opacity-80 truncate max-w-[120px]">· {customer.email}</span>}
                 </button>
               </div>
             </div>

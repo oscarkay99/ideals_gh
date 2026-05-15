@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { getSales, createSale } from '@/services/sales';
-import type { Sale } from '@/types/sale';
+import { getSales, createSale, updateSaleStatus } from '@/services/sales';
+import { useToast } from '@/contexts/ToastContext';
+import type { Sale, SaleStatus } from '@/types/sale';
 
 export function useSales() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToast();
 
   useEffect(() => {
     getSales()
@@ -25,5 +27,15 @@ export function useSales() {
     }
   };
 
-  return { sales, loading, add };
+  const voidSale = async (id: string, status: 'cancelled' | 'refunded') => {
+    setSales(prev => prev.map(s => s.id === id ? { ...s, status } : s));
+    try {
+      await updateSaleStatus(id, status);
+      showToast(`Sale ${status === 'cancelled' ? 'voided' : 'marked as refunded'}`);
+    } catch {
+      showToast('Could not sync status change', 'warning');
+    }
+  };
+
+  return { sales, loading, add, voidSale };
 }

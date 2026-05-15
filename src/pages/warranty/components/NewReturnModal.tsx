@@ -1,8 +1,18 @@
+import { useState } from 'react';
+import CustomerPicker from '@/components/shared/CustomerPicker';
+
 interface Props {
   onClose: () => void;
 }
 
 export default function NewReturnModal({ onClose }: Props) {
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [device, setDevice] = useState('');
+  const [imei, setImei] = useState('');
+  const [reason, setReason] = useState('');
+  const [resolution, setResolution] = useState('Exchange');
+
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white rounded-2xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
@@ -13,25 +23,51 @@ export default function NewReturnModal({ onClose }: Props) {
           </button>
         </div>
         <div className="space-y-4">
-          <div>
-            <label className="text-xs text-slate-500 mb-1 block">Customer Name</label>
-            <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="Customer name" />
-          </div>
+          <CustomerPicker
+            value={customerName}
+            phone={customerPhone}
+            onChange={(name, phone) => { setCustomerName(name); setCustomerPhone(phone); }}
+            label="Customer Name"
+            placeholder="Search existing or type new name…"
+            theme="light"
+          />
           <div>
             <label className="text-xs text-slate-500 mb-1 block">Device / Product</label>
-            <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="e.g. iPhone 15 Pro 256GB" />
+            <input
+              type="text"
+              value={device}
+              onChange={e => setDevice(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              placeholder="e.g. iPhone 15 Pro 256GB"
+            />
           </div>
           <div>
             <label className="text-xs text-slate-500 mb-1 block">IMEI / Serial Number</label>
-            <input type="text" className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200" placeholder="15-digit IMEI" />
+            <input
+              type="text"
+              value={imei}
+              onChange={e => setImei(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
+              placeholder="15-digit IMEI"
+            />
           </div>
           <div>
             <label className="text-xs text-slate-500 mb-1 block">Reason for Return</label>
-            <textarea className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 resize-none" rows={3} placeholder="Describe the issue..." />
+            <textarea
+              value={reason}
+              onChange={e => setReason(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200 resize-none"
+              rows={3}
+              placeholder="Describe the issue..."
+            />
           </div>
           <div>
             <label className="text-xs text-slate-500 mb-1 block">Resolution Type</label>
-            <select className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200">
+            <select
+              value={resolution}
+              onChange={e => setResolution(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl bg-slate-50 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-200"
+            >
               <option>Exchange</option>
               <option>Full Refund</option>
               <option>Partial Refund</option>

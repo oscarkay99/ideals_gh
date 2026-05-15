@@ -167,7 +167,7 @@ export async function runAuditedMutation<T>(
 ): Promise<T> {
   try {
     const result = await mutation();
-    await logAuditEvent({
+    void logAuditEvent({
       ...options,
       status: options.status ?? 'success',
       entityId: options.entityId ?? options.getEntityId?.(result),
@@ -179,7 +179,7 @@ export async function runAuditedMutation<T>(
     });
     return result;
   } catch (error) {
-    await logAuditEvent({
+    void logAuditEvent({
       ...options,
       status: 'failure',
       summary: options.summary ?? `Failed to ${options.action}`,
