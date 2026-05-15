@@ -226,25 +226,7 @@ export function useAuth() {
   }, [state.initializing]);
 
   const login = async (email: string, password: string): Promise<AuthResult> => {
-    // Always try mock users first so demo accounts work regardless of Supabase config
-    const mockFound = mockUsers.find((u) => u.email === email && u.password === password);
-    if (mockFound) {
-      const { password: _pw, ...authUser } = mockFound;
-      localStorage.setItem(MOCK_SESSION_KEY, '1');
-      writeStoredUser(authUser);
-      setAuthState({ user: authUser, initializing: false });
-      await logAuditEvent({
-        layer: 'auth',
-        action: 'login',
-        entityType: 'auth',
-        entityId: authUser.id,
-        status: 'info',
-        summary: `Mock login for ${authUser.email}`,
-        metadata: { authMode: 'mock' },
-      });
-      return { success: true };
-    }
-
+    // Try real Supabase auth first when configured — so all real accounts work
     if (isSupabaseConfigured) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
@@ -270,12 +252,23 @@ export function useAuth() {
       return { success: true };
     }
 
+    // Supabase not configured — fall back to mock users for local development
+    const mockFound = mockUsers.find((u) => u.email === email && u.password === password);
+    if (mockFound) {
+      const { password: _pw, ...authUser } = mockFound;
+      localStorage.setItem(MOCK_SESSION_KEY, '1');
+      writeStoredUser(authUser);
+      setAuthState({ user: authUser, initializing: false });
+      await logAuditEvent({
+        layer: 'auth', action: 'login', entityType: 'auth', entityId: authUser.id,
+        status: 'info', summary: `Mock login for ${authUser.email}`, metadata: { authMode: 'mock' },
+      });
+      return { success: true };
+    }
+
     await logAuditEvent({
-      layer: 'auth',
-      action: 'login',
-      entityType: 'auth',
-      status: 'failure',
-      summary: `Failed login attempt for ${email}`,
+      layer: 'auth', action: 'login', entityType: 'auth',
+      status: 'failure', summary: `Failed login attempt for ${email}`,
       metadata: { authMode: 'unconfigured', email },
     });
     return { success: false, error: 'Invalid email or password' };
