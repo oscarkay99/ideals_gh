@@ -1,36 +1,44 @@
 import { useEffect, useState, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '@/services/supabase';
 
-export function useSetting(key: string) {
-  const [value, setValue] = useState<string | null>(null);
+export function useMonthlyTarget() {
+  const [target, setTarget] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isSupabaseConfigured) { setLoading(false); return; }
-    supabase.from('settings').select('value').eq('key', key).maybeSingle()
-      .then(({ data }) => { setValue(data?.value ?? null); setLoading(false); });
 
-    const channel = supabase.channel(`settings:${key}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'settings', filter: `key=eq.${key}` },
+    supabase.from('settings').select('monthly_profit_target').eq('id', 'store').maybeSingle()
+      .then(({ data }) => {
+        setTarget(data?.monthly_profit_target ?? 0);
+        setLoading(false);
+      });
+
+    const channel = supabase.channel('settings:target')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'settings' },
         (payload) => {
-          const row = payload.new as { value?: string } | null;
-          setValue(row?.value ?? null);
+          const row = payload.new as { monthly_profit_target?: number };
+          if (row?.monthly_profit_target !== undefined) setTarget(row.monthly_profit_target);
         })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [key]);
+  }, []);
 
-  const save = useCallback(async (newValue: string): Promise<boolean> => {
+  const save = useCallback(async (value: number): Promise<boolean> => {
     if (!isSupabaseConfigured) return false;
-    const { error } = await supabase.from('settings').upsert(
-      { key, value: newValue, updated_at: new Date().toISOString() },
-      { onConflict: 'key' }
-    );
-    if (error) { console.error('settings save failed:', error.message); return false; }
-    setValue(newValue);
+    const { error } = await supabase.from('settings')
+      .update({ monthly_profit_target: value, updated_at: new Date().toISOString() })
+      .eq('id', 'store');
+    if (error) { console.error('target save failed:', error.message); return false; }
+    setTarget(value);
     return true;
-  }, [key]);
+  }, []);
 
-  return { value, loading, save };
+  return { target, loading, save };
+}
+
+// Keep generic useSetting for future use with the kv pattern
+export function useSetting(_key: string) {
+  return { value: null as string | null, loading: false, save: async (_v: string) => false };
 }

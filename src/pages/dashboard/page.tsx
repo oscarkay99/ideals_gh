@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { useSetting } from '@/hooks/useSettings';
+import { useMonthlyTarget } from '@/hooks/useSettings';
 import AdminLayout from '@/components/feature/AdminLayout';
 import StatCard from './components/StatCard';
 import RevenueChart from './components/RevenueChart';
@@ -94,13 +94,11 @@ export default function DashboardPage() {
   const [period, setPeriod] = useState<Period>('month');
   const [customStart, setCustomStart] = useState('');
   const [customEnd, setCustomEnd] = useState('');
-  const { value: targetValue, save: saveSetting } = useSetting('monthly_profit_target');
-  const [monthlyTarget, setMonthlyTarget] = useState(0);
+  const { target: monthlyTarget, save: saveTargetToDb, loading: targetLoading } = useMonthlyTarget();
+  const [localTarget, setLocalTarget] = useState(0);
   const [editingTarget, setEditingTarget] = useState(false);
 
-  useEffect(() => {
-    setMonthlyTarget(targetValue ? parseFloat(targetValue) : 0);
-  }, [targetValue]);
+  useEffect(() => { setLocalTarget(monthlyTarget); }, [monthlyTarget]);
 
   const dateSubtitle = useMemo(() =>
     new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(new Date()) + ' · Accra, Ghana'
@@ -172,9 +170,8 @@ export default function DashboardPage() {
   async function saveTarget(val: string) {
     const n = parseFloat(val.replace(/[^0-9.]/g, ''));
     if (!isNaN(n) && n > 0) {
-      const ok = await saveSetting(String(n));
-      if (ok) setMonthlyTarget(n);
-      else alert('Could not save target — please log out and back in, then try again.');
+      const ok = await saveTargetToDb(n);
+      if (!ok) alert('Could not save target — please log out and back in, then try again.');
     }
     setEditingTarget(false);
   }
@@ -193,7 +190,7 @@ export default function DashboardPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sales, expenses, products]);
 
-  const targetPct = monthlyTarget > 0 ? Math.min(Math.round((monthNetProfit / monthlyTarget) * 100), 100) : 0;
+  const targetPct = localTarget > 0 ? Math.min(Math.round((monthNetProfit / localTarget) * 100), 100) : 0;
 
   const stockAlerts  = products.filter(p => p.stock <= 2).length;
   const outOfStock   = products.filter(p => p.stock === 0).length;
@@ -230,7 +227,7 @@ export default function DashboardPage() {
                   autoFocus
                   type="number"
                   placeholder="e.g. 50000"
-                  defaultValue={monthlyTarget > 0 ? String(monthlyTarget) : ''}
+                  defaultValue={localTarget > 0 ? String(localTarget) : ''}
                   onBlur={e => saveTarget(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') saveTarget((e.target as HTMLInputElement).value); if (e.key === 'Escape') setEditingTarget(false); }}
                   className="w-28 bg-white/10 border border-white/20 rounded-lg px-2 py-1 text-white text-sm outline-none text-right"
@@ -239,9 +236,9 @@ export default function DashboardPage() {
             ) : (
               <>
                 <p className="text-white text-lg font-bold">
-                  {monthlyTarget > 0 ? fmt(monthlyTarget) : 'GHS —'}
+                  {localTarget > 0 ? fmt(localTarget) : 'GHS —'}
                 </p>
-                {monthlyTarget > 0 ? (
+                {localTarget > 0 ? (
                   <div className="mt-1.5">
                     <div className="flex items-center justify-end gap-1.5 mb-1">
                       <span className="text-[10px] text-white/40">{fmt(Math.max(monthNetProfit, 0))} net profit</span>
@@ -263,7 +260,7 @@ export default function DashboardPage() {
                     <span className="text-xs font-semibold group-hover:underline" style={{ color: '#F5A623' }}>Set target</span>
                   </button>
                 )}
-                {monthlyTarget > 0 && (
+                {localTarget > 0 && (
                   <button onClick={() => setEditingTarget(true)} className="mt-1 text-[10px] text-white/30 hover:text-white/60 cursor-pointer block ml-auto">
                     Edit target
                   </button>
