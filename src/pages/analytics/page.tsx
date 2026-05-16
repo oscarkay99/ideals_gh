@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { analyticsKPIs, monthlyData } from '@/mocks/analytics';
+import { monthlyData } from '@/mocks/analytics';
+import { useSales } from '@/hooks/useSales';
+import { useLeads } from '@/hooks/useLeads';
+import { useRepairs } from '@/hooks/useRepairs';
 import RevenueVsTarget from './components/RevenueVsTarget';
 import SalesFunnelChart from './components/SalesFunnelChart';
 import TopProductsTable from './components/TopProductsTable';
@@ -15,9 +18,30 @@ const tabs = [
   { id: 'operations', label: 'Operations', icon: 'ri-tools-line' },
 ];
 
+const parseGHS = (t: string) => parseFloat(t.replace(/[^0-9.]/g, '')) || 0;
+const fmtGHS = (n: number) => n >= 1000 ? `GHS ${(n / 1000).toFixed(1)}K` : `GHS ${Math.round(n)}`;
+
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [period, setPeriod] = useState('6M');
+  const { sales } = useSales();
+  const { leads } = useLeads();
+  const { repairs } = useRepairs();
+
+  const analyticsKPIs = useMemo(() => {
+    const completed = sales.filter(s => s.status === 'completed');
+    const totalRevenue = completed.reduce((sum, s) => sum + parseGHS(s.total), 0);
+    const totalOrders = completed.length;
+    const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+    const uniqueCustomers = new Set(completed.map(s => s.customer)).size;
+    const ltv = uniqueCustomers > 0 ? totalRevenue / uniqueCustomers : 0;
+    return [
+      { label: 'Total Revenue', value: fmtGHS(totalRevenue), change: `${totalOrders} sales`, trend: 'up', icon: 'ri-money-dollar-circle-line', accent: 'bg-emerald-500', sub: 'All-time completed' },
+      { label: 'Total Orders', value: `${totalOrders}`, change: `${leads.length} leads`, trend: 'up', icon: 'ri-shopping-bag-3-line', accent: 'bg-blue-500', sub: 'Completed sales' },
+      { label: 'Avg Order Value', value: fmtGHS(avgOrder), change: `${repairs.length} repairs`, trend: 'up', icon: 'ri-bar-chart-box-line', accent: 'bg-violet-500', sub: 'Per transaction' },
+      { label: 'Customer LTV', value: fmtGHS(ltv), change: `${uniqueCustomers} customers`, trend: 'up', icon: 'ri-user-heart-line', accent: 'bg-amber-500', sub: 'Avg lifetime value' },
+    ];
+  }, [sales, leads, repairs]);
 
   return (
     <AdminLayout title="Analytics" subtitle="Deep performance insights across your entire operation">

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import CustomerPicker from '@/components/shared/CustomerPicker';
+import type { WarrantyReturn } from '@/hooks/useWarranty';
 
 interface Props {
   onClose: () => void;
+  onSave: (r: Omit<WarrantyReturn, 'id'>) => void;
 }
 
-export default function NewReturnModal({ onClose }: Props) {
+export default function NewReturnModal({ onClose, onSave }: Props) {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [device, setDevice] = useState('');
@@ -74,7 +76,22 @@ export default function NewReturnModal({ onClose }: Props) {
               <option>Repair Under Warranty</option>
             </select>
           </div>
-          <button onClick={onClose} className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap" style={{ background: '#E05A2B' }}>
+          <button
+            onClick={() => {
+              if (!customerName || !device || !reason) return;
+              onSave({
+                customer: customerName,
+                product: `${device}${imei ? ` (${imei})` : ''}`,
+                issue: reason,
+                status: 'pending',
+                date: new Date().toLocaleDateString('en-GH', { month: 'short', day: 'numeric', year: 'numeric' }),
+                notes: resolution,
+              });
+              onClose();
+            }}
+            className="w-full py-3 rounded-xl text-sm font-semibold text-white cursor-pointer whitespace-nowrap"
+            style={{ background: '#E05A2B' }}
+          >
             Submit Return Request
           </button>
         </div>

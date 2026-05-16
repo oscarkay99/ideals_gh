@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CustomerPicker from '@/components/shared/CustomerPicker';
+import { useToast } from '@/contexts/ToastContext';
 
 interface Props {
   selectedModel: string;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function BookingModal({ selectedModel, tradeValue, onClose }: Props) {
+  const { showToast } = useToast();
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
   const [datetime, setDatetime] = useState('');
@@ -55,7 +57,17 @@ export default function BookingModal({ selectedModel, tradeValue, onClose }: Pro
         </div>
         <div className="flex gap-3 mt-5">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl border border-slate-200 text-sm text-slate-600 hover:bg-slate-50 cursor-pointer whitespace-nowrap">Cancel</button>
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold cursor-pointer whitespace-nowrap hover:opacity-90" style={{ background: '#0D1F4A' }}>Confirm Booking</button>
+          <button
+            onClick={() => {
+              if (!customerName) return;
+              showToast(`Trade-in appointment booked for ${customerName}`);
+              onClose();
+            }}
+            className="flex-1 py-2.5 rounded-xl text-white text-sm font-semibold cursor-pointer whitespace-nowrap hover:opacity-90"
+            style={{ background: '#0D1F4A' }}
+          >
+            Confirm Booking
+          </button>
         </div>
       </div>
     </div>

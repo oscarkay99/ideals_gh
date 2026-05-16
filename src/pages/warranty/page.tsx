@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { usePagination } from '@/hooks/usePagination';
 import Pagination from '@/components/shared/Pagination';
 import AdminLayout from '@/components/feature/AdminLayout';
-import { warranties, returns, warrantyStats } from '@/mocks/warranty';
+import { warranties, warrantyStats } from '@/mocks/warranty';
+import { useWarranty } from '@/hooks/useWarranty';
 import WarrantyDetail from './components/WarrantyDetail';
 import NewReturnModal from './components/NewReturnModal';
 
@@ -22,6 +23,7 @@ const returnStatusConfig: Record<string, { label: string; color: string; bg: str
 };
 
 export default function WarrantyPage() {
+  const { returns, loading: returnsLoading, addReturn, updateStatus, stats } = useWarranty();
   const [activeTab, setActiveTab] = useState('Warranties');
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -34,7 +36,7 @@ export default function WarrantyPage() {
     return matchSearch && matchStatus;
   });
   const { paginated: pagedWarranties, page: wPage, setPage: setWPage, totalPages: wTotalPages, total: wTotal, from: wFrom, to: wTo } = usePagination(filteredWarranties, 15, `${search}|${filterStatus}`);
-  const { paginated: pagedReturns, page: rPage, setPage: setRPage, totalPages: rTotalPages, total: rTotal, from: rFrom, to: rTo } = usePagination(returns, 15);
+  const { paginated: pagedReturns, page: rPage, setPage: setRPage, totalPages: rTotalPages, total: rTotal, from: rFrom, to: rTo } = usePagination(returns as never[], 15);
 
   const selected = warranties.find(w => w.id === selectedWarranty);
 
@@ -45,8 +47,8 @@ export default function WarrantyPage() {
         {[
           { label: 'Active Warranties', value: `${warrantyStats.totalActive}`, icon: 'ri-shield-check-line', color: '#25D366' },
           { label: 'Expiring Soon', value: `${warrantyStats.expiringSoon}`, icon: 'ri-alarm-warning-line', color: '#F5A623' },
-          { label: 'Pending Returns', value: `${warrantyStats.pendingReturns}`, icon: 'ri-arrow-go-back-line', color: '#E05A2B' },
-          { label: 'Refunds This Month', value: `GHS ${warrantyStats.refundValue.toLocaleString()}`, icon: 'ri-refund-2-line', color: '#0D1F4A' },
+          { label: 'Pending Returns', value: `${stats.pendingReturns}`, icon: 'ri-arrow-go-back-line', color: '#E05A2B' },
+          { label: 'Total Returns', value: `${stats.totalReturns}`, icon: 'ri-refund-2-line', color: '#0D1F4A' },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-2xl p-4 border border-slate-100">
             <div className="flex items-center gap-2 mb-2">
@@ -169,42 +171,52 @@ export default function WarrantyPage() {
       {/* Returns Tab */}
       {activeTab === 'Returns & Refunds' && (
         <div className="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-          <div className="divide-y divide-slate-100">
-            {pagedReturns.map(ret => {
-              const st = returnStatusConfig[ret.status];
-              return (
-                <div key={ret.id} className="p-4 flex items-start gap-4 hover:bg-slate-50/50 transition-colors">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: st.bg }}>
-                    <i className="ri-arrow-go-back-line text-sm" style={{ color: st.color }} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-sm font-semibold text-slate-800">{ret.id}</p>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold text-white" style={{ background: st.color }}>{st.label}</span>
+          {returnsLoading ? (
+            <div className="flex items-center justify-center py-16 text-slate-400 text-sm">
+              <i className="ri-loader-4-line animate-spin mr-2" />Loading returns…
+            </div>
+          ) : returns.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <i className="ri-arrow-go-back-line text-3xl text-slate-200 mb-3" />
+              <p className="text-sm font-semibold text-slate-500">No return requests yet</p>
+              <p className="text-xs text-slate-400 mt-1">Click "New Return Request" to log one</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {(pagedReturns as typeof returns).map(ret => {
+                const st = returnStatusConfig[ret.status] ?? returnStatusConfig.pending;
+                return (
+                  <div key={ret.id} className="p-4 flex items-start gap-4 hover:bg-slate-50/50 transition-colors">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: st.bg }}>
+                      <i className="ri-arrow-go-back-line text-sm" style={{ color: st.color }} />
                     </div>
-                    <p className="text-xs text-slate-700">{ret.customer} · {ret.device}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{ret.reason}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Requested: {ret.requestDate}</p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-xs font-semibold text-slate-700">{ret.resolution}</p>
-                    {ret.refundAmount > 0 && <p className="text-xs font-bold" style={{ color: '#E05A2B' }}>GHS {ret.refundAmount.toLocaleString()}</p>}
-                    {ret.status === 'pending' && (
-                      <div className="flex gap-1 mt-2">
-                        <button className="px-2 py-1 rounded-lg text-[10px] font-semibold text-white cursor-pointer" style={{ background: '#25D366' }}>Approve</button>
-                        <button className="px-2 py-1 rounded-lg text-[10px] font-semibold text-white cursor-pointer" style={{ background: '#E05A2B' }}>Reject</button>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className="text-sm font-semibold text-slate-800">{ret.id}</p>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold text-white" style={{ background: st.color }}>{st.label}</span>
                       </div>
-                    )}
+                      <p className="text-xs text-slate-700">{ret.customer} · {ret.product}</p>
+                      <p className="text-xs text-slate-500 mt-0.5">{ret.issue}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Requested: {ret.date} · Resolution: {ret.notes}</p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      {ret.status === 'pending' && (
+                        <div className="flex gap-1 mt-2">
+                          <button onClick={() => updateStatus(ret.id, 'approved')} className="px-2 py-1 rounded-lg text-[10px] font-semibold text-white cursor-pointer" style={{ background: '#25D366' }}>Approve</button>
+                          <button onClick={() => updateStatus(ret.id, 'rejected')} className="px-2 py-1 rounded-lg text-[10px] font-semibold text-white cursor-pointer" style={{ background: '#E05A2B' }}>Reject</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
           <Pagination page={rPage} totalPages={rTotalPages} total={rTotal} from={rFrom} to={rTo} onPageChange={setRPage} />
         </div>
       )}
 
-      {showNewReturn && <NewReturnModal onClose={() => setShowNewReturn(false)} />}
+      {showNewReturn && <NewReturnModal onClose={() => setShowNewReturn(false)} onSave={addReturn} />}
     </AdminLayout>
   );
 }
